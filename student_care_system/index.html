@@ -1,0 +1,2088 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบการคัดกรองและส่งเสริมพัฒนานักเรียน | โรงเรียนหรเทพฯ</title>
+    
+    <!-- Google Fonts: Noto Sans Thai & Prompt -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans Thai"', 'sans-serif'],
+                        heading: ['"Prompt"', 'sans-serif'],
+                        num: ['"Noto Sans Thai"', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .font-num { font-variant-numeric: tabular-nums; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans text-slate-800 bg-slate-100/70 antialiased selection:bg-blue-600 selection:text-white">
+
+    <!-- Top Navigation & RBAC Role Switcher -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 gap-4">
+                
+                <!-- School & System Title -->
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-700 to-indigo-800 text-white flex items-center justify-center font-bold text-xl shadow-md shadow-blue-700/20">
+                        <i class="ph-bold ph-shield-star"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="text-base sm:text-lg font-bold text-slate-900 font-heading leading-tight">
+                                ระบบดูแลช่วยเหลือนักเรียน (C.A.R.E.)
+                            </h1>
+                            <span class="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[11px] font-bold">
+                                MODULE 02 + 03
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500 hidden sm:block">
+                            การคัดกรอง &bull; การส่งเสริมและพัฒนานักเรียนทุกคน &bull; โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right Actions: Role Switcher & Profile -->
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl p-1.5 shadow-2xs">
+                        <span class="text-xs font-semibold text-slate-500 hidden md:inline-flex items-center gap-1 pl-1">
+                            <i class="ph-bold ph-user-switch text-blue-600"></i> สวมบทบาท:
+                        </span>
+                        <select id="roleSwitcherSelect" onchange="changeActiveRole(this.value)" class="text-xs font-bold bg-white text-slate-800 border border-slate-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-blue-500 cursor-pointer">
+                            <option value="ADVISOR_M1_1">ครูสมศรี มีสุข (ครูที่ปรึกษา ม.1/1)</option>
+                            <option value="ADVISOR_M2_1">ครูมานพ ขยันยิ่ง (ครูที่ปรึกษา ม.2/1)</option>
+                            <option value="COUNSELOR">ครูวิภา รักษ์เด็ก (ครูแนะแนว - ทั้งโรงเรียน)</option>
+                            <option value="EXECUTIVE">ดร.สมศักดิ์ รุ่งเรือง (ผู้อำนวยการ - ภาพรวม)</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center gap-2.5 border-l border-slate-200 pl-3">
+                        <img id="userAvatarImg" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=120&auto=format&fit=crop&q=80" alt="Avatar" class="w-9 h-9 rounded-xl object-cover border border-slate-200 shadow-xs">
+                        <div class="hidden lg:block text-left">
+                            <div class="text-xs font-bold text-slate-900" id="userNameLabel">ครูสมศรี มีสุข</div>
+                            <div class="text-[11px] text-blue-600 font-semibold" id="userRoleBadge">ครูที่ปรึกษา ม.1/1</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Primary Navigation Bar (Now with Module 03 Student Development Tab) -->
+            <nav class="flex items-center gap-1 overflow-x-auto border-t border-slate-100 py-2 no-scrollbar" role="tablist">
+                <button type="button" onclick="switchTab('dashboard')" id="navTabDashboard" class="nav-tab active px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-blue-600 text-white shadow-xs">
+                    <i class="ph-bold ph-chart-pie-slice"></i>
+                    <span>ภาพรวมการคัดกรอง (Screening)</span>
+                </button>
+                <button type="button" onclick="switchTab('development')" id="navTabDevelopment" class="nav-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 text-slate-600 hover:bg-slate-100">
+                    <i class="ph-bold ph-sparkle text-indigo-600"></i>
+                    <span>การส่งเสริมและพัฒนานักเรียน (Development)</span>
+                    <span class="px-1.5 py-0.5 rounded-full text-[11px] bg-indigo-100 text-indigo-800 font-bold font-num">ทุกคน</span>
+                </button>
+                <button type="button" onclick="switchTab('sessions')" id="navTabSessions" class="nav-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 text-slate-600 hover:bg-slate-100">
+                    <i class="ph-bold ph-calendar-check"></i>
+                    <span>รอบการคัดกรอง (Sessions)</span>
+                    <span id="badgeActiveSessions" class="px-1.5 py-0.5 rounded-full text-[11px] bg-slate-200 text-slate-700 font-num">3</span>
+                </button>
+                <button type="button" onclick="switchTab('actions')" id="navTabActions" class="nav-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 text-slate-600 hover:bg-slate-100">
+                    <i class="ph-bold ph-bell-ringing text-amber-500"></i>
+                    <span>ภารกิจต้องดำเนินการ (Action Required)</span>
+                    <span id="badgePendingActions" class="px-1.5 py-0.5 rounded-full text-[11px] bg-rose-100 text-rose-700 font-bold font-num">2</span>
+                </button>
+                <button type="button" onclick="switchTab('tools')" id="navTabTools" class="nav-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 text-slate-600 hover:bg-slate-100">
+                    <i class="ph-bold ph-toolbox"></i>
+                    <span>เครื่องมือคัดกรอง (Tools)</span>
+                </button>
+                <button type="button" onclick="openTestRunnerModal()" class="ml-auto px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 cursor-pointer shadow-2xs">
+                    <i class="ph-bold ph-play-circle text-emerald-600"></i>
+                    <span>รันชุดทดสอบ (14 Tests)</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+
+        <!-- ============================================================== -->
+        <!-- VIEW 1: SCREENING DASHBOARD (MODULE 02) -->
+        <!-- ============================================================== -->
+        <section id="viewDashboard" class="space-y-5">
+            <!-- Filter & Drill-down Toolbar -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center gap-2 text-xs font-semibold text-blue-600 mb-0.5">
+                        <i class="ph-bold ph-funnel"></i>
+                        <span>ขอบเขตข้อมูลการคัดกรอง (Multi-Level Drill-Down)</span>
+                    </div>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-900 font-heading">
+                        สรุปผลการคัดกรองและประเมินความเสี่ยงนักเรียน
+                    </h2>
+                </div>
+                
+                <div class="flex items-center gap-2.5 flex-wrap w-full md:w-auto">
+                    <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs">
+                        <span class="text-slate-500 font-medium">ระดับชั้น:</span>
+                        <select id="filterGradeSelect" onchange="onDashboardFilterChange()" class="bg-transparent font-bold text-slate-800 focus:outline-none cursor-pointer">
+                            <option value="ALL">ทุกระดับชั้น (ทั้งโรงเรียน)</option>
+                            <option value="ม.1">มัธยมศึกษาปีที่ 1</option>
+                            <option value="ม.2">มัธยมศึกษาปีที่ 2</option>
+                            <option value="ม.3">มัธยมศึกษาปีที่ 3</option>
+                            <option value="ม.4">มัธยมศึกษาปีที่ 4</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs">
+                        <span class="text-slate-500 font-medium">ห้องเรียน:</span>
+                        <select id="filterClassSelect" onchange="onDashboardFilterChange()" class="bg-transparent font-bold text-slate-800 focus:outline-none cursor-pointer">
+                            <option value="ALL">ทุกห้องเรียน</option>
+                            <option value="1/1">ห้อง 1/1</option>
+                            <option value="1/2">ห้อง 1/2</option>
+                            <option value="2/1">ห้อง 2/1</option>
+                            <option value="3/1">ห้อง 3/1</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs">
+                        <span class="text-slate-500 font-medium">รอบประเมิน:</span>
+                        <select id="filterSessionSelect" onchange="onDashboardFilterChange()" class="bg-transparent font-bold text-slate-800 focus:outline-none cursor-pointer">
+                            <option value="ALL">รอบล่าสุด (ปี 2567 เทอม 1)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6 Key Metrics Cards -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col justify-between">
+                    <div class="flex items-center justify-between text-slate-500 text-xs font-semibold mb-1">
+                        <span>จำนวนทั้งหมด</span>
+                        <i class="ph-bold ph-users text-slate-400 text-base"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl sm:text-3xl font-bold text-slate-900 font-num tracking-tight" id="kpiTotalStudents">0</div>
+                        <span class="text-[11px] text-slate-400 mt-0.5 block">ในขอบเขตที่เลือก</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl border border-emerald-200/80 shadow-xs flex flex-col justify-between bg-gradient-to-b from-white to-emerald-50/20">
+                    <div class="flex items-center justify-between text-emerald-700 text-xs font-bold mb-1">
+                        <span>ปกติ (Normal)</span>
+                        <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs">
+                            <i class="ph-bold ph-check"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-2xl sm:text-3xl font-bold text-emerald-600 font-num tracking-tight" id="kpiNormalStudents">0</div>
+                        <span class="text-[11px] text-emerald-700 font-semibold mt-0.5 block" id="kpiNormalPct">0%</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl border border-amber-200/80 shadow-xs flex flex-col justify-between bg-gradient-to-b from-white to-amber-50/20">
+                    <div class="flex items-center justify-between text-amber-800 text-xs font-bold mb-1">
+                        <span>เฝ้าระวัง (Watch)</span>
+                        <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-xs">
+                            <i class="ph-bold ph-eye"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-2xl sm:text-3xl font-bold text-amber-600 font-num tracking-tight" id="kpiWatchStudents">0</div>
+                        <span class="text-[11px] text-amber-700 font-semibold mt-0.5 block" id="kpiWatchPct">0%</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl border border-orange-200/80 shadow-xs flex flex-col justify-between bg-gradient-to-b from-white to-orange-50/20">
+                    <div class="flex items-center justify-between text-orange-800 text-xs font-bold mb-1">
+                        <span>เสี่ยง (Risk)</span>
+                        <div class="w-6 h-6 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center text-xs">
+                            <i class="ph-bold ph-warning"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-2xl sm:text-3xl font-bold text-orange-600 font-num tracking-tight" id="kpiRiskStudents">0</div>
+                        <span class="text-[11px] text-orange-700 font-semibold mt-0.5 block" id="kpiRiskPct">0%</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl border border-rose-200/80 shadow-xs flex flex-col justify-between bg-gradient-to-b from-white to-rose-50/20">
+                    <div class="flex items-center justify-between text-rose-800 text-xs font-bold mb-1">
+                        <span>มีปัญหา (Problem)</span>
+                        <div class="w-6 h-6 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center text-xs animate-pulse">
+                            <i class="ph-bold ph-warning-octagon"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-2xl sm:text-3xl font-bold text-rose-600 font-num tracking-tight" id="kpiProblemStudents">0</div>
+                        <span class="text-[11px] text-rose-700 font-semibold mt-0.5 block" id="kpiProblemPct">0%</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
+                    <div class="flex items-center justify-between text-slate-500 text-xs font-semibold mb-1">
+                        <span>ยังไม่คัดกรอง</span>
+                        <i class="ph-bold ph-clock text-slate-400 text-base"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl sm:text-3xl font-bold text-slate-600 font-num tracking-tight" id="kpiUnscreenedStudents">0</div>
+                        <span class="text-[11px] text-slate-500 font-medium mt-0.5 block" id="kpiUnscreenedPct">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Charts Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col">
+                    <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2 mb-3">
+                        <i class="ph-bold ph-chart-pie text-blue-600"></i>
+                        <span>สัดส่วนกลุ่มความเสี่ยง</span>
+                    </h3>
+                    <div class="flex-1 flex items-center justify-center min-h-[220px]">
+                        <canvas id="chartRiskDonut" height="200"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col lg:col-span-2">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                            <i class="ph-bold ph-chart-bar text-blue-600"></i>
+                            <span>การกระจายกลุ่มความเสี่ยงจำแนกตามชั้น / ห้องเรียน</span>
+                        </h3>
+                        <span class="text-xs text-slate-400 font-medium">เกณฑ์ สพฐ. 4 กลุ่ม</span>
+                    </div>
+                    <div class="flex-1 min-h-[220px]">
+                        <canvas id="chartRiskBar" height="150"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Screening Ledger Table -->
+            <div class="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-xs space-y-4">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                            <i class="ph-bold ph-student text-blue-600"></i>
+                            <span>ทะเบียนผลการคัดกรองนักเรียนรายบุคคล (Individual View)</span>
+                        </h3>
+                        <p class="text-xs text-slate-500">แสดงผลคะแนน ระดับความเสี่ยง และเหตุผลประกอบการจัดกลุ่มเชิงประจักษ์</p>
+                    </div>
+
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <div class="relative flex-1 sm:w-64">
+                            <i class="ph ph-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-sm"></i>
+                            <input type="text" id="ledgerSearchInput" oninput="renderStudentLedgerTable()" placeholder="ค้นหาชื่อ, รหัสนักเรียน..." class="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-blue-500 transition">
+                        </div>
+                        <button type="button" onclick="openIntakeModal()" class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer">
+                            <i class="ph-bold ph-plus-circle"></i>
+                            <span>+ บันทึกผลคัดกรอง</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase text-[11px]">
+                            <tr>
+                                <th class="py-3 px-3 w-14 text-center">รูป</th>
+                                <th class="py-3 px-3">รหัส / ชื่อ-สกุล</th>
+                                <th class="py-3 px-3 text-center">ชั้น/ห้อง</th>
+                                <th class="py-3 px-3 text-center">การมาเรียน</th>
+                                <th class="py-3 px-3 text-center">คะแนนล่าสุด</th>
+                                <th class="py-3 px-3 text-center">ระดับความเสี่ยง</th>
+                                <th class="py-3 px-4 min-w-[280px]">เหตุผลประกอบการจัดกลุ่ม (Reasoning)</th>
+                                <th class="py-3 px-3 text-center w-28">ดำเนินการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentLedgerTbody" class="divide-y divide-slate-100">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- VIEW 2: STUDENT DEVELOPMENT HUB (MODULE 03) -->
+        <!-- ============================================================== -->
+        <section id="viewDevelopment" class="space-y-6 hidden">
+            <!-- Development Header Banner -->
+            <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 rounded-3xl p-5 sm:p-6 text-white shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center gap-2 text-xs font-semibold text-indigo-300 mb-1">
+                        <i class="ph-bold ph-sparkle"></i>
+                        <span>MODULE 03 — STUDENT DEVELOPMENT (การส่งเสริมและพัฒนานักเรียน)</span>
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-bold font-heading">
+                        ศูนย์ส่งเสริมและพัฒนาศักยภาพนักเรียนทุกคน
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl">
+                        มุ่งเน้นการพัฒนาทักษะชีวิต ความฉลาดทางอารมณ์ ค้นหาจุดเด่นและพรสวรรค์ (Strength-based Approach) พร้อมกลไกส่งต่อช่วยเหลือแบบ 1-Click ทันทีเมื่อพบปัญหา
+                    </p>
+                </div>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <button type="button" onclick="openDevParticipationModal()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-xs sm:text-sm font-bold shadow-md shadow-indigo-500/20 transition flex items-center gap-2 cursor-pointer">
+                        <i class="ph-bold ph-plus-circle"></i>
+                        <span>+ บันทึกผลการพัฒนาผู้เรียน</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Development Dashboard 6 Metrics (STEP 06) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col justify-between">
+                    <div class="flex items-center justify-between text-slate-500 text-xs font-semibold mb-1">
+                        <span>นักเรียนเข้าร่วม</span>
+                        <i class="ph-bold ph-check-circle text-emerald-600 text-base"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl sm:text-3xl font-bold text-emerald-600 font-num tracking-tight" id="kpiDevParticipated">0</div>
+                        <span class="text-[11px] text-emerald-700 font-semibold mt-0.5 block" id="kpiDevParticipatedPct">0%</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col justify-between">
+                    <div class="flex items-center justify-between text-slate-500 text-xs font-semibold mb-1">
+                        <span>ยังไม่เข้าร่วม/ขาด</span>
+                        <i class="ph-bold ph-x-circle text-slate-400 text-base"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl sm:text-3xl font-bold text-slate-700 font-num tracking-tight" id="kpiDevNonParticipated">0</div>
+                        <span class="text-[11px] text-slate-500 mt-0.5 block" id="kpiDevNonParticipatedPct">0%</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col justify-between">
+                    <div class="flex items-center justify-between text-slate-500 text-xs font-semibold mb-1">
+                        <span>กิจกรรมทั้งหมด</span>
+                        <i class="ph-bold ph-calendar text-blue-600 text-base"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl sm:text-3xl font-bold text-blue-700 font-num tracking-tight" id="kpiDevTotalActivities">0</div>
+                        <span class="text-[11px] text-slate-500 mt-0.5 block">ในรอบปีการศึกษา</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col justify-between">
+                    <div class="flex items-center justify-between text-slate-500 text-xs font-semibold mb-1">
+                        <span>โครงการพัฒนา</span>
+                        <i class="ph-bold ph-folder-notch-open text-indigo-600 text-base"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl sm:text-3xl font-bold text-indigo-700 font-num tracking-tight" id="kpiDevPrograms">0</div>
+                        <span class="text-[11px] text-indigo-600 font-semibold mt-0.5 block">ครอบคลุม 8 หมวด</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl border border-amber-300 shadow-xs flex flex-col justify-between bg-gradient-to-b from-white to-amber-50/30">
+                    <div class="flex items-center justify-between text-amber-800 text-xs font-bold mb-1">
+                        <span>นักเรียนเด่น (Star)</span>
+                        <i class="ph-bold ph-star text-amber-500 text-base"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl sm:text-3xl font-bold text-amber-600 font-num tracking-tight" id="kpiDevStarCount">0</div>
+                        <span class="text-[11px] text-amber-700 font-semibold mt-0.5 block">ค้นพบจุดเด่น/พรสวรรค์</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl border border-rose-300 shadow-xs flex flex-col justify-between bg-gradient-to-b from-white to-rose-50/30">
+                    <div class="flex items-center justify-between text-rose-800 text-xs font-bold mb-1">
+                        <span>ต้องพัฒนาเพิ่มเติม</span>
+                        <i class="ph-bold ph-lifebuoy text-rose-500 text-base"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl sm:text-3xl font-bold text-rose-600 font-num tracking-tight" id="kpiDevSupportCount">0</div>
+                        <span class="text-[11px] text-rose-700 font-semibold mt-0.5 block">ต้องการการดูแลใกล้ชิด</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dual Focus Segmentation (STEP 06 & 07: Star Students vs Support Needed) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                
+                <!-- Left: Star & Outstanding Students (นักเรียนเด่น) -->
+                <div class="bg-white p-5 rounded-2xl border border-amber-200/90 shadow-xs flex flex-col space-y-3">
+                    <div class="flex items-center justify-between border-b border-amber-100 pb-2.5">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold">
+                                <i class="ph-bold ph-trophy"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-slate-900 text-sm">นักเรียนเด่น / ส่งเสริมสู่ความเป็นเลิศ (Star & Talented)</h3>
+                                <p class="text-[11px] text-slate-500">นักเรียนที่มีพัฒนาการดีเยี่ยมและค้นพบจุดเด่นเชิงประจักษ์</p>
+                            </div>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800" id="starCountBadge">0 คน</span>
+                    </div>
+
+                    <div id="starStudentsList" class="space-y-3 flex-1 overflow-y-auto max-h-[360px] pr-1">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Right: Students Needing Support with 1-Click Create Case (นักเรียนที่ต้องพัฒนาเพิ่ม) -->
+                <div class="bg-white p-5 rounded-2xl border border-rose-200/90 shadow-xs flex flex-col space-y-3">
+                    <div class="flex items-center justify-between border-b border-rose-100 pb-2.5">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-xl bg-rose-100 text-rose-800 flex items-center justify-center font-bold">
+                                <i class="ph-bold ph-hand-heart"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-slate-900 text-sm">นักเรียนที่ต้องพัฒนาเพิ่มเติม (Students Needing Support)</h3>
+                                <p class="text-[11px] text-slate-500">สังเกตพบปัญหาพฤติกรรม/อารมณ์จากกิจกรรม &bull; กด Create Case ส่งต่อได้ทันที</p>
+                            </div>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800" id="supportCountBadge">0 คน</span>
+                    </div>
+
+                    <div id="supportStudentsList" class="space-y-3 flex-1 overflow-y-auto max-h-[360px] pr-1">
+                        <!-- Injected by JS with 1-Click Create Case Button -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Development Programs & Activities Section (STEP 01 & 02) -->
+            <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs space-y-4">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2 font-heading">
+                            <i class="ph-bold ph-folder-notch-open text-blue-600"></i>
+                            <span>โครงการและกิจกรรมพัฒนาผู้เรียน (Programs & Activities)</span>
+                        </h3>
+                        <p class="text-xs text-slate-500">ครอบคลุม 8 ประเภท: Homeroom, Guidance, Life Skills, Talent, Academic, Behavior, Career, Other</p>
+                    </div>
+
+                    <!-- Program Type Filter Chips -->
+                    <div class="flex items-center gap-1.5 flex-wrap text-xs" id="programTypeFilterBar">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Programs Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="programsGrid">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+
+            <!-- Student Participation & Outcome History Ledger (STEP 03 & 04) -->
+            <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs space-y-4">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2 font-heading">
+                            <i class="ph-bold ph-clipboard-text text-indigo-600"></i>
+                            <span>ทะเบียนการเข้าร่วมและผลการพัฒนาผู้เรียนรายบุคคล (Participation & Outcomes)</span>
+                        </h3>
+                        <p class="text-xs text-slate-500">บันทึก Before / After / ความก้าวหน้า / จุดเด่น / และคำแนะนำต่อยอด</p>
+                    </div>
+                    <div class="relative w-full sm:w-64">
+                        <i class="ph ph-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-sm"></i>
+                        <input type="text" id="devLedgerSearch" oninput="renderDevOutcomesTable()" placeholder="ค้นหานักเรียนในกิจกรรม..." class="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-blue-500 transition">
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase text-[11px]">
+                            <tr>
+                                <th class="py-3 px-3">นักเรียน</th>
+                                <th class="py-3 px-3">กิจกรรมที่เข้าร่วม</th>
+                                <th class="py-3 px-3 text-center">การเข้าร่วม</th>
+                                <th class="py-3 px-3 text-center">ระดับมีส่วนร่วม</th>
+                                <th class="py-3 px-3 text-center">ผลการประเมิน</th>
+                                <th class="py-3 px-4 min-w-[200px]">พัฒนาการ (Before &rarr; After)</th>
+                                <th class="py-3 px-4 min-w-[180px]">จุดเด่น (Strength)</th>
+                                <th class="py-3 px-3 text-center">ดำเนินการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="devOutcomesTbody" class="divide-y divide-slate-100">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- VIEW 3: SCREENING SESSIONS WORKFLOW (MODULE 02) -->
+        <!-- ============================================================== -->
+        <section id="viewSessions" class="space-y-5 hidden">
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center gap-2 text-xs font-semibold text-blue-600 mb-1">
+                        <i class="ph-bold ph-calendar-blank"></i>
+                        <span>วงจรรอบการคัดกรอง (Screening Lifecycle Management)</span>
+                    </div>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-900 font-heading">
+                        จัดการรอบการคัดกรองนักเรียน (Screening Sessions)
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-0.5">
+                        สถานะ: DRAFT &rarr; IN_PROGRESS &rarr; SUBMITTED &rarr; REVIEWED &rarr; COMPLETED
+                    </p>
+                </div>
+                <button type="button" onclick="alert('รอบการประเมินปี 2567 เทอม 1 ได้รับการจัดตั้งเรียบร้อยแล้ว')" class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold transition flex items-center gap-2 shadow-xs cursor-pointer">
+                    <i class="ph-bold ph-plus"></i>
+                    <span>+ สร้างรอบคัดกรองใหม่</span>
+                </button>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-xs">
+                <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold text-[11px]">
+                            <tr>
+                                <th class="py-3 px-3">รหัสรอบ (ScreeningID)</th>
+                                <th class="py-3 px-3">ปีการศึกษา / เทอม</th>
+                                <th class="py-3 px-3 text-center">ระดับชั้น / ห้อง</th>
+                                <th class="py-3 px-3">เครื่องมือที่ใช้</th>
+                                <th class="py-3 px-3">ช่วงเวลาประเมิน</th>
+                                <th class="py-3 px-3 text-center">สถานะ Workflow</th>
+                                <th class="py-3 px-3 text-center">การจัดการสถานะ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sessionsTableBody" class="divide-y divide-slate-100">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- VIEW 4: ACTION REQUIRED CENTER (MODULE 02 & 03 INTEGRATION) -->
+        <!-- ============================================================== -->
+        <section id="viewActions" class="space-y-5 hidden">
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center gap-2 text-xs font-semibold text-rose-600 mb-1">
+                        <i class="ph-bold ph-shield-warning"></i>
+                        <span>ระบบการดูแลช่วยเหลือและส่งต่อนักเรียนกลุ่มเสี่ยง (Auto-Triggered Action Tasks)</span>
+                    </div>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-900 font-heading">
+                        ภารกิจที่ต้องดำเนินการ (Action Required Center)
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-0.5">
+                        ระบบสร้างภารกิจให้อัตโนมัติทันทีจากผลคัดกรองความเสี่ยง และจาก 1-Click Create Case ในกิจกรรมพัฒนา
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-2 text-xs">
+                    <button type="button" onclick="filterActionStatus('ALL')" class="action-filter-btn active px-3 py-1.5 rounded-lg font-bold bg-slate-200 text-slate-800">ทั้งหมด</button>
+                    <button type="button" onclick="filterActionStatus('PENDING')" class="action-filter-btn px-3 py-1.5 rounded-lg font-semibold text-slate-600 hover:bg-slate-100">รอเริ่ม</button>
+                    <button type="button" onclick="filterActionStatus('IN_PROGRESS')" class="action-filter-btn px-3 py-1.5 rounded-lg font-semibold text-slate-600 hover:bg-slate-100">กำลังดำเนินการ</button>
+                    <button type="button" onclick="filterActionStatus('RESOLVED')" class="action-filter-btn px-3 py-1.5 rounded-lg font-semibold text-slate-600 hover:bg-slate-100">เสร็จสิ้น</button>
+                </div>
+            </div>
+
+            <div id="actionCardsContainer" class="space-y-3">
+                <!-- Injected by JS -->
+            </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- VIEW 5: SCREENING TOOLS (MODULE 02) -->
+        <!-- ============================================================== -->
+        <section id="viewTools" class="space-y-5 hidden">
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center gap-2 text-xs font-semibold text-blue-600 mb-1">
+                        <i class="ph-bold ph-sliders"></i>
+                        <span>คลังเครื่องมือประเมินมาตรฐานทางจิตวิทยาและพฤติกรรมสถานศึกษา</span>
+                    </div>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-900 font-heading">
+                        ระบบจัดการเครื่องมือคัดกรอง (Screening Tools Management)
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-0.5">
+                        จัดการชุดเครื่องมือ เกณฑ์คะแนนการตัดความเสี่ยง และมิติในการประเมิน
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="toolsCardsContainer">
+                <!-- Injected by JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ============================================================== -->
+    <!-- MODAL 1: STUDENT 360° INTEGRATION (STEP 05 DEV HISTORY) -->
+    <!-- ============================================================== -->
+    <div id="student360Modal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-3 sm:p-4 hidden backdrop-blur-xs overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-4xl w-full p-5 sm:p-7 shadow-2xl border border-slate-200 flex flex-col gap-5 my-auto max-h-[92vh] overflow-y-auto">
+            <!-- Modal Header: Student Meta -->
+            <div class="flex items-start justify-between border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-4">
+                    <img id="s360Avatar" src="" alt="Student" class="w-16 h-16 rounded-2xl object-cover border-2 border-white shadow-md">
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h3 class="text-lg sm:text-xl font-bold text-slate-900 font-heading" id="s360Name">-</h3>
+                            <span id="s360CurrentRiskBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold">กลุ่มปกติ</span>
+                        </div>
+                        <div class="text-xs text-slate-500 flex items-center gap-3 mt-1 flex-wrap font-num">
+                            <span>รหัส: <strong class="text-slate-800" id="s360Id">-</strong></span>
+                            <span>ชั้น: <strong class="text-slate-800" id="s360Class">-</strong></span>
+                            <span>เลขที่: <strong class="text-slate-800" id="s360Number">-</strong></span>
+                            <span>GPA: <strong class="text-blue-700 font-bold" id="s360Gpa">-</strong></span>
+                            <span>การมาเรียน: <strong class="text-slate-800" id="s360Attendance">-</strong></span>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" onclick="closeStudent360Modal()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition cursor-pointer">
+                    <i class="ph ph-x text-base"></i>
+                </button>
+            </div>
+
+            <!-- Student 360 Content Tabs -->
+            <div class="space-y-4 text-xs">
+                
+                <!-- Section 1: Latest Screening Reasoning -->
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
+                    <div class="flex items-center gap-1.5 font-bold text-slate-800 mb-1.5 text-xs">
+                        <i class="ph-bold ph-chat-centered-dots text-blue-600 text-sm"></i>
+                        <span>ผลการวิเคราะห์และเหตุผลประกอบการจัดกลุ่มคัดกรองล่าสุด (Risk Reasoning Summary)</span>
+                    </div>
+                    <p class="text-slate-700 leading-relaxed font-medium bg-white p-3 rounded-xl border border-slate-200" id="s360ReasoningText">
+                        -
+                    </p>
+                </div>
+
+                <!-- Section 2: Development History Timeline (STEP 05 REQUIREMENT) -->
+                <div class="bg-indigo-50/40 p-4 rounded-2xl border border-indigo-200/80">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                            <i class="ph-bold ph-sparkle text-indigo-600"></i>
+                            <span>ประวัติการส่งเสริมและพัฒนา (Development History)</span>
+                        </h4>
+                        <span class="text-[11px] font-semibold text-indigo-700" id="s360DevCountBadge">0 กิจกรรม</span>
+                    </div>
+                    <div id="s360DevTimelineContainer" class="space-y-2.5">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Section 3: Screening History -->
+                <div>
+                    <h4 class="font-bold text-slate-900 text-sm mb-2 flex items-center gap-2">
+                        <i class="ph-bold ph-clock-counter-clockwise text-blue-600"></i>
+                        <span>ประวัติการคัดกรองย้อนหลัง (Screening History)</span>
+                    </h4>
+                    <div class="border border-slate-200 rounded-xl overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold text-[11px]">
+                                <tr>
+                                    <th class="py-2.5 px-3">ปี / เทอม</th>
+                                    <th class="py-2.5 px-3">เครื่องมือคัดกรอง</th>
+                                    <th class="py-2.5 px-3 text-center">คะแนน</th>
+                                    <th class="py-2.5 px-3 text-center">ระดับความเสี่ยง</th>
+                                    <th class="py-2.5 px-3">ผู้ประเมิน</th>
+                                    <th class="py-2.5 px-3">วันที่</th>
+                                </tr>
+                            </thead>
+                            <tbody id="s360HistoryTbody" class="divide-y divide-slate-100">
+                                <!-- Injected by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Section 4: Risk Trajectory -->
+                <div>
+                    <h4 class="font-bold text-slate-900 text-sm mb-2 flex items-center gap-2">
+                        <i class="ph-bold ph-trend-up text-blue-600"></i>
+                        <span>แนวโน้มและวิถีความเสี่ยง (Risk Trajectory)</span>
+                    </h4>
+                    <div id="s360TrendTimeline" class="p-3 bg-white rounded-xl border border-slate-200 flex items-center gap-4 overflow-x-auto">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Section 5: Associated Actions -->
+                <div>
+                    <h4 class="font-bold text-slate-900 text-sm mb-2 flex items-center gap-2">
+                        <i class="ph-bold ph-list-checks text-amber-600"></i>
+                        <span>ภารกิจการดูแลช่วยเหลือที่เกี่ยวข้อง (Action Required)</span>
+                    </h4>
+                    <div id="s360ActionsContainer" class="space-y-2">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- MODAL 2: 1-CLICK CREATE CASE MODAL (STEP 07 INTEGRATION) -->
+    <!-- ============================================================== -->
+    <div id="createCaseModal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-3 sm:p-4 hidden backdrop-blur-xs overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-slate-200 flex flex-col gap-4 my-auto">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-lg">
+                        <i class="ph-bold ph-hand-heart"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base font-heading">ส่งต่อสร้าง Case ดูแลช่วยเหลือ (Create Case)</h3>
+                        <p class="text-xs text-slate-500">ระบบดึงข้อมูลนักเรียนและกิจกรรมให้อัตโนมัติโดยไม่ต้องพิมพ์ใหม่</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeCreateCaseModal()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition cursor-pointer">
+                    <i class="ph ph-x text-base"></i>
+                </button>
+            </div>
+
+            <form id="createCaseForm" onsubmit="handleCreateCaseSubmit(event)" class="space-y-3.5 text-xs">
+                <!-- Auto-populated Student Meta -->
+                <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 flex items-center gap-3">
+                    <img id="caseStudentAvatar" src="" alt="Student" class="w-10 h-10 rounded-xl object-cover border border-slate-200">
+                    <div>
+                        <div class="font-bold text-slate-900" id="caseStudentName">-</div>
+                        <div class="text-slate-500 text-[11px] font-num">
+                            รหัส: <span id="caseStudentId" class="font-bold text-blue-700">-</span> | ชั้น: <span id="caseStudentClass" class="font-semibold text-slate-700">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hidden / Source Activity Context -->
+                <input type="hidden" id="caseTargetStudentId">
+                <input type="hidden" id="caseTargetActivityId">
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">กิจกรรมที่สังเกตพบปัญหา</label>
+                    <input type="text" id="caseActivityName" readonly class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs bg-slate-100 text-slate-600 font-medium">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">ประเภทการส่งต่อ/ช่วยเหลือ <span class="text-rose-500">*</span></label>
+                    <select id="caseActionTypeSelect" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs bg-white focus:outline-none focus:border-blue-500 font-semibold text-slate-800">
+                        <option value="พูดคุยรายบุคคล">พูดคุยรายบุคคลและให้คำปรึกษา (Counseling)</option>
+                        <option value="ติดตามนักเรียน">ติดตามนักเรียนและเยี่ยมบ้านฉุกเฉิน</option>
+                        <option value="ประเมินเพิ่มเติม">ประเมินภาวะสุขภาพจิตเชิงลึก (2Q/9Q)</option>
+                        <option value="ส่งต่อผู้เชี่ยวชาญ">ส่งต่องานแนะแนว / แพทย์ผู้เชี่ยวชาญ</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">ข้อสังเกตและพฤติกรรมเชิงประจักษ์จากกิจกรรม <span class="text-rose-500">*</span></label>
+                    <textarea id="caseObservationNotes" rows="3" required class="w-full border border-slate-300 rounded-xl p-2.5 text-xs bg-white focus:outline-none focus:border-blue-500 leading-relaxed" placeholder="ระบุข้อสังเกตที่พบ เช่น นั่งแยกตัว ร้องไห้ ไม่ยอมทำกิจกรรม หรือขาดการเข้าร่วม..."></textarea>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                    <button type="button" onclick="closeCreateCaseModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 transition font-semibold cursor-pointer">
+                        ยกเลิก
+                    </button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold transition shadow-xs cursor-pointer flex items-center gap-1.5">
+                        <i class="ph-bold ph-check"></i>
+                        <span>ยืนยันสร้าง Case ดูแลช่วยเหลือ</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- MODAL 3: RECORD PARTICIPATION & OUTCOME (STEP 03 & 04) -->
+    <!-- ============================================================== -->
+    <div id="devParticipationModal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-3 sm:p-4 hidden backdrop-blur-xs overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl border border-slate-200 flex flex-col gap-4 my-auto max-h-[92vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-lg">
+                        <i class="ph-bold ph-note-pencil"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base font-heading">บันทึกการเข้าร่วมและผลการพัฒนาผู้เรียน (Outcome)</h3>
+                        <p class="text-xs text-slate-500">ประเมิน Before / After และค้นหาจุดเด่น (Strengths) ของนักเรียนทุกคน</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeDevParticipationModal()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition cursor-pointer">
+                    <i class="ph ph-x text-base"></i>
+                </button>
+            </div>
+
+            <form id="devParticipationForm" onsubmit="handleDevParticipationSubmit(event)" class="space-y-3.5 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">เลือกกิจกรรมพัฒนา <span class="text-rose-500">*</span></label>
+                        <select id="partActivitySelect" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs bg-white focus:outline-none focus:border-blue-500 font-medium">
+                            <!-- Injected by JS -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">เลือกนักเรียน <span class="text-rose-500">*</span></label>
+                        <select id="partStudentSelect" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs bg-white focus:outline-none focus:border-blue-500 font-medium">
+                            <!-- Injected by JS -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Participation Status Grid -->
+                <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">การเข้าร่วม (Attendance)</label>
+                        <select id="partAttendanceSelect" class="w-full border border-slate-300 rounded-lg p-1.5 text-xs bg-white font-semibold">
+                            <option value="PRESENT">เข้าร่วม (Present)</option>
+                            <option value="ABSENT">ขาด (Absent)</option>
+                            <option value="LEAVE">ลา (Leave)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">ระดับมีส่วนร่วม</label>
+                        <select id="partLevelSelect" class="w-full border border-slate-300 rounded-lg p-1.5 text-xs bg-white font-semibold">
+                            <option value="HIGH">มาก (High)</option>
+                            <option value="MEDIUM">ปานกลาง (Medium)</option>
+                            <option value="LOW">น้อย (Low)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">ผลประเมิน (Performance)</label>
+                        <select id="partPerformanceSelect" class="w-full border border-slate-300 rounded-lg p-1.5 text-xs bg-white font-semibold">
+                            <option value="EXCELLENT">ดีเยี่ยม (Excellent)</option>
+                            <option value="GOOD">ดี (Good)</option>
+                            <option value="PASS">ผ่านเกณฑ์ (Pass)</option>
+                            <option value="NEEDS_IMPROVEMENT">ต้องปรับปรุง (Needs Support)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Before & After Outcome Measurement (STEP 04) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">สถานะ/พฤติกรรมก่อนร่วมกิจกรรม (Before)</label>
+                        <textarea id="partBeforeInput" rows="2" placeholder="เช่น ค่อนข้างประหม่า ไม่กล้าแสดงความคิดเห็น..." class="w-full border border-slate-300 rounded-xl p-2 text-xs bg-white focus:outline-none focus:border-blue-500"></textarea>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">สถานะ/พฤติกรรมหลังร่วมกิจกรรม (After)</label>
+                        <textarea id="partAfterInput" rows="2" placeholder="เช่น กล้าพูดในกลุ่มย่อย เป็นตัวแทนนำเสนอ..." class="w-full border border-slate-300 rounded-xl p-2 text-xs bg-white focus:outline-none focus:border-blue-500"></textarea>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">จุดเด่น / ศักยภาพที่ค้นพบ (Strength)</label>
+                        <input type="text" id="partStrengthInput" placeholder="เช่น อัจฉริยภาพการคิดเชิงตรรกะ, มีภาวะผู้นำ, ละเอียดรอบคอบ" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs bg-white focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">ข้อเสนอแนะในการต่อยอด (Recommendation)</label>
+                        <input type="text" id="partRecommendationInput" placeholder="เช่น ส่งเสริมเข้าแข่งขันโอลิมปิก, มอบหมายงานแกนนำ" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs bg-white focus:outline-none focus:border-blue-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">บันทึกพฤติกรรมระหว่างกิจกรรม (Remark)</label>
+                    <textarea id="partRemarkInput" rows="2" placeholder="ระบุข้อสังเกตเพิ่มเติม..." class="w-full border border-slate-300 rounded-xl p-2 text-xs bg-white focus:outline-none focus:border-blue-500"></textarea>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                    <button type="button" onclick="closeDevParticipationModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 transition font-semibold cursor-pointer">
+                        ยกเลิก
+                    </button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition shadow-xs cursor-pointer">
+                        บันทึกผลการพัฒนา
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- MODAL 4: CLASSROOM SCREENING INTAKE (MODULE 02) -->
+    <!-- ============================================================== -->
+    <div id="screeningIntakeModal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-3 sm:p-4 hidden backdrop-blur-xs overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-7 shadow-2xl border border-slate-200 flex flex-col gap-4 my-auto max-h-[92vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-lg">
+                        <i class="ph-bold ph-note-pencil"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base font-heading">บันทึกผลการคัดกรองนักเรียนรายบุคคล</h3>
+                        <p class="text-xs text-slate-500">เครื่องมือ: SDQ ฉบับครูประเมิน</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeIntakeModal()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition cursor-pointer">
+                    <i class="ph ph-x text-base"></i>
+                </button>
+            </div>
+
+            <form id="screeningIntakeForm" onsubmit="handleScreeningSubmit(event)" class="space-y-4 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">รอบการคัดกรอง (Screening Session) <span class="text-rose-500">*</span></label>
+                        <select id="intakeSessionSelect" onchange="onIntakeSessionChange()" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs bg-white focus:outline-none focus:border-blue-500 font-medium"></select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">เลือกนักเรียน <span class="text-rose-500">*</span></label>
+                        <select id="intakeStudentSelect" onchange="onIntakeStudentChange()" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs bg-white focus:outline-none focus:border-blue-500 font-medium"></select>
+                    </div>
+                </div>
+
+                <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-slate-800 text-xs">คะแนนตามมิติ (Domain Scores)</span>
+                        <span class="text-[11px] text-slate-500">คะแนนเต็มมิติละ 10 คะแนน</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 font-num">
+                        <div>
+                            <label class="block text-[11px] text-slate-600 mb-1">1. อารมณ์ (0-10)</label>
+                            <input type="number" id="subEmo" min="0" max="10" value="0" oninput="calculateLiveIntake()" class="w-full border border-slate-300 rounded-lg p-2 text-center text-xs font-bold focus:border-blue-500 focus:outline-none bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-600 mb-1">2. พฤติกรรมเกเร (0-10)</label>
+                            <input type="number" id="subCond" min="0" max="10" value="0" oninput="calculateLiveIntake()" class="w-full border border-slate-300 rounded-lg p-2 text-center text-xs font-bold focus:border-blue-500 focus:outline-none bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-600 mb-1">3. ซน/สมาธิสั้น (0-10)</label>
+                            <input type="number" id="subHyper" min="0" max="10" value="0" oninput="calculateLiveIntake()" class="w-full border border-slate-300 rounded-lg p-2 text-center text-xs font-bold focus:border-blue-500 focus:outline-none bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-600 mb-1">4. เพื่อน (0-10)</label>
+                            <input type="number" id="subPeer" min="0" max="10" value="0" oninput="calculateLiveIntake()" class="w-full border border-slate-300 rounded-lg p-2 text-center text-xs font-bold focus:border-blue-500 focus:outline-none bg-white">
+                        </div>
+                        <div class="col-span-2 sm:col-span-1">
+                            <label class="block text-[11px] text-slate-600 mb-1">5. สังคม (จุดเด่น 0-10)</label>
+                            <input type="number" id="subPro" min="0" max="10" value="8" oninput="calculateLiveIntake()" class="w-full border border-slate-300 rounded-lg p-2 text-center text-xs font-bold focus:border-blue-500 focus:outline-none bg-white">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3.5 rounded-2xl border border-blue-200 bg-blue-50/50 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-600 font-semibold text-xs">คะแนนรวมความยากลำบาก:</span>
+                            <span class="text-base font-bold text-blue-700 font-num" id="liveScorePreview">0 / 40</span>
+                        </div>
+                        <div id="liveBadgePreview" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+                            ปกติ (Normal)
+                        </div>
+                    </div>
+                    <div class="text-[11px] text-slate-700 bg-white p-2.5 rounded-xl border border-blue-100 leading-relaxed font-medium" id="liveReasoningPreview">
+                        คำนวณเหตุผลประกอบการจัดกลุ่มอัตโนมัติ...
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">บันทึกพฤติกรรมเชิงประจักษ์ / ข้อสังเกตของครู</label>
+                    <textarea id="intakeNotes" rows="2" placeholder="ระบุพฤติกรรมในห้องเรียน..." class="w-full border border-slate-300 rounded-xl p-2.5 text-xs bg-white focus:outline-none focus:border-blue-500"></textarea>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                    <button type="button" onclick="closeIntakeModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 transition font-semibold cursor-pointer">
+                        ยกเลิก
+                    </button>
+                    <button type="submit" id="btnSubmitIntake" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow-xs cursor-pointer">
+                        บันทึกผลการคัดกรอง
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- MODAL 5: TEST RUNNER (14 TESTS) -->
+    <!-- ============================================================== -->
+    <div id="testRunnerModal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-3 sm:p-4 hidden backdrop-blur-xs overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-3xl w-full p-5 sm:p-7 shadow-2xl border border-slate-200 flex flex-col gap-4 my-auto max-h-[92vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-lg">
+                        <i class="ph-bold ph-flask"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base font-heading">ชุดทดสอบระบบอัตโนมัติ 14 รายการ (MODULE 02 + 03)</h3>
+                        <p class="text-xs text-slate-500">Screening Validation 7 ข้อ + Student Development 7 ข้อ</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeTestRunnerModal()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition cursor-pointer">
+                    <i class="ph ph-x text-base"></i>
+                </button>
+            </div>
+
+            <div class="flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-semibold text-slate-600">ผลการทดสอบรวม:</span>
+                    <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-num" id="testRunnerPassBadge">14 / 14 PASSED (100%)</span>
+                </div>
+                <button type="button" onclick="runInBrowserTests()" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+                    <i class="ph-bold ph-arrows-clockwise"></i>
+                    <span>รันชุดทดสอบซ้ำ</span>
+                </button>
+            </div>
+
+            <div class="space-y-2 text-xs" id="testRunnerResultsList">
+                <!-- Injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Scripts -->
+    <script src="app.js"></script>
+    <script src="test_suite.js"></script>
+
+    <!-- UI Controller Script -->
+    <script>
+        let currentTab = 'dashboard';
+        let currentActionFilter = 'ALL';
+        let currentProgramTypeFilter = 'ALL';
+        let chartDonutInstance = null;
+        let chartBarInstance = null;
+
+        window.onload = function() {
+            initApp();
+        };
+
+        function initApp() {
+            updateRoleUI();
+            populateFilterDropdowns();
+            renderDashboard();
+            renderDevelopmentView();
+            renderSessionsTable();
+            renderActionCards();
+            renderToolsCards();
+        }
+
+        function switchTab(tabId) {
+            currentTab = tabId;
+            const views = ['viewDashboard', 'viewDevelopment', 'viewSessions', 'viewActions', 'viewTools'];
+            const navTabs = ['navTabDashboard', 'navTabDevelopment', 'navTabSessions', 'navTabActions', 'navTabTools'];
+
+            views.forEach(v => {
+                document.getElementById(v)?.classList.add('hidden');
+            });
+            navTabs.forEach(n => {
+                const el = document.getElementById(n);
+                if (el) {
+                    el.className = 'nav-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 text-slate-600 hover:bg-slate-100';
+                }
+            });
+
+            if (tabId === 'dashboard') {
+                document.getElementById('viewDashboard')?.classList.remove('hidden');
+                document.getElementById('navTabDashboard').className = 'nav-tab active px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-blue-600 text-white shadow-xs';
+                renderDashboard();
+            } else if (tabId === 'development') {
+                document.getElementById('viewDevelopment')?.classList.remove('hidden');
+                document.getElementById('navTabDevelopment').className = 'nav-tab active px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-indigo-600 text-white shadow-xs';
+                renderDevelopmentView();
+            } else if (tabId === 'sessions') {
+                document.getElementById('viewSessions')?.classList.remove('hidden');
+                document.getElementById('navTabSessions').className = 'nav-tab active px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-blue-600 text-white shadow-xs';
+                renderSessionsTable();
+            } else if (tabId === 'actions') {
+                document.getElementById('viewActions')?.classList.remove('hidden');
+                document.getElementById('navTabActions').className = 'nav-tab active px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-blue-600 text-white shadow-xs';
+                renderActionCards();
+            } else if (tabId === 'tools') {
+                document.getElementById('viewTools')?.classList.remove('hidden');
+                document.getElementById('navTabTools').className = 'nav-tab active px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-blue-600 text-white shadow-xs';
+                renderToolsCards();
+            }
+        }
+
+        function changeActiveRole(roleKey) {
+            currentUser = USERS[roleKey];
+            updateRoleUI();
+            renderDashboard();
+            renderDevelopmentView();
+            renderSessionsTable();
+            renderActionCards();
+        }
+
+        function updateRoleUI() {
+            document.getElementById('userAvatarImg').src = currentUser.avatar;
+            document.getElementById('userNameLabel').innerText = currentUser.name;
+            document.getElementById('userRoleBadge').innerText = currentUser.roleTitle;
+
+            const activeSessions = screeningSessions.filter(s => s.status !== 'COMPLETED').length;
+            document.getElementById('badgeActiveSessions').innerText = activeSessions;
+            const pendingActions = actionRequiredList.filter(a => a.status === 'PENDING').length;
+            document.getElementById('badgePendingActions').innerText = pendingActions;
+        }
+
+        function populateFilterDropdowns() {
+            const sSelect = document.getElementById('filterSessionSelect');
+            if (sSelect) {
+                sSelect.innerHTML = '<option value="ALL">รอบประเมินล่าสุดทั้งหมด</option>';
+                screeningSessions.forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s.screeningId;
+                    opt.innerText = `${s.screeningId} (${s.grade}/${s.class} - ${s.status})`;
+                    sSelect.appendChild(opt);
+                });
+            }
+        }
+
+        function onDashboardFilterChange() {
+            renderDashboard();
+        }
+
+        // MODULE 02 Dashboard
+        function renderDashboard() {
+            const g = document.getElementById('filterGradeSelect').value;
+            const c = document.getElementById('filterClassSelect').value;
+            const sess = document.getElementById('filterSessionSelect').value;
+
+            const metrics = getScreeningDashboardMetrics({ grade: g, class: c }, sess === 'ALL' ? null : sess);
+
+            document.getElementById('kpiTotalStudents').innerText = metrics.totalStudents;
+            document.getElementById('kpiNormalStudents').innerText = metrics.normalCount;
+            document.getElementById('kpiNormalPct').innerText = `${metrics.normalPct}% ของทั้งหมด`;
+            document.getElementById('kpiWatchStudents').innerText = metrics.watchCount;
+            document.getElementById('kpiWatchPct').innerText = `${metrics.watchPct}% ของทั้งหมด`;
+            document.getElementById('kpiRiskStudents').innerText = metrics.riskCount;
+            document.getElementById('kpiRiskPct').innerText = `${metrics.riskPct}% ของทั้งหมด`;
+            document.getElementById('kpiProblemStudents').innerText = metrics.problemCount;
+            document.getElementById('kpiProblemPct').innerText = `${metrics.problemPct}% ของทั้งหมด`;
+            document.getElementById('kpiUnscreenedStudents').innerText = metrics.unscreenedCount;
+            document.getElementById('kpiUnscreenedPct').innerText = `${metrics.unscreenedPct}% ของทั้งหมด`;
+
+            renderCharts(metrics);
+            renderStudentLedgerTable();
+        }
+
+        function renderCharts(metrics) {
+            const ctxDonut = document.getElementById('chartRiskDonut')?.getContext('2d');
+            if (ctxDonut) {
+                if (chartDonutInstance) chartDonutInstance.destroy();
+                chartDonutInstance = new Chart(ctxDonut, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['ปกติ', 'เฝ้าระวัง', 'เสี่ยง', 'มีปัญหา', 'ยังไม่คัดกรอง'],
+                        datasets: [{
+                            data: [metrics.normalCount, metrics.watchCount, metrics.riskCount, metrics.problemCount, metrics.unscreenedCount],
+                            backgroundColor: ['#10b981', '#f59e0b', '#f97316', '#ef4444', '#94a3b8'],
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: 'Noto Sans Thai', size: 11 } } }
+                        },
+                        cutout: '70%'
+                    }
+                });
+            }
+
+            const ctxBar = document.getElementById('chartRiskBar')?.getContext('2d');
+            if (ctxBar) {
+                if (chartBarInstance) chartBarInstance.destroy();
+                chartBarInstance = new Chart(ctxBar, {
+                    type: 'bar',
+                    data: {
+                        labels: ['ม.1/1', 'ม.1/2', 'ม.2/1', 'ม.3/1', 'ม.4/1'],
+                        datasets: [
+                            { label: 'ปกติ', data: [2, 1, 1, 1, 0], backgroundColor: '#10b981' },
+                            { label: 'เฝ้าระวัง', data: [1, 1, 0, 0, 0], backgroundColor: '#f59e0b' },
+                            { label: 'เสี่ยง', data: [1, 0, 1, 0, 0], backgroundColor: '#f97316' },
+                            { label: 'มีปัญหา', data: [1, 0, 0, 0, 0], backgroundColor: '#ef4444' }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { stacked: true, grid: { display: false } },
+                            y: { stacked: true, beginAtZero: true, grid: { color: '#f1f5f9' } }
+                        },
+                        plugins: {
+                            legend: { position: 'top', labels: { boxWidth: 10, font: { family: 'Noto Sans Thai', size: 11 } } }
+                        }
+                    }
+                });
+            }
+        }
+
+        function renderStudentLedgerTable() {
+            const tbody = document.getElementById('studentLedgerTbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            const search = (document.getElementById('ledgerSearchInput')?.value || '').trim().toLowerCase();
+            const g = document.getElementById('filterGradeSelect').value;
+            const c = document.getElementById('filterClassSelect').value;
+
+            let list = students.filter(s => canUserAccessStudent(currentUser, s));
+            if (g !== 'ALL') list = list.filter(s => s.grade === g);
+            if (c !== 'ALL') list = list.filter(s => s.class === c);
+
+            if (search) {
+                list = list.filter(s => s.name.toLowerCase().includes(search) || s.studentId.toLowerCase().includes(search));
+            }
+
+            list.forEach(st => {
+                const res = screeningResults.find(r => r.studentId === st.studentId);
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50/80 transition';
+
+                let badgeHtml = '<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-500">ยังไม่คัดกรอง</span>';
+                let scoreText = '-';
+                let reasoningText = 'ยังไม่มีผลการคัดกรองในระบบ';
+
+                if (res) {
+                    scoreText = `<span class="font-bold font-num text-slate-900">${res.score}</span> / 40`;
+                    reasoningText = res.reasoning;
+
+                    if (res.riskLevel === 'NORMAL') {
+                        badgeHtml = '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">ปกติ</span>';
+                    } else if (res.riskLevel === 'WATCH') {
+                        badgeHtml = '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">เฝ้าระวัง</span>';
+                    } else if (res.riskLevel === 'RISK') {
+                        badgeHtml = '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-orange-50 text-orange-700 border border-orange-200">เสี่ยง</span>';
+                    } else if (res.riskLevel === 'PROBLEM') {
+                        badgeHtml = '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200 animate-pulse">มีปัญหา</span>';
+                    }
+                }
+
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3 text-center">
+                        <img src="${st.avatar}" alt="${st.name}" class="w-8 h-8 rounded-full object-cover border border-slate-200 mx-auto">
+                    </td>
+                    <td class="py-2.5 px-3">
+                        <div class="font-bold text-slate-900">${st.name}</div>
+                        <div class="text-[11px] text-slate-400 font-num">${st.studentId} (${st.nickname})</div>
+                    </td>
+                    <td class="py-2.5 px-3 text-center font-semibold text-slate-700">${st.grade}/${st.class}</td>
+                    <td class="py-2.5 px-3 text-center font-num font-medium text-slate-700">${st.attendanceRate}</td>
+                    <td class="py-2.5 px-3 text-center">${scoreText}</td>
+                    <td class="py-2.5 px-3 text-center">${badgeHtml}</td>
+                    <td class="py-2.5 px-4 text-slate-600 text-[11px] leading-relaxed">${reasoningText}</td>
+                    <td class="py-2.5 px-3 text-center">
+                        <button type="button" onclick="openStudent360Modal('${st.studentId}')" class="px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold transition cursor-pointer">
+                            360°
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ==========================================================
+        // MODULE 03: STUDENT DEVELOPMENT LOGIC & UI
+        // ==========================================================
+        function renderDevelopmentView() {
+            const metrics = getDevelopmentDashboardMetrics();
+
+            document.getElementById('kpiDevParticipated').innerText = metrics.participatedCount;
+            document.getElementById('kpiDevParticipatedPct').innerText = `${metrics.participatedPct}% เข้าร่วมแล้ว`;
+            document.getElementById('kpiDevNonParticipated').innerText = metrics.nonParticipatedCount;
+            document.getElementById('kpiDevNonParticipatedPct').innerText = `${metrics.nonParticipatedPct}% ยังไม่เข้าร่วม`;
+            document.getElementById('kpiDevTotalActivities').innerText = metrics.totalActivities;
+            document.getElementById('kpiDevPrograms').innerText = developmentPrograms.length;
+            document.getElementById('kpiDevStarCount').innerText = metrics.starStudents.length;
+            document.getElementById('kpiDevSupportCount').innerText = metrics.supportNeededStudents.length;
+
+            document.getElementById('starCountBadge').innerText = `${metrics.starStudents.length} คน`;
+            document.getElementById('supportCountBadge').innerText = `${metrics.supportNeededStudents.length} คน`;
+
+            renderStarStudentsList(metrics.starStudents);
+            renderSupportNeededStudentsList(metrics.supportNeededStudents);
+            renderProgramTypeFilterBar();
+            renderProgramsGrid();
+            renderDevOutcomesTable();
+        }
+
+        function renderStarStudentsList(stars) {
+            const container = document.getElementById('starStudentsList');
+            if (!container) return;
+            container.innerHTML = '';
+
+            stars.forEach(st => {
+                const card = document.createElement('div');
+                card.className = 'p-3.5 rounded-xl border border-amber-200 bg-amber-50/40 space-y-2';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <img src="${st.avatar}" alt="${st.name}" class="w-9 h-9 rounded-xl object-cover border border-amber-200">
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-xs sm:text-sm">${st.name}</h4>
+                                <span class="text-[11px] text-slate-500 font-num">ชั้น ${st.class} | จาก: ${st.activityName}</span>
+                            </div>
+                        </div>
+                        <button type="button" onclick="openStudent360Modal('${st.studentId}')" class="px-2.5 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-bold transition">
+                            ดู 360°
+                        </button>
+                    </div>
+                    <div class="text-[11px] text-slate-700 bg-white p-2.5 rounded-lg border border-amber-100 leading-relaxed">
+                        <strong class="text-amber-800 block mb-0.5">🌟 จุดเด่นและศักยภาพ:</strong>
+                        ${st.strength}
+                        <div class="mt-1 text-slate-500 border-t border-slate-100 pt-1">
+                            <strong>คำแนะนำต่อยอด:</strong> ${st.recommendation}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderSupportNeededStudentsList(supports) {
+            const container = document.getElementById('supportStudentsList');
+            if (!container) return;
+            container.innerHTML = '';
+
+            supports.forEach(st => {
+                const card = document.createElement('div');
+                card.className = 'p-3.5 rounded-xl border border-rose-200 bg-rose-50/40 space-y-2';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <img src="${st.avatar}" alt="${st.name}" class="w-9 h-9 rounded-xl object-cover border border-rose-200">
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-xs sm:text-sm">${st.name}</h4>
+                                <span class="text-[11px] text-slate-500 font-num">ชั้น ${st.class} | กิจกรรม: ${st.activityName}</span>
+                            </div>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-md text-[11px] font-bold ${st.attendance === 'ABSENT' ? 'bg-rose-600 text-white' : 'bg-orange-100 text-orange-800'}">
+                            ${st.attendance === 'ABSENT' ? 'ขาดกิจกรรม' : 'มีข้อสังเกต'}
+                        </span>
+                    </div>
+                    <div class="text-[11px] text-slate-700 bg-white p-2.5 rounded-lg border border-rose-100 leading-relaxed">
+                        <strong class="text-rose-800 block mb-0.5">⚠️ ข้อสังเกตจากกิจกรรม:</strong>
+                        ${st.remark || st.recommendation}
+                    </div>
+                    <div class="flex items-center justify-between pt-1">
+                        <button type="button" onclick="openStudent360Modal('${st.studentId}')" class="text-xs text-slate-500 hover:text-slate-800 underline">
+                            ดูข้อมูลรอบด้าน 360°
+                        </button>
+                        <!-- STEP 07: 1-Click Create Case Trigger -->
+                        <button type="button" onclick="openCreateCaseModal('${st.studentId}', '${st.activityId}', '${(st.remark || '').replace(/'/g, "\\'")}')" class="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-2xs">
+                            <i class="ph-bold ph-plus-circle"></i>
+                            <span>+ Create Case (ส่งต่อช่วยเหลือ)</span>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderProgramTypeFilterBar() {
+            const container = document.getElementById('programTypeFilterBar');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const types = ['ALL', ...Object.keys(PROGRAM_TYPES)];
+            types.forEach(t => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `px-2.5 py-1 rounded-lg font-semibold transition ${currentProgramTypeFilter === t ? 'bg-blue-600 text-white font-bold' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+                btn.innerText = t === 'ALL' ? 'ทุกประเภท (8 หมวด)' : PROGRAM_TYPES[t];
+                btn.onclick = () => {
+                    currentProgramTypeFilter = t;
+                    renderProgramTypeFilterBar();
+                    renderProgramsGrid();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function renderProgramsGrid() {
+            const container = document.getElementById('programsGrid');
+            if (!container) return;
+            container.innerHTML = '';
+
+            let list = developmentPrograms;
+            if (currentProgramTypeFilter !== 'ALL') {
+                list = list.filter(p => p.type === currentProgramTypeFilter);
+            }
+
+            list.forEach(p => {
+                const actCount = developmentActivities.filter(a => a.programId === p.programId).length;
+                const card = document.createElement('div');
+                card.className = 'p-4 rounded-2xl border border-slate-200 bg-white shadow-xs flex flex-col justify-between space-y-3';
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
+                            <span class="font-mono font-bold text-blue-700 text-xs">${p.programId}</span>
+                            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">${p.type}</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-sm">${p.programName}</h4>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">${p.objective}</p>
+                    </div>
+                    <div class="pt-2 border-t border-slate-100 text-xs text-slate-500 space-y-1">
+                        <div>กลุ่มเป้าหมาย: <strong class="text-slate-800">${p.targetGroup}</strong></div>
+                        <div>ผู้รับผิดชอบ: <strong class="text-slate-800">${p.responsiblePerson}</strong></div>
+                        <div class="flex items-center justify-between pt-1">
+                            <span class="font-num">${p.startDate} ถึง ${p.endDate}</span>
+                            <span class="font-bold text-blue-600 font-num">${actCount} กิจกรรม</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderDevOutcomesTable() {
+            const tbody = document.getElementById('devOutcomesTbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            const search = (document.getElementById('devLedgerSearch')?.value || '').trim().toLowerCase();
+            let list = studentParticipations;
+
+            if (search) {
+                list = list.filter(p => {
+                    const st = students.find(s => s.studentId === p.studentId) || {};
+                    return st.name?.toLowerCase().includes(search) || p.studentId.toLowerCase().includes(search);
+                });
+            }
+
+            list.forEach(p => {
+                const st = students.find(s => s.studentId === p.studentId) || { name: p.studentId, class: '-' };
+                const act = developmentActivities.find(a => a.activityId === p.activityId) || { activityName: p.activityId };
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50/80 transition';
+
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3">
+                        <div class="font-bold text-slate-900">${st.name}</div>
+                        <div class="text-[11px] text-slate-400 font-num">${p.studentId} (${st.grade}/${st.class})</div>
+                    </td>
+                    <td class="py-2.5 px-3">
+                        <div class="font-semibold text-slate-800">${act.activityName}</div>
+                        <div class="text-[11px] text-blue-600 font-mono">${p.activityId}</div>
+                    </td>
+                    <td class="py-2.5 px-3 text-center">
+                        <span class="px-2 py-0.5 rounded-full text-xs font-bold ${p.attendance === 'PRESENT' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                            ${p.attendance}
+                        </span>
+                    </td>
+                    <td class="py-2.5 px-3 text-center font-bold font-num ${p.participation === 'HIGH' ? 'text-emerald-700' : 'text-slate-600'}">
+                        ${p.participation}
+                    </td>
+                    <td class="py-2.5 px-3 text-center font-semibold text-slate-800">
+                        ${p.evaluation}
+                    </td>
+                    <td class="py-2.5 px-4 text-slate-600 text-[11px] leading-relaxed">
+                        <div class="text-slate-400">ก่อน: ${p.before || '-'}</div>
+                        <div class="font-semibold text-slate-800">หลัง: ${p.after || '-'}</div>
+                    </td>
+                    <td class="py-2.5 px-4 text-[11px] font-medium text-amber-900 bg-amber-50/30">
+                        ${p.strength || '-'}
+                    </td>
+                    <td class="py-2.5 px-3 text-center">
+                        <button type="button" onclick="openStudent360Modal('${p.studentId}')" class="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition">
+                            360°
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // STEP 07: 1-Click Create Case Modal Handling
+        function openCreateCaseModal(studentId, activityId, observationNotes) {
+            const student = students.find(s => s.studentId === studentId);
+            if (!student) return;
+
+            const activity = developmentActivities.find(a => a.activityId === activityId) || { activityName: "กิจกรรมพัฒนาผู้เรียน" };
+
+            document.getElementById('caseTargetStudentId').value = student.studentId;
+            document.getElementById('caseTargetActivityId').value = activityId;
+            document.getElementById('caseStudentAvatar').src = student.avatar;
+            document.getElementById('caseStudentName').innerText = student.name;
+            document.getElementById('caseStudentId').innerText = student.studentId;
+            document.getElementById('caseStudentClass').innerText = `${student.grade}/${student.class}`;
+            document.getElementById('caseActivityName').value = activity.activityName;
+            document.getElementById('caseObservationNotes').value = observationNotes || "นักเรียนมีพฤติกรรมแยกตัวหรือต้องการความช่วยเหลือเพิ่มเติมระหว่างกิจกรรม";
+
+            document.getElementById('createCaseModal').classList.remove('hidden');
+        }
+
+        function closeCreateCaseModal() {
+            document.getElementById('createCaseModal').classList.add('hidden');
+        }
+
+        function handleCreateCaseSubmit(e) {
+            e.preventDefault();
+            const studentId = document.getElementById('caseTargetStudentId').value;
+            const activityId = document.getElementById('caseTargetActivityId').value;
+            const actionType = document.getElementById('caseActionTypeSelect').value;
+            const notes = document.getElementById('caseObservationNotes').value;
+
+            const newCase = createCaseFromActivity(studentId, activityId, notes, actionType);
+
+            if (newCase) {
+                alert(`สร้าง Case การดูแลช่วยเหลือสำเร็จ!\nรหัสภารกิจ: ${newCase.actionId}\nเรื่อง: ${newCase.title}\nผู้รับผิดชอบ: ${newCase.assignedPerson}`);
+                closeCreateCaseModal();
+                updateRoleUI();
+                renderActionCards();
+            }
+        }
+
+        // Record Activity Participation Modal
+        function openDevParticipationModal() {
+            const actSelect = document.getElementById('partActivitySelect');
+            actSelect.innerHTML = '';
+            developmentActivities.forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = a.activityId;
+                opt.innerText = `${a.activityId} - ${a.activityName}`;
+                actSelect.appendChild(opt);
+            });
+
+            const stdSelect = document.getElementById('partStudentSelect');
+            stdSelect.innerHTML = '';
+            students.forEach(st => {
+                const opt = document.createElement('option');
+                opt.value = st.studentId;
+                opt.innerText = `${st.studentId} - ${st.name} (${st.grade}/${st.class})`;
+                stdSelect.appendChild(opt);
+            });
+
+            document.getElementById('devParticipationModal').classList.remove('hidden');
+        }
+
+        function closeDevParticipationModal() {
+            document.getElementById('devParticipationModal').classList.add('hidden');
+        }
+
+        function handleDevParticipationSubmit(e) {
+            e.preventDefault();
+            const actId = document.getElementById('partActivitySelect').value;
+            const stdId = document.getElementById('partStudentSelect').value;
+            const att = document.getElementById('partAttendanceSelect').value;
+            const partLevel = document.getElementById('partLevelSelect').value;
+            const perf = document.getElementById('partPerformanceSelect').value;
+            const before = document.getElementById('partBeforeInput').value;
+            const after = document.getElementById('partAfterInput').value;
+            const strength = document.getElementById('partStrengthInput').value;
+            const rec = document.getElementById('partRecommendationInput').value;
+            const remark = document.getElementById('partRemarkInput').value;
+
+            const isStar = perf === 'EXCELLENT' || (strength && partLevel === 'HIGH');
+            const needsSupport = perf === 'NEEDS_IMPROVEMENT' || att === 'ABSENT';
+
+            const newRecord = {
+                participationId: `PART-67-${String(studentParticipations.length + 1).padStart(3, '0')}`,
+                studentId: stdId,
+                activityId: actId,
+                attendance: att,
+                participation: partLevel,
+                performance: perf,
+                evaluation: perf === 'EXCELLENT' ? 'ดีเยี่ยม (10/10)' : (perf === 'GOOD' ? 'ดี (8/10)' : (perf === 'PASS' ? 'ผ่านเกณฑ์ (6/10)' : 'ต้องปรับปรุง (4/10)')),
+                before: before,
+                after: after,
+                improvement: after ? `มีพัฒนาการหลังร่วมกิจกรรม: ${after}` : 'ไม่มี',
+                strength: strength,
+                recommendation: rec,
+                remark: remark,
+                isStar: isStar,
+                needsSupport: needsSupport,
+                recordedBy: currentUser.name,
+                recordedAt: new Date().toISOString().replace('T', ' ').substring(0, 16)
+            };
+
+            studentParticipations.unshift(newRecord);
+            alert("บันทึกผลการประเมินการพัฒนาผู้เรียนสำเร็จ!");
+            closeDevParticipationModal();
+            renderDevelopmentView();
+        }
+
+        // Student 360 Modal with STEP 05 Development Timeline Integration
+        function openStudent360Modal(studentId) {
+            const data = getStudent360Data(studentId);
+            if (!data) return;
+
+            const st = data.student;
+            document.getElementById('s360Avatar').src = st.avatar;
+            document.getElementById('s360Name').innerText = `${st.name} (${st.nickname})`;
+            document.getElementById('s360Id').innerText = st.studentId;
+            document.getElementById('s360Class').innerText = `${st.grade}/${st.class}`;
+            document.getElementById('s360Number').innerText = st.number;
+            document.getElementById('s360Gpa').innerText = st.gpa;
+            document.getElementById('s360Attendance').innerText = st.attendanceRate;
+
+            const badgeEl = document.getElementById('s360CurrentRiskBadge');
+            if (data.currentRiskLevel === 'NORMAL') {
+                badgeEl.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800';
+                badgeEl.innerText = 'กลุ่มปกติ (Normal)';
+            } else if (data.currentRiskLevel === 'WATCH') {
+                badgeEl.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800';
+                badgeEl.innerText = 'กลุ่มเฝ้าระวัง (Watch)';
+            } else if (data.currentRiskLevel === 'RISK') {
+                badgeEl.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-orange-100 text-orange-800';
+                badgeEl.innerText = 'กลุ่มเสี่ยง (Risk)';
+            } else if (data.currentRiskLevel === 'PROBLEM') {
+                badgeEl.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800';
+                badgeEl.innerText = 'กลุ่มมีปัญหา (Problem)';
+            } else {
+                badgeEl.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700';
+                badgeEl.innerText = 'ยังไม่คัดกรอง';
+            }
+
+            document.getElementById('s360ReasoningText').innerText = data.screeningHistory.length > 0 ? data.screeningHistory[0].reasoning : 'ยังไม่มีข้อมูลผลการคัดกรองในรอบปัจจุบัน';
+
+            // STEP 05: Development History Timeline in Student 360
+            const devContainer = document.getElementById('s360DevTimelineContainer');
+            devContainer.innerHTML = '';
+            const devHist = data.developmentHistory || [];
+            document.getElementById('s360DevCountBadge').innerText = `${devHist.length} กิจกรรมที่เข้าร่วม`;
+
+            if (devHist.length === 0) {
+                devContainer.innerHTML = '<div class="text-slate-400 py-1 italic">ยังไม่มีประวัติการเข้าร่วมกิจกรรมพัฒนา</div>';
+            } else {
+                devHist.forEach(d => {
+                    const el = document.createElement('div');
+                    el.className = 'p-3 rounded-xl bg-white border border-indigo-100 shadow-2xs space-y-1.5';
+                    el.innerHTML = `
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-slate-900">${d.activityName}</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-800">${d.programType}</span>
+                        </div>
+                        <div class="text-[11px] text-slate-500 font-num">โครงการ: ${d.programName} | เข้าร่วม: <strong>${d.attendance}</strong> (ผล: ${d.evaluation})</div>
+                        ${d.strength ? `<div class="text-[11px] text-amber-900 bg-amber-50 p-2 rounded-lg border border-amber-200"><strong>🌟 จุดเด่นที่พบ:</strong> ${d.strength}</div>` : ''}
+                        ${d.improvement ? `<div class="text-[11px] text-slate-600"><strong>พัฒนาการ:</strong> ${d.improvement}</div>` : ''}
+                    `;
+                    devContainer.appendChild(el);
+                });
+            }
+
+            // Screening History Table
+            const tbody = document.getElementById('s360HistoryTbody');
+            tbody.innerHTML = '';
+            data.screeningHistory.forEach(h => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="py-2 px-3 font-num font-semibold text-slate-800">${h.academicYear}/${h.semester}</td>
+                    <td class="py-2 px-3 text-slate-700">${h.toolName}</td>
+                    <td class="py-2 px-3 text-center font-num font-bold text-slate-900">${h.score}</td>
+                    <td class="py-2 px-3 text-center"><span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${h.riskLevel === 'NORMAL' ? 'bg-emerald-100 text-emerald-800' : (h.riskLevel === 'WATCH' ? 'bg-amber-100 text-amber-800' : (h.riskLevel === 'RISK' ? 'bg-orange-100 text-orange-800' : 'bg-rose-100 text-rose-800'))}">${h.riskLevel}</span></td>
+                    <td class="py-2 px-3 text-slate-600">${h.recordedBy}</td>
+                    <td class="py-2 px-3 font-num text-slate-400">${h.recordedAt}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Trend Timeline
+            const trendContainer = document.getElementById('s360TrendTimeline');
+            trendContainer.innerHTML = '';
+            data.riskTrend.forEach((t, idx) => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center gap-2 flex-shrink-0';
+                item.innerHTML = `
+                    <div class="p-2 rounded-xl border border-slate-200 text-center bg-slate-50 min-w-[90px]">
+                        <span class="font-num text-[11px] font-semibold text-slate-500 block">เทอม ${t.yearTerm}</span>
+                        <span class="text-xs font-bold block ${t.riskLevel === 'NORMAL' ? 'text-emerald-600' : (t.riskLevel === 'WATCH' ? 'text-amber-600' : (t.riskLevel === 'RISK' ? 'text-orange-600' : 'text-rose-600'))}">${t.riskLevel}</span>
+                        <span class="text-[10px] text-slate-400 font-num">(${t.score} คะแนน)</span>
+                    </div>
+                    ${idx < data.riskTrend.length - 1 ? '<i class="ph ph-arrow-right text-slate-300"></i>' : ''}
+                `;
+                trendContainer.appendChild(item);
+            });
+
+            // Actions list
+            const actContainer = document.getElementById('s360ActionsContainer');
+            actContainer.innerHTML = '';
+            if (data.activeActions.length === 0) {
+                actContainer.innerHTML = '<div class="text-slate-400 py-2">ไม่มีภารกิจค้างดำเนินการสำหรับนักเรียนคนนี้</div>';
+            } else {
+                data.activeActions.forEach(a => {
+                    const el = document.createElement('div');
+                    el.className = 'p-3 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between';
+                    el.innerHTML = `
+                        <div>
+                            <span class="font-bold text-slate-800">${a.title}</span>
+                            <span class="text-slate-500 block text-[11px]">ผู้รับผิดชอบ: ${a.assignedPerson} | กำหนด: ${a.dueDate}</span>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${a.status === 'RESOLVED' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${a.status}</span>
+                    `;
+                    actContainer.appendChild(el);
+                });
+            }
+
+            document.getElementById('student360Modal').classList.remove('hidden');
+        }
+
+        function closeStudent360Modal() {
+            document.getElementById('student360Modal').classList.add('hidden');
+        }
+
+        // Intake & Other Common Modals
+        function openIntakeModal() {
+            const sessSelect = document.getElementById('intakeSessionSelect');
+            sessSelect.innerHTML = '';
+            screeningSessions.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.screeningId;
+                opt.innerText = `${s.screeningId} (${s.grade}/${s.class} - ${s.status})`;
+                sessSelect.appendChild(opt);
+            });
+
+            onIntakeSessionChange();
+            calculateLiveIntake();
+            document.getElementById('screeningIntakeModal').classList.remove('hidden');
+        }
+
+        function closeIntakeModal() {
+            document.getElementById('screeningIntakeModal').classList.add('hidden');
+        }
+
+        function onIntakeSessionChange() {
+            const sessId = document.getElementById('intakeSessionSelect').value;
+            const sess = screeningSessions.find(s => s.screeningId === sessId);
+            const stdSelect = document.getElementById('intakeStudentSelect');
+            stdSelect.innerHTML = '';
+
+            if (sess) {
+                const matchStudents = students.filter(s => s.grade === sess.grade && s.class === sess.class);
+                matchStudents.forEach(st => {
+                    const opt = document.createElement('option');
+                    opt.value = st.studentId;
+                    opt.innerText = `${st.studentId} - ${st.name} (เลขที่ ${st.number})`;
+                    stdSelect.appendChild(opt);
+                });
+            }
+            onIntakeStudentChange();
+        }
+
+        function onIntakeStudentChange() {
+            calculateLiveIntake();
+        }
+
+        function calculateLiveIntake() {
+            const emo = parseInt(document.getElementById('subEmo')?.value) || 0;
+            const cond = parseInt(document.getElementById('subCond')?.value) || 0;
+            const hyper = parseInt(document.getElementById('subHyper')?.value) || 0;
+            const peer = parseInt(document.getElementById('subPeer')?.value) || 0;
+            const pro = parseInt(document.getElementById('subPro')?.value) || 8;
+
+            const stdId = document.getElementById('intakeStudentSelect')?.value;
+            const student = students.find(s => s.studentId === stdId);
+            const att = student ? student.attendanceRate : "95%";
+
+            const result = classifyStudentRisk("TOOL-SDQ-2567", {
+                emotional: emo,
+                conduct: cond,
+                hyperactivity: hyper,
+                peer: peer,
+                prosocial: pro
+            }, att);
+
+            document.getElementById('liveScorePreview').innerText = `${result.score} / 40`;
+            const badge = document.getElementById('liveBadgePreview');
+            if (badge) {
+                badge.innerText = result.riskLevel;
+                if (result.riskLevel === 'NORMAL') badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800';
+                else if (result.riskLevel === 'WATCH') badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800';
+                else if (result.riskLevel === 'RISK') badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-orange-100 text-orange-800';
+                else badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800';
+            }
+
+            document.getElementById('liveReasoningPreview').innerText = result.reasoning;
+        }
+
+        function handleScreeningSubmit(e) {
+            e.preventDefault();
+            const sessId = document.getElementById('intakeSessionSelect').value;
+            const stdId = document.getElementById('intakeStudentSelect').value;
+            const emo = parseInt(document.getElementById('subEmo').value) || 0;
+            const cond = parseInt(document.getElementById('subCond').value) || 0;
+            const hyper = parseInt(document.getElementById('subHyper').value) || 0;
+            const peer = parseInt(document.getElementById('subPeer').value) || 0;
+            const pro = parseInt(document.getElementById('subPro').value) || 8;
+            const notes = document.getElementById('intakeNotes').value;
+
+            const student = students.find(s => s.studentId === stdId);
+            const totalScore = emo + cond + hyper + peer;
+
+            const validation = validateScreeningInput({
+                studentId: stdId,
+                screeningId: sessId,
+                score: totalScore,
+                teacherId: currentUser.id
+            });
+
+            if (!validation.isValid) {
+                alert("เกิดข้อผิดพลาดในการบันทึก:\n" + validation.errors.join("\n"));
+                return;
+            }
+
+            const classification = classifyStudentRisk("TOOL-SDQ-2567", {
+                emotional: emo,
+                conduct: cond,
+                hyperactivity: hyper,
+                peer: peer,
+                prosocial: pro
+            }, student.attendanceRate);
+
+            const newRes = {
+                resultId: `RES-67-${String(screeningResults.length + 1).padStart(2, '0')}`,
+                studentId: stdId,
+                screeningId: sessId,
+                score: classification.score,
+                subScores: { emotional: emo, conduct: cond, hyperactivity: hyper, peer: peer, prosocial: pro },
+                category: "แบบประเมิน SDQ ฉบับครู",
+                riskLevel: classification.riskLevel,
+                riskFactors: classification.riskFactors,
+                reasoning: classification.reasoning,
+                recordedBy: `${currentUser.id} (${currentUser.name})`,
+                recordedAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
+                evidenceNotes: notes
+            };
+
+            screeningResults.unshift(newRes);
+            const createdAction = autoGenerateActionRequired(student, newRes);
+
+            let alertMsg = `บันทึกผลการคัดกรองของ ${student.name} สำเร็จ!\nระดับความเสี่ยง: ${classification.riskLevel}\n${classification.reasoning}`;
+            if (createdAction) {
+                alertMsg += `\n\n[อัตโนมัติ] ระบบได้สร้าง 'Action Required' รหัส ${createdAction.actionId} (${createdAction.title}) ให้ผู้รับผิดชอบเรียบร้อยแล้ว`;
+            }
+
+            alert(alertMsg);
+            closeIntakeModal();
+            renderDashboard();
+            renderActionCards();
+            updateRoleUI();
+        }
+
+        // Sessions Table
+        function renderSessionsTable() {
+            const tbody = document.getElementById('sessionsTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            screeningSessions.forEach(sess => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50/80 transition';
+
+                const tool = screeningTools.find(t => t.toolId === sess.toolId) || { toolName: sess.toolId };
+
+                let statusBadge = '';
+                if (sess.status === 'DRAFT') {
+                    statusBadge = '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700">DRAFT (เตรียมรอบ)</span>';
+                } else if (sess.status === 'IN_PROGRESS') {
+                    statusBadge = '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">IN_PROGRESS (เปิดคัดกรอง)</span>';
+                } else if (sess.status === 'SUBMITTED') {
+                    statusBadge = '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">SUBMITTED (ส่งตรวจ)</span>';
+                } else if (sess.status === 'REVIEWED') {
+                    statusBadge = '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">REVIEWED (ตรวจรับรองแล้ว)</span>';
+                } else {
+                    statusBadge = '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">COMPLETED (ปิดรอบสมบูรณ์)</span>';
+                }
+
+                let actionBtn = '';
+                if (sess.status === 'DRAFT') {
+                    actionBtn = `<button onclick="transitionSessionState('${sess.screeningId}', 'IN_PROGRESS')" class="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] cursor-pointer">เปิดรับการคัดกรอง</button>`;
+                } else if (sess.status === 'IN_PROGRESS') {
+                    actionBtn = `<button onclick="transitionSessionState('${sess.screeningId}', 'SUBMITTED')" class="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-[11px] cursor-pointer">ส่งผลตรวจทาน</button>`;
+                } else if (sess.status === 'SUBMITTED') {
+                    actionBtn = `<button onclick="transitionSessionState('${sess.screeningId}', 'REVIEWED')" class="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px] cursor-pointer">รับรองผล (แนะแนว)</button>`;
+                } else if (sess.status === 'REVIEWED') {
+                    actionBtn = `<button onclick="transitionSessionState('${sess.screeningId}', 'COMPLETED')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] cursor-pointer">อนุมัติปิดรอบ (ผู้บริหาร)</button>`;
+                } else {
+                    actionBtn = `<span class="text-emerald-700 text-[11px] font-semibold">ล็อกผลแล้ว</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td class="py-3 px-3 font-mono font-bold text-blue-700">${sess.screeningId}</td>
+                    <td class="py-3 px-3 font-num font-semibold text-slate-800">${sess.academicYear} / เทอม ${sess.semester}</td>
+                    <td class="py-3 px-3 text-center font-bold text-slate-800">${sess.grade}/${sess.class}</td>
+                    <td class="py-3 px-3 text-slate-700 font-medium">${tool.toolName}</td>
+                    <td class="py-3 px-3 font-num text-slate-500 text-[11px]">${sess.startDate} ถึง ${sess.endDate}</td>
+                    <td class="py-3 px-3 text-center">${statusBadge}</td>
+                    <td class="py-3 px-3 text-center">${actionBtn}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function transitionSessionState(sessionId, targetState) {
+            const sess = screeningSessions.find(s => s.screeningId === sessionId);
+            if (!sess) return;
+
+            if (!canUserTransitionSession(currentUser, sess, targetState)) {
+                alert(`ท่านไม่มีสิทธิ์เปลี่ยนสถานะรอบนี้เป็น ${targetState} ในฐานะ ${currentUser.roleTitle}`);
+                return;
+            }
+
+            sess.status = targetState;
+            renderSessionsTable();
+            renderDashboard();
+            updateRoleUI();
+        }
+
+        // Action Center
+        function filterActionStatus(st) {
+            currentActionFilter = st;
+            document.querySelectorAll('.action-filter-btn').forEach(btn => {
+                btn.className = 'action-filter-btn px-3 py-1.5 rounded-lg font-semibold text-slate-600 hover:bg-slate-100';
+            });
+            event.target.className = 'action-filter-btn active px-3 py-1.5 rounded-lg font-bold bg-slate-200 text-slate-800';
+            renderActionCards();
+        }
+
+        function renderActionCards() {
+            const container = document.getElementById('actionCardsContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            let list = actionRequiredList;
+            if (currentActionFilter !== 'ALL') {
+                list = list.filter(a => a.status === currentActionFilter);
+            }
+
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-400">
+                        <i class="ph ph-check-circle text-4xl text-emerald-500 mb-2 block"></i>
+                        <span class="font-bold text-slate-700">ไม่มีภารกิจค้างในเงื่อนไขนี้</span>
+                    </div>
+                `;
+                return;
+            }
+
+            list.forEach(a => {
+                const student = students.find(s => s.studentId === a.studentId) || { name: a.studentId, grade: '-', class: '-' };
+                const isCrit = a.priority === 'CRITICAL';
+
+                const card = document.createElement('div');
+                card.className = `p-4 sm:p-5 rounded-2xl border ${isCrit ? 'border-rose-300 bg-rose-50/30' : 'border-slate-200 bg-white'} shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4`;
+
+                let statusBadge = '';
+                if (a.status === 'PENDING') statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800">รอเริ่มดำเนินการ</span>';
+                else if (a.status === 'IN_PROGRESS') statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">กำลังดำเนินการ</span>';
+                else statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">เสร็จสิ้น</span>';
+
+                card.innerHTML = `
+                    <div class="space-y-1.5 flex-1">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="font-mono text-xs font-bold text-blue-700">${a.actionId}</span>
+                            <span class="px-2 py-0.5 rounded-md text-[11px] font-bold ${isCrit ? 'bg-rose-600 text-white' : 'bg-orange-100 text-orange-800'}">
+                                ${a.priority}
+                            </span>
+                            <span class="text-xs font-bold text-slate-700">${a.actionType}</span>
+                            ${statusBadge}
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-sm sm:text-base">${a.title}</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">${a.description}</p>
+                        <div class="text-xs text-slate-500 flex items-center gap-3 pt-1 flex-wrap">
+                            <span>นักเรียน: <strong class="text-slate-800">${student.name} (${student.grade}/${student.class})</strong></span>
+                            <span>ผู้รับผิดชอบ: <strong class="text-blue-700">${a.assignedPerson}</strong></span>
+                            <span>กำหนดส่ง: <strong class="text-slate-700 font-num">${a.dueDate}</strong></span>
+                        </div>
+                        ${a.outcomeNotes ? `<div class="mt-2 text-xs bg-white p-2 rounded-lg border border-slate-200 text-slate-700"><strong>บันทึกผล:</strong> ${a.outcomeNotes}</div>` : ''}
+                    </div>
+                    <div class="flex sm:flex-col items-center gap-2 w-full sm:w-auto">
+                        <button type="button" onclick="openStudent360Modal('${student.studentId}')" class="flex-1 sm:flex-none px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+                            ดู 360°
+                        </button>
+                        ${a.status !== 'RESOLVED' ? `
+                            <button type="button" onclick="resolveActionTask('${a.actionId}')" class="flex-1 sm:flex-none px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition">
+                                บันทึกผลเสร็จสิ้น
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function resolveActionTask(actionId) {
+            const note = prompt("กรุณาระบุบันทึกผลการดูแลช่วยเหลือนักเรียน (Intervention Outcome):", "ได้ดำเนินการให้คำปรึกษาและประสานผู้ปกครองเรียบร้อยแล้ว");
+            if (!note) return;
+
+            const a = actionRequiredList.find(x => x.actionId === actionId);
+            if (a) {
+                a.status = 'RESOLVED';
+                a.outcomeNotes = note;
+                renderActionCards();
+                updateRoleUI();
+            }
+        }
+
+        // Tools
+        function renderToolsCards() {
+            const container = document.getElementById('toolsCardsContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            screeningTools.forEach(t => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between space-y-3';
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
+                            <span class="font-mono font-bold text-blue-700 text-xs">${t.toolId}</span>
+                            <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">${t.activeStatus}</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-sm sm:text-base">${t.toolName}</h4>
+                        <span class="text-xs text-blue-600 font-semibold block mt-0.5">เวอร์ชัน: ${t.version}</span>
+                        <p class="text-xs text-slate-600 mt-2 leading-relaxed">${t.description}</p>
+                    </div>
+                    <div class="pt-2 border-t border-slate-100 text-xs text-slate-500 space-y-1">
+                        <div>วิธีให้คะแนน: <strong class="text-slate-800">${t.scoringMethod}</strong></div>
+                        <div>ช่วงคะแนนที่ถูกต้อง: <strong class="text-slate-800 font-num">${t.minScore} - ${t.maxScore} คะแนน</strong></div>
+                        <div>จำนวนมิติที่ประเมิน: <strong class="text-slate-800 font-num">${t.categories.length} มิติ</strong></div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Test Runner Modal for 14 tests
+        function openTestRunnerModal() {
+            document.getElementById('testRunnerModal').classList.remove('hidden');
+            runInBrowserTests();
+        }
+
+        function closeTestRunnerModal() {
+            document.getElementById('testRunnerModal').classList.add('hidden');
+        }
+
+        function runInBrowserTests() {
+            const summary = typeof runAllSystemTests !== 'undefined' ? runAllSystemTests() : runAllScreeningTests();
+            const container = document.getElementById('testRunnerResultsList');
+            container.innerHTML = '';
+
+            document.getElementById('testRunnerPassBadge').innerText = `${summary.passed} / ${summary.total} PASSED (${Math.round((summary.passed/summary.total)*100)}%)`;
+
+            summary.results.forEach(t => {
+                const item = document.createElement('div');
+                item.className = `p-3 rounded-xl border ${t.passed ? 'border-emerald-200 bg-emerald-50/40' : 'border-rose-200 bg-rose-50/40'} flex items-start justify-between gap-3`;
+                item.innerHTML = `
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono font-bold ${t.passed ? 'text-emerald-700' : 'text-rose-700'}">${t.id}</span>
+                            <span class="font-bold text-slate-800 text-xs sm:text-sm">${t.name}</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">${t.details}</p>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full text-xs font-bold ${t.passed ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                        ${t.passed ? '✓ PASS' : '✗ FAIL'}
+                    </span>
+                `;
+                container.appendChild(item);
+            });
+        }
+    </script>
+</body>
+</html>
