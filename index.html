@@ -1053,7 +1053,8 @@
                         <i class="ph-fill ph-shield-check text-blue-600 text-sm"></i>
                         <span>การรักษาความปลอดภัยของสถานศึกษา</span>
                     </div>
-                    <span>กรุณายืนยันตัวตนด้วยบัญชี Google ของสถานศึกษา (@hrt.ac.th หรือบัญชีที่ได้รับอนุญาต) เพื่อเข้าใช้งานระบบ</span>
+                    <!-- [FIX-AUTH-05] Support standard Google accounts / Gmail -->
+                    <span>กรุณายืนยันตัวตนด้วยบัญชี Google (Gmail หรือ Google Workspace ที่ได้รับอนุญาต) เพื่อเข้าใช้งานระบบ</span>
                 </div>
 
                 <button type="button" id="btnGoogleSignIn" onclick="executeGoogleLogin()" class="w-full py-3.5 px-4 bg-white hover:bg-slate-50 border border-slate-300 rounded-2xl font-bold text-slate-700 text-sm flex items-center justify-center gap-3 shadow-xs hover:shadow transition min-h-[48px] cursor-pointer">
@@ -12046,10 +12047,11 @@ ightarrow$ จ่ายพัสดุ (ราชการ)</option>
             authState = 'AUTHENTICATING';
             // Truthful Login Flow: Check Google Session or redirect to institutional Google Auth
             if (typeof google !== 'undefined' && google.script && google.script.run) {
-                showToast('กำลังเชื่อมต่อการยืนยันตัวตน Google Workspace...', 'info');
+                // [FIX-AUTH-06] Updated Google Authentication notifications for Gmail & Google Workspace
+                showToast('กำลังเชื่อมต่อการยืนยันตัวตน Google Account...', 'info');
                 checkAuthenticationAndInitialize();
             } else {
-                showToast('ตรวจสอบสิทธิ์เข้าใช้งานผ่าน Google Workspace (@hrt.ac.th)', 'info');
+                showToast('ตรวจสอบสิทธิ์เข้าใช้งานผ่านบัญชี Google', 'info');
                 checkAuthenticationAndInitialize();
             }
         }
