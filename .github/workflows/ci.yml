@@ -22,12 +22,7 @@ jobs:
 
       - name: Verify JavaScript Syntax of Runtime Files
         run: |
-          node -c Config.gs
-          node -c Api.gs
-          node -c Read.gs
-          node -c Write.gs
-          node -c Audit.gs
-          node -c Code.gs
+          node -e "const vm = require('vm'), fs = require('fs'); ['Config.gs','Api.gs','Read.gs','Write.gs','Audit.gs','Code.gs'].forEach(f => new vm.Script(fs.readFileSync(f, 'utf8'))); console.log('All .gs runtime files passed syntax check');"
 
       - name: Build Release Packages & Checksums
         run: |

@@ -1,5 +1,5 @@
 HRT Inventory Release Packages Checksums (v2.7.0-rc.6)
-Created: 2026-11-08T10:14:03.108Z
+Created: 2026-11-08T10:32:25.863Z
 
-a6d7f130697778d008fb2b3d5e9ce10881824d95d5d85a6edf2512db195debdf  HRT_Inventory_v2.7.0-rc.6_Runtime.zip (273966 bytes)
-cc334fb20f59f3dd6954ca481228d6941f7965d93b87aca274c4eb7926bfc528  HRT_Inventory_v2.7.0-rc.6_Handover.zip (1838673 bytes)
+04c1fc1eccf756caca7ff8ebf99ecd3a9db37180e47076bfc6b8bf038b843a27  HRT_Inventory_v2.7.0-rc.6_Runtime.zip (274047 bytes)
+24ff54519d0e3c1eccdca182b284aff71716112c4e523b378a84abb2f20a181c  HRT_Inventory_v2.7.0-rc.6_Handover.zip (1838689 bytes)

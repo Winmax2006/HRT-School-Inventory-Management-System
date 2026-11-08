@@ -13,7 +13,7 @@
 | ด้าน | สถานะ | หลักฐานเชิงประจักษ์ |
 |---|:---:|---|
 | **การเชื่อมต่อ GitHub** | **เชื่อมต่อแล้ว** | Local Git Repository มี `remote.origin.url` ชี้ไปยัง `https://github.com/Winmax2006/HRT-School-Inventory-Management-System.git` |
-| **การซิงก์ Source ขึ้น GitHub** | **ยังไม่ซิงก์ (Unsynced)** | ปลายทางบน GitHub เป็น Empty Repository (`size: 0`, สร้างเมื่อ `2026-11-08T01:22:36Z`) ยังไม่มีการ Push Commit ของรุ่น `v2.7.0-rc.6` ขึ้นไป |
+| **การซิงก์ Source ขึ้น GitHub** | **ซิงก์แล้ว (Synced)** | Push ขึ้น branch main ที่ `https://github.com/Winmax2006/HRT-School-Inventory-Management-System.git` เรียบร้อยแล้ว พร้อมระบบ CI Quality Gate |
 | **การ Deploy บน Apps Script** | **ยังไม่ Deploy (NOT VERIFIED)** | ไม่พบไฟล์ `.clasp.json`, ไม่พบ Script ID และยังไม่มีการผูกอัตโนมัติกับ Google Apps Script Web App |
 
 ---

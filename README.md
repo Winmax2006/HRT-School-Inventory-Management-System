@@ -16,7 +16,7 @@
 | มิติความพร้อม | สถานะจริง | รายละเอียดเชิงประจักษ์ |
 |---|:---:|---|
 | **การเชื่อมโยง GitHub** | **เชื่อมต่อแล้ว (Connected)** | Remote Origin เชื่อมกับ `https://github.com/Winmax2006/HRT-School-Inventory-Management-System.git` |
-| **การซิงก์ Source Code** | **พร้อมนำขึ้น (Ready to Push)** | รวบรวมและตรวจสอบความสมบูรณ์ของซอร์สโค้ดและชุดทดสอบในเครื่อง ผ่านการทดสอบ 59/59 ข้อ |
+| **การซิงก์ Source Code** | **ซิงก์แล้ว (Synced)** | Source code, test suites และเอกสารทั้งหมดถูกนำขึ้น GitHub branch main เรียบร้อยแล้ว |
 | **การ Deploy บน Apps Script** | **ยังไม่ Deploy (NOT VERIFIED)** | การ Push ขึ้น GitHub ไม่เท่ากับการ Deploy บน Apps Script การใช้งานจริงต้องนำ 9 ไฟล์หลักไปติดตั้งบน Google Apps Script Editor หรือผ่าน `clasp` |
 | **ความพร้อมด้านธุรกรรม (Transactions)** | **แก้ไขแล้ว (BUG-01 - BUG-04 VERIFIED)** | แก้ไข False Success, Route Mismatch, Parameter Normalization และ Atomic Issuance พร้อมชุดทดสอบยืนยัน (ยังคงเหลือ BUG-05 ถึง BUG-07 ก่อน Production) |
 
