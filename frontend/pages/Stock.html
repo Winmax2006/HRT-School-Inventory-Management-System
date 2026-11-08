@@ -1,0 +1,56 @@
+<!-- ========================================== -->
+<!-- VIEW 2: STOCK / FSN MANAGEMENT (STREAMLINED) -->
+<!-- ========================================== -->
+<main id="viewFSN" class="flex-1 overflow-y-auto p-4 lg:p-6 hidden flex-col gap-4">
+    <!-- Header & Action -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+            <div class="flex items-center gap-2">
+                <h2 class="font-bold text-slate-900 text-sm sm:text-base">ทะเบียนเลขพัสดุตามระบบ FSN</h2>
+                <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200">e-GP มาตรฐาน 13 หลัก</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">จำแนกตามมาตรฐาน FSN (Group-Class-NIIN) พร้อมเอกสารคุณลักษณะเฉพาะ (TOR PDF)</p>
+        </div>
+        <button onclick="openAddFsnModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-3.5 py-2 rounded-lg text-xs flex items-center gap-1.5 transition">
+            <i class="ph-bold ph-plus"></i>
+            <span>+ เพิ่มเลขพัสดุ FSN</span>
+        </button>
+    </div>
+
+    <!-- Collapsible Educational Accordion (Req 16) -->
+    <div class="bg-amber-50/70 border border-amber-200/80 rounded-xl overflow-hidden text-xs">
+        <button onclick="toggleFsnInfo()" class="w-full p-3 flex items-center justify-between text-left font-semibold text-amber-900 hover:bg-amber-100/50 transition">
+            <div class="flex items-center gap-2">
+                <i class="ph-fill ph-info text-amber-600 text-sm"></i>
+                <span>ⓘ เกี่ยวกับมาตรฐานโครงสร้างเลขพัสดุ FSN 13 หลัก</span>
+            </div>
+            <i class="ph ph-caret-down transition-transform duration-200" id="fsnInfoCaret"></i>
+        </button>
+        <div id="fsnInfoContent" class="hidden px-4 pb-3 text-amber-800 text-xs leading-relaxed space-y-1 border-t border-amber-200/50 pt-2">
+            <p>• <b>โครงสร้างรหัส</b>: <code>[กลุ่ม 2 หลัก][ชั้น 2 หลัก]-[NIIN 9 หลัก]</code> เช่น <code>7510-00-582-4112</code></p>
+            <p>• <b>กลุ่มพัสดุภาครัฐ</b>: 75 (เครื่องเขียน), 70 (ไอทีและคอมพิวเตอร์), 78 (กีฬา), 79 (ทำความสะอาด), 65 (เวชภัณฑ์/ยา), 62 (ไฟฟ้าและแสงสว่าง)</p>
+            <p>• <b>เอกสารคุณลักษณะ (TOR)</b>: สามารถแนบและเปิดตรวจทานไฟล์ Specification PDF ได้ในตัว</p>
+        </div>
+    </div>
+
+    <!-- FSN Table -->
+    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-[13px] border-collapse text-table-cell">
+                <thead>
+                    <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-600 font-semibold text-table-header">
+                        <th class="py-2 px-4 text-sm font-semibold">รหัส FSN (13 หลัก)</th>
+                        <th class="py-2 px-4 text-sm font-semibold">ชื่อรายการมาตรฐาน FSN</th>
+                        <th class="py-2 px-4 hidden md:table-cell text-sm font-semibold">กลุ่มพัสดุ</th>
+                        <th class="py-2 px-4 text-sm font-semibold">พัสดุในคลังที่ผูกไว้</th>
+                        <th class="py-2 px-4 text-center text-sm font-semibold">เอกสารคุณลักษณะ</th>
+                        <th class="py-2 px-4 text-right text-sm font-semibold">ดำเนินการ</th>
+                    </tr>
+                </thead>
+                <tbody id="fsnTableBody" class="divide-y divide-slate-100 text-table-cell">
+                    <!-- Injected by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>

@@ -1,0 +1,794 @@
+<!-- ========================================== -->
+<!-- VIEW 3: INVENTORY DOCUMENTS & REPORTS (จัดการเอกสารคลังพัสดุ พ.ด. ๑-๗) -->
+<!-- ========================================== -->
+<main id="viewDocs" class="flex-1 overflow-y-auto p-4 lg:p-6 hidden flex-col gap-4">
+    <!-- Header & Action Bar -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3 no-print">
+        <div>
+            <h2 class="font-bold text-slate-900 text-xl flex items-center gap-2">
+                <i class="ph-fill ph-file-text text-blue-600 text-xl"></i>
+                <span>จัดการเอกสารคลังพัสดุ (Official Inventory Documents)</span>
+            </h2>
+            <p class="text-[13px] text-slate-500 mt-0.5">ระบบออกเอกสารและรายงานตามระเบียบพัสดุภาครัฐ โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี) สังกัด อบจ.สระบุรี</p>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+            <button onclick="printCurrentDocument()" class="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 rounded-lg text-sm font-semibold transition">
+                <i class="ph-bold ph-printer text-base"></i>
+                <span>พิมพ์เอกสารนี้ (Print A4)</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 7 Document Selection Tabs (no-print) -->
+    <div class="flex flex-wrap gap-2 border-b border-slate-200 pb-2.5 no-print">
+        <button onclick="switchDocTab('requisition')" id="docTabRequisition" class="doc-tab-btn px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-blue-600 text-white">
+            <i class="ph-bold ph-file-arrow-up"></i>
+            <span>1. ใบเบิก (พ.ด. ๑)</span>
+        </button>
+        <button onclick="switchDocTab('daily')" id="docTabDaily" class="doc-tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700">
+            <i class="ph-bold ph-calendar-check"></i>
+            <span>2. ยอดคงเหลือรายวัน (พ.ด. ๒)</span>
+        </button>
+        <button onclick="switchDocTab('monthly')" id="docTabMonthly" class="doc-tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700">
+            <i class="ph-bold ph-chart-bar"></i>
+            <span>3. สรุปรายเดือน (พ.ด. ๓)</span>
+        </button>
+        <button onclick="switchDocTab('stockCard')" id="docTabStockCard" class="doc-tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700">
+            <i class="ph-bold ph-identification-card"></i>
+            <span>4. ทะเบียนคุมพัสดุ (พ.ด. ๔)</span>
+        </button>
+        <button onclick="switchDocTab('yearEndSummary')" id="docTabYearEndSummary" class="doc-tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700">
+            <i class="ph-bold ph-certificate text-amber-600"></i>
+            <span>5. สรุปภาพรวมสิ้นปี (พ.ด. ๕)</span>
+        </button>
+        <button onclick="switchDocTab('yearEndCategory')" id="docTabYearEndCategory" class="doc-tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700">
+            <i class="ph-bold ph-folders text-amber-600"></i>
+            <span>6. สรุปตามหมวดสิ้นปี (พ.ด. ๖)</span>
+        </button>
+        <button onclick="switchDocTab('yearEndAllItems')" id="docTabYearEndAllItems" class="doc-tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700">
+            <i class="ph-bold ph-list-numbers text-amber-600"></i>
+            <span>7. ตรวจนับทุกรายการสิ้นปี (พ.ด. ๗)</span>
+        </button>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- DOC SUB-VIEW 1: ใบเบิกพัสดุ (REQUISITION SLIP) -->
+    <!-- ========================================== -->
+    <div id="docContentRequisition" class="flex flex-col gap-4">
+        <!-- Toolbar -->
+        <div class="bg-white p-3 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-3 no-print">
+            <div class="flex items-center gap-2">
+                <label for="selectRequisitionPreset" class="text-xs font-semibold text-slate-600">เลือกรายการใบเบิก:</label>
+                <select id="selectRequisitionPreset" onchange="loadRequisitionDocPreset()" aria-label="เลือกรายการใบเบิกพัสดุ" title="เลือกรายการใบเบิกพัสดุ" class="border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs bg-white focus:outline-none focus:border-blue-500">
+                    <!-- Injected by JS -->
+                </select>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="openRequisitionModal(null)" class="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition">
+                    <i class="ph-bold ph-plus"></i>
+                    <span>+ บันทึกขอเบิกใหม่</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Printable Document Sheet (A4 Portrait Style - แบบ พ.ด. ๑) -->
+        <div class="doc-preview-wrapper">
+            <div class="printable-document doc-portrait-a4 text-slate-800">
+                <!-- Print Running Header Meta -->
+                <div class="doc-print-header-meta flex justify-between items-center text-[9pt] text-slate-600 border-b border-slate-300 pb-1 mb-2">
+                    <span>แบบ พ.ด. ๑ • ระบบบริหารคลังพัสดุ โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)</span>
+                    <span class="font-mono text-[8.5pt]">พิมพ์จากระบบ: <span class="doc-print-time">-</span> | จนท.ผู้พิมพ์: <span class="doc-print-user">-</span> | หน้า 1 / 1</span>
+                </div>
+
+                <!-- Government Letterhead with Official Doc Control Box -->
+                <div class="flex items-start justify-between border-b-2 border-slate-900 pb-2.5 mb-4 gap-4">
+                    <div>
+                        <div class="doc-small text-slate-600 uppercase font-semibold">แบบฟอร์มงานพัสดุสถานศึกษา</div>
+                        <h3 class="doc-title text-slate-900 mt-0.5">ใบเบิกพัสดุ</h3>
+                        <div class="doc-subtitle text-slate-800">โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)</div>
+                        <div class="doc-meta text-slate-600">กลุ่มบริหารงานงบประมาณ • สังกัดองค์การบริหารส่วนจังหวัดสระบุรี</div>
+                    </div>
+                    <div class="doc-control-box flex-shrink-0 text-right">
+                        <div class="font-bold text-sm text-slate-900 border-b border-black pb-0.5">แบบ พ.ด. ๑</div>
+                        <div class="doc-small text-slate-700 mt-0.5">ใบเบิกพัสดุสถานศึกษา</div>
+                        <div class="doc-small font-mono font-bold text-slate-900" id="reqDocSerialNo">รหัสเอกสาร: HRT-INV-REQ-2569/012</div>
+                    </div>
+                </div>
+
+                <!-- Meta Information Box -->
+                <div class="grid grid-cols-2 gap-3 doc-meta mb-4 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <div class="space-y-1">
+                        <div><b>เลขที่ใบเบิก:</b> <span id="reqDocNo" class="font-mono font-bold text-blue-900">REQ-2569/012</span></div>
+                        <div><b>ผู้ขอเบิก:</b> <span id="reqDocTeacher">ครูกัญญา สร้อยสว่าง</span></div>
+                        <div><b>กลุ่มสาระฯ / ฝ่ายงาน:</b> <span id="reqDocDept">กลุ่มสาระการเรียนรู้ภาษาไทย</span></div>
+                    </div>
+                    <div class="space-y-1 text-right sm:text-left">
+                        <div><b>วันที่ขอเบิก:</b> <span id="reqDocDate">15 พฤษภาคม 2569</span></div>
+                        <div><b>คลังพัสดุที่จ่าย:</b> <span id="reqDocWarehouse" class="font-bold text-slate-900">ห้องเก็บพัสดุ</span></div>
+                        <div><b>วัตถุประสงค์:</b> <span id="reqDocPurpose">เพื่อใช้จัดการเรียนการสอนและงานธุรการ</span></div>
+                    </div>
+                </div>
+
+                <!-- Requisition Items Table (8 Columns Budget: 6+19+31+7+7+7+13+10 = 100%) -->
+                <div class="overflow-x-auto mb-4">
+                    <table class="w-full border-collapse border border-slate-400">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-900 font-bold">
+                                <th class="border border-slate-400 py-1.5 px-1 text-center w-[6%] font-semibold">ลำดับ</th>
+                                <th class="border border-slate-400 py-1.5 px-1.5 text-center w-[19%] font-semibold">รหัสพัสดุ (FSN 13 หลัก)</th>
+                                <th class="border border-slate-400 py-1.5 px-2 text-left w-[31%] font-semibold">รายการพัสดุ</th>
+                                <th class="border border-slate-400 py-1.5 px-1 text-center w-[7%] font-semibold">ขอเบิก</th>
+                                <th class="border border-slate-400 py-1.5 px-1 text-center w-[7%] font-semibold">จ่ายจริง</th>
+                                <th class="border border-slate-400 py-1.5 px-1 text-center w-[7%] font-semibold">หน่วย</th>
+                                <th class="border border-slate-400 py-1.5 px-1.5 text-left w-[13%] font-semibold">สถานที่จัดเก็บ</th>
+                                <th class="border border-slate-400 py-1.5 px-1 text-center w-[10%] font-semibold">หมายเหตุ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reqDocTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Signatures Block (3 Columns) -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 text-center border-t border-slate-300 signature-section">
+                    <div class="flex flex-col items-center gap-0.5">
+                        <div class="h-8"></div>
+                        <div>ลงชื่อ..........................................................</div>
+                        <div class="font-semibold text-slate-900" id="signTeacherName">(ครูกัญญา สร้อยสว่าง)</div>
+                        <div class="doc-small text-slate-600">ผู้ขอเบิกพัสดุ</div>
+                        <div class="doc-small text-slate-500">วันที่ 15 / พ.ค. / 2569</div>
+                    </div>
+                    <div class="flex flex-col items-center gap-0.5">
+                        <div class="h-8"></div>
+                        <div>ลงชื่อ..........................................................</div>
+                        <div class="font-semibold text-slate-900">(นายอนันต์ มั่นคง)</div>
+                        <div class="doc-small text-slate-600">เจ้าหน้าที่พัสดุ (ผู้จ่าย)</div>
+                        <div class="doc-small text-slate-500">วันที่ 15 / พ.ค. / 2569</div>
+                    </div>
+                    <div class="flex flex-col items-center gap-0.5">
+                        <div class="h-8"></div>
+                        <div>ลงชื่อ..........................................................</div>
+                        <div class="font-semibold text-slate-900">(นายสมศักดิ์ รุ่งเรือง)</div>
+                        <div class="doc-small text-slate-600">ผู้อำนวยการโรงเรียน (ผู้อนุมัติ)</div>
+                        <div class="doc-small text-slate-500">วันที่ 15 / พ.ค. / 2569</div>
+                    </div>
+                </div>
+
+                <!-- Print Running Footer Meta -->
+                <div class="doc-print-footer-meta flex justify-between items-center text-[9pt] text-slate-600 border-t border-slate-300 pt-1 mt-2">
+                    <span>ใบเบิกพัสดุสถานศึกษา (แบบ พ.ด. ๑) • โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)</span>
+                    <span class="font-bold">หน้า 1 / 1</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- DOC SUB-VIEW 2: รายงานยอดคงเหลือรายวัน (DAILY REPORT) -->
+    <!-- ========================================== -->
+    <div id="docContentDaily" class="hidden flex-col gap-4">
+        <!-- Toolbar with Category Selector & Date Filter -->
+        <div class="bg-white p-3 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-3 no-print">
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="flex items-center gap-2">
+                    <label for="dailyReportDatePicker" class="text-xs font-semibold text-slate-600 whitespace-nowrap">เลือกวันที่:</label>
+                    <input type="date" id="dailyReportDatePicker" value="2024-05-15" onchange="renderDailyReport()" aria-label="เลือกวันที่สำหรับรายงานประจำวัน" class="border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs bg-white focus:outline-none focus:border-blue-500 min-h-[36px]">
+                </div>
+                <div class="flex items-center gap-2">
+                    <label for="dailyCategorySelect" class="text-xs font-semibold text-slate-600 whitespace-nowrap">แยกตามหมวดพัสดุ:</label>
+                    <select id="dailyCategorySelect" onchange="renderDailyReport()" aria-label="เลือกหมวดหมู่วัสดุ" class="border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs bg-white focus:outline-none focus:border-blue-500 min-h-[36px] font-medium text-slate-800">
+                        <option value="ALL">ทุกหมวดพัสดุ (8 หมวดหมู่วัสดุราชการ)</option>
+                        <option value="OFF">หมวด 1 วัสดุสำนักงาน (CAT01-OFF)</option>
+                        <option value="EDU">หมวด 2 วัสดุการศึกษา (CAT02-EDU)</option>
+                        <option value="COM">หมวด 3 วัสดุคอมพิวเตอร์ (CAT03-COM)</option>
+                        <option value="SPT">หมวด 4 วัสดุกีฬา (CAT04-SPT)</option>
+                        <option value="HOU">หมวด 5 วัสดุงานบ้านงานครัว (CAT05-HOU)</option>
+                        <option value="MED">หมวด 6 วัสดุวิทยาศาสตร์/การแพทย์ (CAT06-MED)</option>
+                        <option value="ELE">หมวด 7 วัสดุไฟฟ้าและวิทยุ (CAT07-ELE)</option>
+                        <option value="BLD">หมวด 8 วัสดุก่อสร้าง (CAT08-BLD)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-slate-500">
+                <span class="font-semibold">สถานที่จัดเก็บหลัก:</span>
+                <span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-bold">ห้องเก็บพัสดุ</span>
+                <button onclick="printCurrentDocument()" class="ml-2 bg-slate-800 hover:bg-slate-900 text-white font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm text-xs transition">
+                    <i class="ph-bold ph-printer"></i>
+                    <span>พิมพ์เอกสาร (พ.ด. ๒)</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Printable Document Multi-Page Sheets Container -->
+        <div id="dailyDocPagesContainer" class="doc-preview-wrapper flex flex-col gap-6 w-full">
+            <!-- Dynamic multi-page sheets rendered by JS (renderDailyReport) -->
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- DOC SUB-VIEW 3: ใบสรุปรายงานยอดคงเหลือรายเดือน (MONTHLY REPORT) -->
+    <!-- ========================================== -->
+    <div id="docContentMonthly" class="hidden flex-col gap-4">
+        <!-- Toolbar -->
+        <div class="bg-white p-3 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-3 no-print">
+            <div class="flex items-center gap-2">
+                <label for="monthlySelect" class="text-xs font-semibold text-slate-600">เลือกเดือนที่ต้องการสรุป:</label>
+                <select id="monthlySelect" onchange="renderMonthlyReport()" aria-label="เลือกเดือนที่ต้องการสรุปรายงานประจำเดือน" title="เลือกเดือนที่ต้องการสรุปรายงานประจำเดือน" class="border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs bg-white focus:outline-none focus:border-blue-500">
+                    <option value="5/2567" selected>พฤษภาคม 2567 (ปีงบประมาณ 2567)</option>
+                    <option value="6/2567">มิถุนายน 2567 (ปีงบประมาณ 2567)</option>
+                    <option value="7/2567">กรกฎาคม 2567 (ปีงบประมาณ 2567)</option>
+                </select>
+            </div>
+            <div class="text-xs text-slate-500">
+                สรุปจำแนกตาม <span class="font-bold text-slate-800">8 หมวดหมู่วัสดุราชการไทย</span>
+            </div>
+        </div>
+
+        <!-- Printable Document Sheet (A4 Landscape Style - แบบ พ.ด. ๓) -->
+        <div class="doc-preview-wrapper">
+            <div class="printable-document doc-landscape-a4 text-slate-800">
+                <!-- Print Running Header Meta -->
+                <div class="doc-print-header-meta flex justify-between items-center text-[9pt] text-slate-600 border-b border-slate-300 pb-1 mb-2">
+                    <span>แบบ พ.ด. ๓ • ระบบบริหารคลังพัสดุ โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)</span>
+                    <span class="font-mono text-[8.5pt]">พิมพ์จากระบบ: <span class="doc-print-time">-</span> | จนท.ผู้พิมพ์: <span class="doc-print-user">-</span> | หน้า 1 / 1</span>
+                </div>
+
+                <!-- Letterhead with Official Doc Control Box -->
+                <div class="flex items-start justify-between border-b-2 border-slate-900 pb-2.5 mb-3 gap-4">
+                    <div>
+                        <div class="doc-small text-slate-600 uppercase font-semibold">แบบฟอร์มงานพัสดุสถานศึกษา</div>
+                        <h3 class="doc-title text-slate-900 mt-0.5">ใบสรุปรายงานยอดคงเหลือพัสดุประจำเดือน</h3>
+                        <div class="doc-subtitle text-slate-800">โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี) สังกัดองค์การบริหารส่วนจังหวัดสระบุรี</div>
+                        <div class="doc-meta text-slate-600 mt-0.5">ประจำเดือน: <span id="monthlyDocMonth" class="font-bold text-slate-900">พฤษภาคม 2569</span></div>
+                    </div>
+                    <div class="doc-control-box flex-shrink-0 text-right">
+                        <div class="font-bold text-sm text-slate-900 border-b border-black pb-0.5">แบบ พ.ด. ๓ (รายเดือน)</div>
+                        <div class="doc-small text-slate-700 mt-0.5">สรุปยอดคงเหลือประจำเดือน</div>
+                        <div class="doc-small font-mono font-bold text-slate-900" id="monthlyDocSerialNo">รหัสเอกสาร: HRT-INV-MTH-2569/05</div>
+                    </div>
+                </div>
+
+                <!-- Category Table (8 Official Thai Government Categories: 4+32+8+12+12+12+13+7 = 100%) -->
+                <div class="overflow-x-auto mb-4">
+                    <table class="w-full border-collapse border border-slate-400">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-900 font-bold">
+                                <th class="border border-slate-400 py-1.5 px-1 text-center w-[4%] font-semibold">ลำดับ</th>
+                                <th class="border border-slate-400 py-1.5 px-2 text-left w-[32%] font-semibold">หมวดหมู่วัสดุตามระเบียบภาครัฐ (กลุ่มพัสดุ FSN)</th>
+                                <th class="border border-slate-400 py-1.5 px-1 text-center w-[8%] font-semibold">จำนวนชนิด</th>
+                                <th class="border border-slate-400 py-1.5 px-1.5 text-right w-[12%] font-semibold">ยอดยกมา (฿)</th>
+                                <th class="border border-slate-400 py-1.5 px-1.5 text-right w-[12%] font-semibold">รับเข้าในเดือน (฿)</th>
+                                <th class="border border-slate-400 py-1.5 px-1.5 text-right w-[12%] font-semibold">เบิกจ่ายในเดือน (฿)</th>
+                                <th class="border border-slate-400 py-1.5 px-1.5 text-right w-[13%] font-semibold">คงเหลือสิ้นเดือน (฿)</th>
+                                <th class="border border-slate-400 py-1.5 px-1 text-center w-[7%] font-semibold">สัดส่วน %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="monthlyDocTableBody">
+                            <!-- Injected by JS -->
+                        </tbody>
+                        <tfoot id="monthlyDocTableFoot">
+                            <!-- Injected by JS -->
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- Signatures Block (Committee of 3) -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 text-center border-t border-slate-300 signature-section">
+                    <div class="flex flex-col items-center gap-0.5">
+                        <div class="h-8"></div>
+                        <div>ลงชื่อ..........................................................</div>
+                        <div class="font-semibold text-slate-900">(นางกัลยาณี เกษมสุข)</div>
+                        <div class="doc-small text-slate-600">ประธานกรรมการตรวจนับพัสดุ</div>
+                        <div class="doc-small text-slate-500">วันที่ 31 / พ.ค. / 2569</div>
+                    </div>
+                    <div class="flex flex-col items-center gap-0.5">
+                        <div class="h-8"></div>
+                        <div>ลงชื่อ..........................................................</div>
+                        <div class="font-semibold text-slate-900">(นายวิชัย สุวรรณโชติ)</div>
+                        <div class="doc-small text-slate-600">กรรมการตรวจนับพัสดุ</div>
+                        <div class="doc-small text-slate-500">วันที่ 31 / พ.ค. / 2569</div>
+                    </div>
+                    <div class="flex flex-col items-center gap-0.5">
+                        <div class="h-8"></div>
+                        <div>ลงชื่อ..........................................................</div>
+                        <div class="font-semibold text-slate-900">(นายอนันต์ มั่นคง)</div>
+                        <div class="doc-small text-slate-600">เจ้าหน้าที่พัสดุ (กรรมการ/เลขานุการ)</div>
+                        <div class="doc-small text-slate-500">วันที่ 31 / พ.ค. / 2569</div>
+                    </div>
+                </div>
+
+                <!-- Print Running Footer Meta -->
+                <div class="doc-print-footer-meta flex justify-between items-center text-[9pt] text-slate-600 border-t border-slate-300 pt-1 mt-2">
+                    <span>ใบสรุปรายงานยอดคงเหลือพัสดุประจำเดือน (แบบ พ.ด. ๓) • โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)</span>
+                    <span class="font-bold">หน้า 1 / 1</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- DOC SUB-VIEW 4: ทะเบียนคุมพัสดุ (STOCK CARD / พ.ด. ๔) -->
+    <!-- ========================================== -->
+    <div id="docContentStockCard" class="hidden flex-col gap-4">
+        <!-- Toolbar -->
+        <div class="bg-white p-3 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-3 no-print">
+            <div class="flex items-center gap-2 flex-1 max-w-md">
+                <label for="stockCardItemSelect" class="text-xs font-semibold text-slate-600 flex-shrink-0">เลือกพัสดุ:</label>
+                <select id="stockCardItemSelect" onchange="loadStockCardItem()" aria-label="เลือกรายการพัสดุสำหรับพิมพ์ทะเบียนคุมพัสดุ" title="เลือกรายการพัสดุสำหรับพิมพ์ทะเบียนคุมพัสดุ" class="w-full border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs bg-white focus:outline-none focus:border-blue-500">
+                    <!-- Populated by JS -->
+                </select>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="printCurrentDocument()" class="inline-flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                    <i class="ph-bold ph-printer"></i>
+                    <span>พิมพ์ Stock Card</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Printable Document Sheet (A4 Landscape Style - แบบ พ.ด. ๔) -->
+        <div class="doc-preview-wrapper">
+            <div class="printable-document doc-landscape-a4 text-slate-800">
+                <!-- Print Running Header Meta -->
+                <div class="doc-print-header-meta flex justify-between items-center text-[9pt] text-slate-600 border-b border-slate-300 pb-1 mb-2">
+                    <span>แบบ พ.ด. ๔ • ระบบบริหารคลังพัสดุ โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)</span>
+                    <span class="font-mono text-[8.5pt]">พิมพ์จากระบบ: <span class="doc-print-time">-</span> | จนท.ผู้พิมพ์: <span class="doc-print-user">-</span> | หน้า 1 / 1</span>
+                </div>
+
+                <!-- Letterhead with Official Doc Control Box -->
+                <div class="flex items-start justify-between border-b-2 border-slate-900 pb-2.5 mb-3 gap-4">
+                    <div>
+                        <div class="doc-small text-slate-600 uppercase font-semibold">แบบฟอร์มงานพัสดุสถานศึกษา</div>
+                        <h3 class="doc-title text-slate-900 mt-0.5">ทะเบียนคุมพัสดุ (Stock Card)</h3>
+                        <div class="doc-subtitle text-slate-800">โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)</div>
+                        <div class="doc-meta text-slate-600">กลุ่มบริหารงานงบประมาณ สังกัดองค์การบริหารส่วนจังหวัดสระบุรี</div>
+                    </div>
+                    <div class="doc-control-box flex-shrink-0 text-right">
+                        <div class="font-bold text-sm text-slate-900 border-b border-black pb-0.5">แบบ พ.ด. ๔ (ทะเบียนคุม)</div>
+                        <div class="doc-small text-slate-700 mt-0.5">ทะเบียนคุมพัสดุรายตัว</div>
+                        <div class="doc-small font-mono font-bold text-slate-900" id="scHeaderDocSerial">รหัสเอกสาร: HRT-INV-STK-OFF-001</div>
+                        <div class="doc-small font-mono font-bold text-slate-900 mt-0.5" id="scHeaderFsnCode">FSN: 7510-00-582-4112</div>
+                    </div>
+                </div>
+
+                <!-- Material Details Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 bg-slate-50 p-2.5 rounded-xl border border-slate-200 mb-4 doc-meta">
+                    <div>
+                        <span class="text-slate-500 block doc-small">ชื่อพัสดุ / รายการ:</span>
+                        <span class="font-bold text-slate-900 block truncate text-sm" id="scName">กระดาษ A4</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block doc-small">หมวดหมู่วัสดุ:</span>
+                        <span class="font-semibold text-blue-900 text-sm" id="scCategory">วัสดุสำนักงาน</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block doc-small">สถานที่จัดเก็บ:</span>
+                        <span class="font-bold text-emerald-800 text-sm" id="scWarehouse">ห้องเก็บพัสดุ</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block doc-small">หน่วยนับ:</span>
+                        <span class="font-semibold text-slate-800 text-sm" id="scUnit">รีม</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block doc-small">รหัสพัสดุ FSN 13 หลัก:</span>
+                        <span class="font-mono font-bold text-slate-900 text-xs sm:text-sm" id="scFsnCode">7510-00-582-4112</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block doc-small">เกณฑ์พัสดุขั้นต่ำ (Min Stock):</span>
+                        <span class="font-bold text-red-700 font-num text-sm" id="scMin">20</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block doc-small">จุดสั่งซื้อซ้ำ (ROP):</span>
+                        <span class="font-bold text-amber-700 font-num text-sm" id="scRop">40</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block doc-small">ราคาต่อหน่วยล่าสุด:</span>
+                        <span class="font-bold text-slate-900 font-num text-sm" id="scUnitCost">฿115.00</span>
+                    </div>
+                    <div class="sm:col-span-4 border-t border-slate-200 pt-1.5 flex items-center justify-between">
+                        <div>
+                            <span class="text-slate-500 doc-small mr-1">ผู้จัดจำหน่าย / แหล่งที่มา:</span>
+                            <span class="font-medium text-slate-800 doc-small" id="scSupplier">บจก. ออฟฟิศเมท</span>
+                        </div>
+                        <div class="text-slate-500 doc-small">
+                            รหัสอ้างอิงภายใน: <span id="scHeaderCode" class="font-mono font-bold text-slate-800">OFF-001</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ledger Table -->
+                <div class="overflow-x-auto mb-4">
+                    <table class="w-full border-collapse border border-slate-400">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-900 font-bold text-center">
+                                <th class="border border-slate-400 py-1 px-1.5 w-[8%] font-semibold" rowspan="2">วัน เดือน ปี</th>
+                                <th class="border border-slate-400 py-1 px-1.5 w-[12%] font-semibold" rowspan="2">เลขที่เอกสาร / รายการ</th>
+                                <th class="border border-slate-400 py-1 px-2 w-[16%] font-semibold" rowspan="2">ผู้เบิก / หน่วยงาน</th>
+                                <th class="border border-slate-400 py-1 px-1 w-[8%] font-semibold" rowspan="2">ราคา/หน่วย (฿)</th>
+                                <th class="border border-slate-400 py-0.5 px-1 text-center" colspan="2">รับเข้า</th>
+                                <th class="border border-slate-400 py-0.5 px-1 text-center" colspan="2">จ่ายออก</th>
+                                <th class="border border-slate-400 py-0.5 px-1 text-center" colspan="2">คงเหลือ</th>
+                                <th class="border border-slate-400 py-1 px-1 w-[9%] font-semibold" rowspan="2">หมายเหตุ</th>
+                            </tr>
+                            <tr class="bg-slate-50 text-slate-700 text-center font-semibold">
+                                <th class="border border-slate-400 py-0.5 px-1 w-[6%]">จำนวน</th>
+                                <th class="border border-slate-400 py-0.5 px-1 w-[9%]">มูลค่า (฿)</th>
+                                <th class="border border-slate-400 py-0.5 px-1 w-[6%]">จำนวน</th>
+                                <th class="border border-slate-400 py-0.5 px-1 w-[9%]">มูลค่า (฿)</th>
+                                <th class="border border-slate-400 py-0.5 px-1 w-[7%]">จำนวน</th>
+                                <th class="border border-slate-400 py-0.5 px-1 w-[10%]">มูลค่า (฿)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scLedgerBody">
+                            <!-- Populated dynamically by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="doc-small text-slate-600 flex items-center justify-between border-t border-slate-300 pt-2.5 signature-section">
+                    <span>บันทึกและประมวลผลโดย: ระบบบริหารคลังพัสดุ HRT Inventory System</span>
+                    <span>เจ้าหน้าที่ผู้ดูแล: นายอนันต์ มั่นคง (งานพัสดุ)</span>
+                </div>
+
+                <!-- Print Running Footer Meta -->
+                <div class="doc-print-footer-meta flex justify-between items-center text-[9pt] text-slate-600 border-t border-slate-300 pt-1 mt-2">
+                    <span>ทะเบียนคุมพัสดุ (แบบ พ.ด. ๔) • โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)</span>
+                    <span class="font-bold">หน้า 1 / 1</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- DOC SUB-VIEW 5: สรุปภาพรวมสิ้นปีงบ (แบบ พ.ด. ๕) -->
+    <!-- ========================================== -->
+    <div id="docContentYearEndSummary" class="hidden flex-col gap-4">
+        <!-- Toolbar -->
+        <div class="bg-white p-3 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-3 no-print">
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-semibold text-slate-600">รอบรายงานสิ้นปีงบประมาณ:</span>
+                <span id="yeSummaryFiscalBadge" class="bg-amber-100 text-amber-900 font-bold px-2.5 py-1 rounded text-xs border border-amber-300">
+                    ปีงบประมาณ พ.ศ. 2567 (1 ต.ค. 2566 – 30 ก.ย. 2567)
+                </span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="printCurrentDocument()" class="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold transition">
+                    <i class="ph-bold ph-printer"></i>
+                    <span>พิมพ์แบบ พ.ด. ๕ (A4 ขาวดำ)</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Printable Document Sheet (A4 Landscape Style - Exact 1 Page Fit - แบบ พ.ด. ๕) -->
+        <div class="doc-preview-wrapper">
+            <div class="printable-document doc-landscape-a4 text-slate-800">
+                <!-- Print Running Header Meta -->
+                <div class="doc-print-header-meta flex justify-between items-center text-[9pt] text-slate-600 border-b border-slate-300 pb-1 mb-2">
+                    <span>แบบ พ.ด. ๕ • ระบบบริหารคลังพัสดุ โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)</span>
+                    <span class="font-mono text-[8.5pt]">พิมพ์จากระบบ: <span class="doc-print-time">-</span> | จนท.ผู้พิมพ์: <span class="doc-print-user">-</span> | หน้า 1 / 1</span>
+                </div>
+
+                <!-- Letterhead with Official Doc Control Box -->
+                <div class="flex items-start justify-between border-b-2 border-slate-900 pb-2 mb-2.5 gap-4">
+                    <div>
+                        <div class="doc-small text-slate-600 uppercase font-semibold">แบบฟอร์มเอกสารรายงานพัสดุคงเหลือสิ้นปีงบประมาณ</div>
+                        <h3 class="doc-title text-slate-900 mt-0.5 leading-tight">รายงานสรุปผลการตรวจนับและยอดพัสดุคงเหลือ ณ วันสิ้นปีงบประมาณ</h3>
+                        <div class="doc-subtitle text-slate-800">โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี) สังกัดองค์การบริหารส่วนจังหวัดสระบุรี</div>
+                        <div class="doc-meta text-slate-600 mt-0.5">
+                            ประจำปีงบประมาณ พ.ศ. <span id="yeSumDocYear" class="font-bold text-slate-900">2569</span> (ณ วันที่ 30 กันยายน <span id="yeSumDocYearDate" class="font-bold text-slate-900">2569</span>)
+                        </div>
+                    </div>
+                    <div class="doc-control-box flex-shrink-0 text-right">
+                        <div class="font-bold text-sm text-slate-900 border-b border-black pb-0.5">แบบ พ.ด. ๕</div>
+                        <div class="doc-small text-slate-700 mt-0.5">สรุปภาพรวมสถานศึกษา</div>
+                        <div class="doc-small font-mono font-bold text-slate-900" id="yeSumDocSerialNo">รหัสเอกสาร: HRT-INV-YE-SUM-2569/001</div>
+                    </div>
+                </div>
+
+                <!-- Meta Information Box -->
+                <div class="grid grid-cols-2 gap-3 doc-meta mb-2.5 bg-slate-50 p-2 rounded-lg border border-slate-200">
+                    <div class="space-y-0.5">
+                        <div><b>หน่วยงานผู้เบิก:</b> โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)</div>
+                        <div><b>กลุ่มงาน:</b> กลุ่มบริหารงานงบประมาณ (งานพัสดุและสินทรัพย์)</div>
+                        <div><b>คำสั่งแต่งตั้งคณะกรรมการ:</b> คำสั่ง ร.ร.หรเทพ ที่ 88/2569 ลงวันที่ 15 กันยายน 2569</div>
+                    </div>
+                    <div class="space-y-0.5 text-right sm:text-left">
+                        <div><b>รอบระยะเวลาบัญชี:</b> <span id="yeSumDocPeriod">1 ตุลาคม 2568 ถึง 30 กันยายน 2569</span></div>
+                        <div><b>วันที่ดำเนินการตรวจนับ:</b> 30 กันยายน 2569</div>
+                        <div><b>สถานที่จัดเก็บหลัก:</b> ห้องเก็บพัสดุ ศูนย์กลางโรงเรียน</div>
+                    </div>
+                </div>
+
+                <!-- Side-by-Side Tables Layout (Financial Movement + Condition Breakdown) -->
+                <div class="ye-summary-grid grid grid-cols-1 lg:grid-cols-12 gap-3 mb-2">
+                    <!-- Table 1: Financial Movement (Left) -->
+                    <div class="ye-summary-left lg:col-span-7 overflow-x-auto">
+                        <div class="doc-meta font-bold text-slate-900 mb-1">1. รายการประเมินการเคลื่อนไหวทางบัญชีพัสดุคงคลัง</div>
+                        <table class="w-full border-collapse border border-slate-400">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-900 font-bold">
+                                    <th class="border border-slate-400 py-1 px-1 text-center w-[6%] font-semibold">ที่</th>
+                                    <th class="border border-slate-400 py-1 px-1.5 text-left w-[40%] font-semibold">รายการประเมินทางบัญชี</th>
+                                    <th class="border border-slate-400 py-1 px-1 text-center w-[10%] font-semibold">ชนิด</th>
+                                    <th class="border border-slate-400 py-1 px-1 text-center w-[12%] font-semibold">จำนวน</th>
+                                    <th class="border border-slate-400 py-1 px-1.5 text-right w-[20%] font-semibold">มูลค่ารวม (฿)</th>
+                                    <th class="border border-slate-400 py-1 px-1 text-center w-[12%] font-semibold">หมายเหตุ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num">1</td>
+                                    <td class="border border-slate-400 py-1 px-1.5 font-semibold text-slate-900">ยอดยกมาต้นปี (1 ต.ค.)</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num">100</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num" id="yeSumOpeningQty">4,250</td>
+                                    <td class="border border-slate-400 py-1 px-1.5 text-right font-num" id="yeSumOpeningVal">฿340,000.00</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center text-slate-500 doc-small">ยกยอดมา</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num">2</td>
+                                    <td class="border border-slate-400 py-1 px-1.5 font-semibold text-slate-900">รับเข้าระหว่างปี (จัดซื้อ/รับโอน)</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num">85</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num text-emerald-800 font-bold" id="yeSumInQty">+2,180</td>
+                                    <td class="border border-slate-400 py-1 px-1.5 text-right font-num text-emerald-800 font-bold" id="yeSumInVal">+฿185,450.00</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center text-slate-500 doc-small">ใบตรวจรับ</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num">3</td>
+                                    <td class="border border-slate-400 py-1 px-1.5 font-semibold text-slate-900">จ่ายออกระหว่างปี (เบิกจ่าย)</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num">92</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num text-red-700 font-bold" id="yeSumOutQty">-2,450</td>
+                                    <td class="border border-slate-400 py-1 px-1.5 text-right font-num text-red-700 font-bold" id="yeSumOutVal">-฿198,300.00</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center text-slate-500 doc-small">แบบ พ.ด.๑</td>
+                                </tr>
+                                <tr class="bg-blue-50/70 font-bold border-t-2 border-slate-900">
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num">4</td>
+                                    <td class="border border-slate-400 py-1 px-1.5 text-slate-900">ยอดคงเหลือตามบัญชี (30 ก.ย.)</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num">100</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num" id="yeSumBookQty">3,980</td>
+                                    <td class="border border-slate-400 py-1 px-1.5 text-right font-num text-blue-900" id="yeSumBookVal">฿327,150.00</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center text-blue-900 doc-small">ทะเบียนคุม</td>
+                                </tr>
+                                <tr class="bg-emerald-50/70 font-bold">
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num">5</td>
+                                    <td class="border border-slate-400 py-1 px-1.5 text-emerald-950">ยอดที่ตรวจนับได้จริง (30 ก.ย.)</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num">100</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num text-emerald-900" id="yeSumActualQty">3,980</td>
+                                    <td class="border border-slate-400 py-1 px-1.5 text-right font-num text-emerald-950" id="yeSumActualVal">฿327,150.00</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center text-emerald-800 doc-small">นับจริงครบ</td>
+                                </tr>
+                                <tr class="bg-slate-100 font-bold">
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num">6</td>
+                                    <td class="border border-slate-400 py-1 px-1.5 text-slate-800">ผลต่างการตรวจนับ (ขาด / เกิน)</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num">0</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num text-slate-700" id="yeSumDiffQty">0</td>
+                                    <td class="border border-slate-400 py-1 px-1.5 text-right font-num text-slate-700" id="yeSumDiffVal">฿0.00</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center text-emerald-800 doc-small">ตรงตามบัญชี</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Table 2: Condition Breakdown (Right) -->
+                    <div class="ye-summary-right lg:col-span-5 overflow-x-auto">
+                        <div class="doc-meta font-bold text-slate-900 mb-1">2. สรุปสภาพพัสดุคงเหลือ (ณ 30 ก.ย.)</div>
+                        <table class="w-full border-collapse border border-slate-400">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-900 font-bold">
+                                    <th class="border border-slate-400 py-1 px-1 text-center w-[8%] font-semibold">ที่</th>
+                                    <th class="border border-slate-400 py-1 px-1.5 text-left w-[40%] font-semibold">สภาพพัสดุ</th>
+                                    <th class="border border-slate-400 py-1 px-1 text-center w-[16%] font-semibold">รายการ</th>
+                                    <th class="border border-slate-400 py-1 px-1 text-center w-[12%] font-semibold">%</th>
+                                    <th class="border border-slate-400 py-1 px-1.5 text-right w-[24%] font-semibold">มูลค่าคงเหลือ (฿)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num">1</td>
+                                    <td class="border border-slate-400 py-1 px-1.5 font-semibold text-emerald-900">1. ปกติ พร้อมใช้งาน</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num font-bold text-emerald-800" id="yeCondCountNormal">96</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num text-emerald-800">96.0%</td>
+                                    <td class="border border-slate-400 py-1 px-1.5 text-right font-num text-emerald-900" id="yeCondValNormal">฿318,450.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num">2</td>
+                                    <td class="border border-slate-400 py-1 px-1.5 font-semibold text-amber-900">2. ชำรุด (ซ่อมได้)</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num font-bold text-amber-800" id="yeCondCountRepair">3</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num text-amber-800">3.0%</td>
+                                    <td class="border border-slate-400 py-1 px-1.5 text-right font-num text-amber-900" id="yeCondValRepair">฿6,800.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num">3</td>
+                                    <td class="border border-slate-400 py-1 px-1.5 font-semibold text-red-900">3. รอจำหน่าย/เสื่อมสภาพ</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num font-bold text-red-800" id="yeCondCountDisposed">1</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num text-red-800">1.0%</td>
+                                    <td class="border border-slate-400 py-1 px-1.5 text-right font-num text-red-900" id="yeCondValDisposed">฿1,900.00</td>
+                                </tr>
+                                <tr class="bg-slate-100 font-bold border-t-2 border-slate-900">
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num" colspan="2">รวมพัสดุทุกสภาพ</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num" id="yeCondCountTotal">100</td>
+                                    <td class="border border-slate-400 py-1 px-1 text-center font-num">100.0%</td>
+                                    <td class="border border-slate-400 py-1 px-1.5 text-right font-num" id="yeCondValTotal">฿327,150.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="text-[8.5pt] text-slate-500 mt-1 italic leading-tight">
+                            * ปกติรอเบิกจ่ายปีงบถัดไป / ชำรุดเสนอตั้งงบซ่อม / รอจำหน่ายเสนอขออนุมัติจำหน่าย
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3-Party Signatures Block -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-center border-t border-slate-300 signature-section">
+                    <div class="flex flex-col items-center gap-0.5">
+                        <div class="h-6 sig-gap"></div>
+                        <div>ลงชื่อ..........................................................</div>
+                        <div class="font-semibold text-slate-900">(นายอนันต์ มั่นคง)</div>
+                        <div class="doc-small text-slate-600">เจ้าหน้าที่ / ผู้ได้รับมอบหมายตรวจนับ</div>
+                        <div class="doc-small text-slate-500">วันที่ 30 กันยายน <span class="doc-sum-sign-year">2569</span></div>
+                    </div>
+                    <div class="flex flex-col items-center gap-0.5">
+                        <div class="h-6 sig-gap"></div>
+                        <div>ลงชื่อ..........................................................</div>
+                        <div class="font-semibold text-slate-900">(นายวิชัย สุวรรณโชติ)</div>
+                        <div class="doc-small text-slate-600">หัวหน้าเจ้าหน้าที่พัสดุ (ผู้ตรวจสอบ)</div>
+                        <div class="doc-small text-slate-500">วันที่ 30 กันยายน <span class="doc-sum-sign-year">2569</span></div>
+                    </div>
+                    <div class="flex flex-col items-center gap-0.5">
+                        <div class="h-6 sig-gap"></div>
+                        <div>ลงชื่อ..........................................................</div>
+                        <div class="font-semibold text-slate-900">(นางกัลยาณี เกษมสุข)</div>
+                        <div class="doc-small text-slate-600">หัวหน้ากลุ่มบริหารงานงบประมาณ (ผู้เห็นชอบ)</div>
+                        <div class="doc-small text-slate-500">วันที่ 30 กันยายน <span class="doc-sum-sign-year">2569</span></div>
+                    </div>
+                </div>
+
+                <!-- Print Running Footer Meta -->
+                <div class="doc-print-footer-meta flex justify-between items-center text-[9pt] text-slate-600 border-t border-slate-300 pt-1 mt-2">
+                    <span>แบบฟอร์มเอกสารรายงานพัสดุคงเหลือสิ้นปีงบประมาณ (แบบ พ.ด. ๕) • โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)</span>
+                    <span class="font-bold">หน้า 1 / 1</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- DOC SUB-VIEW 6: สรุปตาม 8 หมวดสิ้นปีงบ (แบบ พ.ด. ๖) -->
+    <!-- ========================================== -->
+    <div id="docContentYearEndCategory" class="hidden flex-col gap-4">
+        <!-- Toolbar -->
+        <div class="bg-white p-3 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-3 no-print">
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-semibold text-slate-600">รายงานพัสดุสิ้นปีงบประมาณแยกตาม 8 หมวดราชการ:</span>
+                <span id="yeCategoryFiscalBadge" class="bg-amber-100 text-amber-900 font-bold px-2.5 py-1 rounded text-xs border border-amber-300">
+                    ปีงบประมาณ พ.ศ. 2567
+                </span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="printCurrentDocument()" class="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold transition">
+                    <i class="ph-bold ph-printer"></i>
+                    <span>พิมพ์แบบ พ.ด. ๖ (A4 แนวนอน)</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Printable Document Sheet (A4 Landscape Style - แบบ พ.ด. ๖) -->
+        <div class="doc-preview-wrapper">
+            <div class="printable-document doc-landscape-a4 text-slate-800">
+                <!-- Print Running Header Meta -->
+                <div class="doc-print-header-meta flex justify-between items-center text-[9pt] text-slate-600 border-b border-slate-300 pb-1 mb-2">
+                    <span>แบบ พ.ด. ๖ • ระบบบริหารคลังพัสดุ โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)</span>
+                    <span class="font-mono text-[8.5pt]">พิมพ์จากระบบ: <span class="doc-print-time">-</span> | จนท.ผู้พิมพ์: <span class="doc-print-user">-</span> | หน้า 1 / 1</span>
+                </div>
+
+                <!-- Letterhead with Official Doc Control Box -->
+                <div class="doc-letterhead-cat flex items-start justify-between border-b-2 border-slate-900 pb-2 mb-2.5 gap-4">
+                    <div>
+                        <div class="doc-small text-slate-600 uppercase font-semibold">แบบฟอร์มเอกสารรายงานพัสดุคงเหลือสิ้นปีงบประมาณ</div>
+                        <h3 class="doc-title text-slate-900 mt-0.5">รายงานยอดพัสดุคงเหลือ ณ วันสิ้นปีงบประมาณ แยกตาม 8 หมวดหมู่วัสดุ</h3>
+                        <div class="doc-subtitle text-slate-800">โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี) สังกัดองค์การบริหารส่วนจังหวัดสระบุรี</div>
+                        <div class="doc-meta text-slate-600 mt-0.5">
+                            ประจำปีงบประมาณ พ.ศ. <span id="yeCatDocYear" class="font-bold text-slate-900">2569</span> (ณ วันที่ 30 กันยายน <span id="yeCatDocYearDate" class="font-bold text-slate-900">2569</span>)
+                        </div>
+                    </div>
+                    <div class="doc-control-box flex-shrink-0 text-right">
+                        <div class="font-bold text-sm text-slate-900 border-b border-black pb-0.5">แบบ พ.ด. ๖</div>
+                        <div class="doc-small text-slate-700 mt-0.5">สรุปตาม 8 หมวดราชการ</div>
+                        <div class="doc-small font-mono font-bold text-slate-900" id="yeCatDocSerialNo">รหัสเอกสาร: HRT-INV-YE-CAT-2569/001</div>
+                    </div>
+                </div>
+
+                <!-- 8 Categories Table -->
+                <div class="overflow-x-auto mb-3">
+                    <table class="w-full border-collapse border border-slate-400">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-900 font-bold">
+                                <th class="border border-slate-400 py-1.5 px-1 text-center w-[4%] font-semibold">ลำดับ</th>
+                                <th class="border border-slate-400 py-1.5 px-2 text-left w-[28%] font-semibold">หมวดหมู่วัสดุราชการ (กลุ่มพัสดุ FSN)</th>
+                                <th class="border border-slate-400 py-1.5 px-1 text-center w-[7%] font-semibold">ชนิด</th>
+                                <th class="border border-slate-400 py-1.5 px-1.5 text-right w-[11%] font-semibold">ยอดยกมา 1 ต.ค.(฿)</th>
+                                <th class="border border-slate-400 py-1.5 px-1.5 text-right w-[11%] font-semibold">รับเข้าทั้งปี (฿)</th>
+                                <th class="border border-slate-400 py-1.5 px-1.5 text-right w-[11%] font-semibold">จ่ายออกทั้งปี (฿)</th>
+                                <th class="border border-slate-400 py-1.5 px-1.5 text-right w-[12%] font-semibold">คงเหลือ 30 ก.ย.(฿)</th>
+                                <th class="border border-slate-400 py-1.5 px-1 text-center w-[6%] font-semibold">ร้อยละ %</th>
+                                <th class="border border-slate-400 py-1.5 px-1.5 text-center w-[10%] font-semibold">สภาพพัสดุ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="yeCategoryTableBody">
+                            <!-- Injected by JS -->
+                        </tbody>
+                        <tfoot id="yeCategoryTableFoot">
+                            <!-- Injected by JS -->
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- 3-Party Signatures Block -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 text-center border-t border-slate-300 signature-section">
+                    <div class="flex flex-col items-center gap-0.5">
+                        <div class="h-6 sig-gap-cat"></div>
+                        <div>ลงชื่อ..........................................................</div>
+                        <div class="font-semibold text-slate-900">(นายอนันต์ มั่นคง)</div>
+                        <div class="doc-small text-slate-600">เจ้าหน้าที่ / ผู้ได้รับมอบหมาย</div>
+                        <div class="doc-small text-slate-500">วันที่ 30 กันยายน <span class="doc-cat-sign-year">2569</span></div>
+                    </div>
+                    <div class="flex flex-col items-center gap-0.5">
+                        <div class="h-6 sig-gap-cat"></div>
+                        <div>ลงชื่อ..........................................................</div>
+                        <div class="font-semibold text-slate-900">(นายวิชัย สุวรรณโชติ)</div>
+                        <div class="doc-small text-slate-600">หัวหน้าเจ้าหน้าที่พัสดุ</div>
+                        <div class="doc-small text-slate-500">วันที่ 30 กันยายน <span class="doc-cat-sign-year">2569</span></div>
+                    </div>
+                    <div class="flex flex-col items-center gap-0.5">
+                        <div class="h-6 sig-gap-cat"></div>
+                        <div>ลงชื่อ..........................................................</div>
+                        <div class="font-semibold text-slate-900">(นางกัลยาณี เกษมสุข)</div>
+                        <div class="doc-small text-slate-600">หัวหน้ากลุ่มบริหารงานงบประมาณ</div>
+                        <div class="doc-small text-slate-500">วันที่ 30 กันยายน <span class="doc-cat-sign-year">2569</span></div>
+                    </div>
+                </div>
+
+                <!-- Print Running Footer Meta -->
+                <div class="doc-print-footer-meta flex justify-between items-center text-[9pt] text-slate-600 border-t border-slate-300 pt-1 mt-2">
+                    <span>แบบฟอร์มเอกสารรายงานพัสดุคงเหลือสิ้นปีงบประมาณ • โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)</span>
+                    <span class="font-bold">หน้า 1 / 1</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- DOC SUB-VIEW 7: ตรวจนับทุกรายการสิ้นปี (แบบ พ.ด. ๗) -->
+    <!-- ========================================== -->
+    <div id="docContentYearEndAllItems" class="hidden flex-col gap-4">
+        <!-- Toolbar -->
+        <div class="bg-white p-3 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-3 no-print">
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-semibold text-slate-600">บัญชีตรวจนับพัสดุคงเหลือทุกรายการ (100 รายการ):</span>
+                    <span id="yeAllItemsFiscalBadge" class="bg-amber-100 text-amber-900 font-bold px-2.5 py-1 rounded text-xs border border-amber-300">
+                        ปีงบประมาณ พ.ศ. 2569
+                    </span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label for="yeDocOrientation" class="text-xs font-semibold text-slate-600 whitespace-nowrap">รูปแบบหน้ากระดาษ:</label>
+                    <select id="yeDocOrientation" onchange="renderYearEndAllItemsReport()" aria-label="เลือกรูปแบบหน้ากระดาษ" class="border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs bg-white focus:outline-none focus:border-blue-500 font-medium text-slate-800">
+                        <option value="portrait" selected>A4 แนวตั้ง (Portrait - 5 หน้า)</option>
+                        <option value="landscape">A4 แนวนอน (Landscape - 6 หน้า)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="printCurrentDocument()" class="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold transition shadow-sm">
+                    <i class="ph-bold ph-printer"></i>
+                    <span id="btnPrintDoc7Text">พิมพ์แบบ พ.ด. ๗ (A4 แนวตั้ง 5 หน้า)</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Container for Multi-page Sheets (Pages 1 - 5 in Portrait, or 1 - 6 in Landscape) -->
+        <div id="yeAllItemsPagesContainer" class="doc-preview-wrapper flex flex-col gap-6 w-full">
+            <!-- Dynamic Paged Sheets injected by renderYearEndAllItemsReport() -->
+        </div>
+    </div>
+</main>

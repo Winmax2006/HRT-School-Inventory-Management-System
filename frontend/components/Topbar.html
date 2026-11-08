@@ -1,0 +1,71 @@
+<!-- Minimal User-Focused Topbar -->
+<header class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-3 sm:px-4 lg:px-6 flex-shrink-0 z-20 gap-2 sm:gap-4">
+    <!-- 1. Menu Toggle (Mobile: < md) -->
+    <button type="button" class="text-slate-600 hover:text-slate-900 p-2 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg hover:bg-slate-100 md:hidden flex-shrink-0 transition" onclick="toggleSidebar()" aria-label="เปิด/ปิด เมนูแถบข้าง" title="เปิด/ปิด เมนู">
+        <i class="ph ph-list text-xl"></i>
+    </button>
+
+    <!-- 2. Page Title -->
+    <div class="flex items-center gap-2 flex-shrink-0 min-w-0">
+        <span class="font-bold text-slate-800 text-base sm:text-lg truncate" id="topbarHeading">ภาพรวมคลังพัสดุ</span>
+        <span class="text-xs text-slate-300 hidden xl:inline">•</span>
+        <span class="text-xs text-slate-500 hidden xl:inline truncate max-w-[220px]" id="topbarSub">ศูนย์ควบคุมและติดตามสถานะพัสดุสถานศึกษา</span>
+    </div>
+
+    <!-- 3. Global Search -->
+    <div class="relative flex-1 max-w-xs sm:max-w-sm md:max-w-md mx-1 sm:mx-2">
+        <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs sm:text-sm pointer-events-none"></i>
+        <input type="text" id="searchInput" aria-label="ค้นหาพัสดุด่วน (กด Ctrl+K)" placeholder="ค้นหาพัสดุด่วน... (Ctrl+K)" class="w-full pl-8 sm:pl-9 pr-7 sm:pr-8 py-2 text-xs bg-slate-100 hover:bg-slate-200/60 focus:bg-white border border-slate-200/80 focus:border-blue-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100 transition text-slate-700 placeholder:text-slate-400">
+        <button type="button" onclick="clearSearch()" id="clearSearchBtn" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 hidden text-xs leading-none p-1.5 rounded-full hover:bg-slate-200" aria-label="ล้างการค้นหา" title="ล้างการค้นหา">
+            <i class="ph-bold ph-x"></i>
+        </button>
+    </div>
+
+    <!-- 4. Primary Action -->
+    <button type="button" onclick="openRequisitionModal(null)" aria-label="ทำเรื่องขอเบิกพัสดุ" class="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-3 sm:px-4 py-2 min-h-[40px] rounded-lg text-xs sm:text-sm font-semibold transition flex-shrink-0 cursor-pointer">
+        <i class="ph-bold ph-hand-pointing text-xs sm:text-sm"></i>
+        <span class="hidden sm:inline">+ ขอเบิกพัสดุ</span>
+        <span class="sm:hidden">+ เบิก</span>
+    </button>
+
+    <!-- 5. User Profile & RBAC Switcher -->
+    <div class="relative flex-shrink-0">
+        <button type="button" onclick="toggleRoleDropdown()" id="userRoleBtn" class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-slate-100 transition border border-transparent hover:border-slate-200 min-h-[40px]" aria-label="สลับบทบาทผู้ใช้งานปัจจุบัน" aria-haspopup="true" aria-expanded="false" title="คลิกเพื่อสลับบทบาทการใช้งาน (ทดสอบสิทธิ์)">
+            <div id="userAvatarBadge" class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs">
+                อน
+            </div>
+            <div class="hidden md:block text-xs text-left leading-none">
+                <div id="userRoleLabel" class="font-bold text-slate-800 text-[11px] flex items-center gap-1">
+                    <span id="userRoleText">เจ้าหน้าที่พัสดุ</span>
+                    <i class="ph ph-caret-down text-[10px] text-slate-400"></i>
+                </div>
+                <div id="userRoleSubLabel" class="text-[10px] text-slate-400 mt-0.5"><span id="userRoleBadge">กลุ่มงบประมาณ (สิทธิ์เต็ม)</span></div>
+            </div>
+        </button>
+
+        <!-- Role Dropdown Menu (Floating UI - Keeps Elevation Shadow) -->
+        <div id="roleDropdownMenu" class="hidden absolute right-0 top-full mt-2 w-64 bg-white border border-slate-200 rounded-xl shadow-xl py-2 z-50 text-xs">
+            <div class="px-3 py-1.5 border-b border-slate-100 flex items-center justify-between">
+                <span class="font-bold text-slate-500 uppercase text-[10px]">สลับบทบาทผู้ใช้ (RBAC)</span>
+                <span class="bg-blue-100 text-blue-700 text-[10px] px-1.5 py-0.5 rounded font-bold">2 กลุ่มหลัก</span>
+            </div>
+            <button type="button" onclick="setUserRole('officer')" class="w-full px-3 py-2 text-left flex items-start gap-2.5 hover:bg-blue-50 transition border-b border-slate-50">
+                <i class="ph-fill ph-shield-check text-blue-600 text-base mt-0.5"></i>
+                <div>
+                    <div class="font-bold text-slate-800 flex items-center gap-1">
+                        <span>เจ้าหน้าที่พัสดุและผู้บริหาร</span>
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+                    </div>
+                    <div class="text-[10px] text-slate-500 mt-0.5">สิทธิ์เต็ม: รับเข้า, อนุมัติ, ตรวจนับ, ปิดบัญชี, ตั้งค่า</div>
+                </div>
+            </button>
+            <button type="button" onclick="setUserRole('teacher')" class="w-full px-3 py-2 text-left flex items-start gap-2.5 hover:bg-emerald-50 transition">
+                <i class="ph-fill ph-chalkboard-teacher text-emerald-600 text-base mt-0.5"></i>
+                <div>
+                    <div class="font-bold text-slate-800">กลุ่มครูและบุคลากร</div>
+                    <div class="text-[10px] text-slate-500 mt-0.5">สิทธิ์จำกัด: ดูพัสดุ, ทำเรื่องขอเบิก, ดูประวัติการเบิก</div>
+                </div>
+            </button>
+        </div>
+    </div>
+</header>

@@ -1,0 +1,146 @@
+{
+  "report_timestamp": "2026-10-30T13:40:00+07:00",
+  "timezone": "Asia/Bangkok",
+  "git": {
+    "branch": "main",
+    "commit": "dd000c0",
+    "working_tree_state": "dirty (untracked release files, documentation artifacts, and test runners)"
+  },
+  "versions": {
+    "config_declared": "2.7.0-rc.6",
+    "index_declared": "v2.7.0-rc.6",
+    "miniui_declared": "v2.7.0-rc.6",
+    "app_js_declared": "v2.7.0-rc.6",
+    "version_manifest_declared": "v2.7.0-rc.6",
+    "readme_declared": "2.6.0 (Legacy Documentation Discrepancy)",
+    "effective_candidate": "v2.7.0-rc.6"
+  },
+  "files": [
+    {
+      "path": "Config.gs",
+      "size_bytes": 18737,
+      "sha256": "4cd1ef31d89849147075795e5666779c27ee36cd8ffc68fe022ea93f3bd37d7f",
+      "last_modified": "2026-10-30T01:59:52.997Z"
+    },
+    {
+      "path": "Api.gs",
+      "size_bytes": 57504,
+      "sha256": "55a463864208431bfa8e21b4d8369d0589ec83547efddcd5afb269a39cdd1b2a",
+      "last_modified": "2026-10-30T00:35:30.060Z"
+    },
+    {
+      "path": "Read.gs",
+      "size_bytes": 85315,
+      "sha256": "791bf5fc5693c35a2a5b8192addee270f6c2c6f0833433ad52700b02d961f825",
+      "last_modified": "2026-10-30T00:04:34.369Z"
+    },
+    {
+      "path": "Write.gs",
+      "size_bytes": 100939,
+      "sha256": "575ab957c86bfe8fca6a2376dd3d492ce5a2277e594fc68651ea4c0664097857",
+      "last_modified": "2026-10-30T00:26:29.429Z"
+    },
+    {
+      "path": "Audit.gs",
+      "size_bytes": 16712,
+      "sha256": "00d914bcbd2c953062e9fbe5dd2e9e9d93597685e370a9b0ba5031c20fab9e47",
+      "last_modified": "2026-10-28T15:48:03.550Z"
+    },
+    {
+      "path": "Code.gs",
+      "size_bytes": 16684,
+      "sha256": "8e00de0fc095036d7001a228dc65f2d8ff9ede07b484b2eeac8786cfcf69aa1b",
+      "last_modified": "2026-10-30T00:31:19.699Z"
+    },
+    {
+      "path": "index.html",
+      "size_bytes": 985263,
+      "sha256": "0d468f6e8ad6b61baf4cac46da4951448ae2689213a0af567b9f57d969feb298",
+      "last_modified": "2026-10-30T02:01:27.058Z"
+    },
+    {
+      "path": "MiniUI.html",
+      "size_bytes": 84248,
+      "sha256": "e4d7a4e52ae65fa588ef4e4fda14a94566c77548c1507323c102f80f115c9523",
+      "last_modified": "2026-10-30T02:01:41.337Z"
+    },
+    {
+      "path": "frontend/main/App.js",
+      "size_bytes": 148994,
+      "sha256": "f2c7462c46952c218a8d47ed537384398e67c59b8526dcb838360e31fb8c2034",
+      "last_modified": "2026-10-30T02:02:13.063Z"
+    },
+    {
+      "path": "appsscript.json",
+      "size_bytes": 381,
+      "sha256": "2e88517c17942abd0a15f3c99383a12c11f04080ccd2d573d1d1449f4609e092",
+      "last_modified": "2026-10-28T11:28:45.806Z"
+    },
+    {
+      "path": "README.md",
+      "size_bytes": 44917,
+      "sha256": "0b49431f629cebcff94328e9274478fa3ccd85892aba8d6ed9cc318698671c63",
+      "last_modified": "2026-10-22T09:43:36.718Z"
+    },
+    {
+      "path": "VERSION_MANIFEST.json",
+      "size_bytes": 2007,
+      "sha256": "cc2e2eb416671f0226c39be9a02a501dbd5b4f64e1c76d9136999c74ab4170f1",
+      "last_modified": "2026-10-30T02:13:24.856Z"
+    },
+    {
+      "path": "FILES.sha256",
+      "size_bytes": 41375,
+      "sha256": "116c7065c2e33c2a4dbc40024672dba51da666d04ef23453be29792defe35ca6",
+      "last_modified": "2026-10-30T02:13:24.961Z"
+    },
+    {
+      "path": "HRT_Inventory_v2.7.0-rc.6_Runtime.zip",
+      "size_bytes": 247191,
+      "sha256": "359b034110f27ae54f5365563cd244722e843340e5d71a986608381018004fa0",
+      "last_modified": "2026-10-30T02:13:25.035Z"
+    },
+    {
+      "path": "HRT_Inventory_v2.7.0-rc.6_Handover.zip",
+      "size_bytes": 1631264,
+      "sha256": "cd4bc8c1b26835c0beb9db0f6a23d806ea2ed6109a996d65716e4beeb4d50689",
+      "last_modified": "2026-10-30T02:13:25.450Z"
+    },
+    {
+      "path": "docs/repair/ACCEPTANCE_MATRIX.csv",
+      "size_bytes": 54555,
+      "sha256": "dd081e727dd956ff339484817ecc31becf736351a2d9390035e1131150fcb06e",
+      "last_modified": "2026-10-30T02:09:57.315Z"
+    },
+    {
+      "path": "docs/repair/PROGRESS.md",
+      "size_bytes": 20922,
+      "sha256": "3aa2523079f92be2505f04eff8ca3b38ad362e11d0f54b2a3fba57fd67621ffb",
+      "last_modified": "2026-10-30T02:10:41.811Z"
+    },
+    {
+      "path": "docs/repair/FINAL_ACCEPTANCE_REPORT.md",
+      "size_bytes": 29492,
+      "sha256": "6a021486ac19303546e030e764a2686ed2a2d62f66ecc588673771ea2f0b72cc",
+      "last_modified": "2026-10-30T02:13:41.791Z"
+    },
+    {
+      "path": "docs/repair/INSTALL_GAS.md",
+      "size_bytes": 10865,
+      "sha256": "16aa12a479b771e6cf1a4e15f650be93ae3d9ba5a63936c3ec4a9be578976b9f",
+      "last_modified": "2026-10-30T02:03:27.145Z"
+    },
+    {
+      "path": "docs/repair/QR_SUPPORT_MATRIX.md",
+      "size_bytes": 11263,
+      "sha256": "7bf692e7ed45d94169b3162e24457fc9e12f12c2f6d300f681be2888a4ca4c2f",
+      "last_modified": "2026-10-30T00:40:07.614Z"
+    },
+    {
+      "path": "docs/repair/FILE_DISPOSITION.csv",
+      "size_bytes": 114132,
+      "sha256": "2ddcca1df86f7e2276f3532e421618b41aec08783c698e72915a7d8c80263f20",
+      "last_modified": "2026-10-30T02:13:24.848Z"
+    }
+  ]
+}

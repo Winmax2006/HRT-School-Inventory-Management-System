@@ -1,0 +1,210 @@
+{
+  "system": "HRT Inventory System",
+  "school": "โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)",
+  "canonical_version": "2.7.0-rc.4",
+  "version_type": "release_candidate",
+  "release_state": "STAGING_RELEASE_CANDIDATE_4",
+  "historical_baseline": "v2.6.0",
+  "incoming_plan_version": "v2.7.0-rc.3",
+  "outgoing_plan_version": "v2.7.0-rc.4",
+  "git": {
+    "branch": "main",
+    "base_commit": "dd000c0",
+    "description": "Prompt 09: Clean Separation of Production Code and Test/Mock Data, Elimination of Synthetic Data, Standalone demo.html Sandbox, 82-Test Verification"
+  },
+  "build_artifacts": {
+    "Config.gs": {
+      "path": "Config.gs",
+      "sha256": "986B1E1F75976C22F30246053EC7A0967211A16E635853C5F829492E7EF8D6E0",
+      "version_label": "2.7.0-rc.4"
+    },
+    "Api.gs": {
+      "path": "Api.gs",
+      "sha256": "E1DBDB76E8B60A7D8FA07C61229C06698D9FF31687CB25D03D19DB6348145B6D",
+      "version_label": "2.7.0-rc.4"
+    },
+    "Read.gs": {
+      "path": "Read.gs",
+      "sha256": "3115319C06998F8B432418F93EDA41E8B1DCD0F35576211099C161A655E6E182",
+      "version_label": "2.7.0-rc.4"
+    },
+    "Write.gs": {
+      "path": "Write.gs",
+      "sha256": "B665E4A098E270D782457E675D49515030D8979E61055CE38EC7C05BBF74A8C8",
+      "version_label": "2.7.0-rc.4"
+    },
+    "Audit.gs": {
+      "path": "Audit.gs",
+      "sha256": "60993701BFC345AFA4D7D2F09FFCD15561BFE075ADD6C84B3ADFA8132C7609CA",
+      "version_label": "2.7.0-rc.4"
+    },
+    "Code.gs": {
+      "path": "Code.gs",
+      "sha256": "6134B3EA35E35F438146CA659A705B3019FCE67D95FBC8B7549942B7B890D53D",
+      "version_label": "2.7.0-rc.4"
+    },
+    "index.html": {
+      "path": "index.html",
+      "sha256": "8556102B91DC0CF37BE4F671B6FAC2ACFA0CFD29DBD6ABEC547147CCF1136542",
+      "version_label": "v2.7.0-rc.4"
+    },
+    "frontend/main/App.js": {
+      "path": "frontend/main/App.js",
+      "sha256": "CAA8715DFC2751292D523C499E4C968B3671FBA35AA869E44C9A75CC260F7E63",
+      "version_label": "v2.7.0-rc.4"
+    },
+    "frontend/pages/Settings.html": {
+      "path": "frontend/pages/Settings.html",
+      "sha256": "DCEB621EEF75574E918508046F9955AB959D4A222933CB44CC19A21B76CDC7E8",
+      "version_label": "v2.7.0-rc.4"
+    }
+  },
+  "verification_summary": {
+    "total_tests": 82,
+    "passed_tests": 82,
+    "failed_tests": 0,
+    "pass_rate_pct": "100.0%",
+    "suites": [
+      {
+        "name": "tests/p9_clean_separation_test.js",
+        "passed": 10,
+        "total": 10,
+        "coverage": [
+          "S.1_No_Embedded_Sample_Items",
+          "S.2_Eliminate_USR_ANANT_01",
+          "S.3_No_Silent_Mock_Fallback",
+          "S.4_Genuine_Empty_State",
+          "S.5_Backend_Unavailable_Error",
+          "S.6_Demo_Mode_Isolation_Banner",
+          "S.7_Clean_Deploy_Packaging",
+          "S.8_Business_Services_Operational",
+          "S.9_No_Storage_Leak",
+          "S.10_Anti_Role_Spoofing_RBAC"
+        ]
+      },
+      {
+        "name": "tests/p8_backend_sheets_architecture_test.js",
+        "passed": 10,
+        "total": 10,
+        "coverage": [
+          "S.1_ScriptLock_Mutex_Concurrency",
+          "S.2_Persistent_Idempotency_Replay",
+          "S.3_Transaction_Recovery_Failure_Injection",
+          "S.4_SSOT_Ledger_Canonical_Directions",
+          "S.5_Multi_Warehouse_Cart_Policy",
+          "S.6_Requisition_Quantities_Lifecycle",
+          "S.7_Physical_Count_Semantics_Null_vs_Zero",
+          "S.8_Valuation_Snapshot_Immutability",
+          "S.9_20_Logical_Groups_16_Sheets_Constraints",
+          "S.10_Identity_ExecuteAs_Secrets_Isolation"
+        ]
+      },
+      {
+        "name": "tests/p7_settings_comprehensive_test.js",
+        "passed": 10,
+        "total": 10,
+        "coverage": [
+          "S.1_Requester_RPC_Rejected",
+          "S.2_Officer_Director_RBAC_Suspended_Guard",
+          "S.3_Save_Reload_Persistence_Cancel_Concurrency",
+          "S.4_Field_Validation_Negative_Formula_Decimals",
+          "S.5_Viewing_Active_Year_Closed_Write_Lock",
+          "S.6_QR_Resolution_Revocation_No_Write_Scan",
+          "S.7_MiniUI_Lifecycle_Idempotent_Retry",
+          "S.8_CSV_Import_Validation_Dry_Run",
+          "S.9_Signatory_Snapshot_Sequence_Mutex",
+          "S.10_UI_Responsive_LIFO_Stack_Print_CSS"
+        ]
+      },
+      {
+        "name": "tests/p6_acceptance_suite.js",
+        "passed": 10,
+        "total": 10,
+        "coverage": [
+          "A.1_Auth_RBAC",
+          "A.2_Fiscal_Bounds",
+          "A.3_Dashboard_ABC",
+          "A.4_Requisition_E2E",
+          "A.5_Integrity_Concurrency",
+          "A.6_Year_End_Audit",
+          "A.7_Settings_CSV",
+          "A.8_UI_Responsive_A11y",
+          "A.9_Gov_Forms",
+          "A.10_Backup_Restore"
+        ]
+      },
+      {
+        "name": "tests/p4_settings_important_test.js",
+        "passed": 10,
+        "total": 10,
+        "coverage": [
+          "I-1",
+          "I-2",
+          "I-3",
+          "I-4",
+          "I-5",
+          "Settings_1_9",
+          "Optimistic_Revision_Concurrency",
+          "N-3_Forms_Mapping",
+          "Health_Diagnostic_16_Sheets",
+          "Version_Manifest"
+        ]
+      },
+      {
+        "name": "tests/p3_miniui_critical_test.js",
+        "passed": 11,
+        "total": 11,
+        "coverage": [
+          "C-1",
+          "C-2",
+          "C-3",
+          "C-4",
+          "C-5",
+          "C-6",
+          "C-7",
+          "MiniUI_QR",
+          "Lifecycle",
+          "Settings_QR",
+          "Version_Manifest"
+        ]
+      },
+      {
+        "name": "tests/p1_p2_contract_lifecycle_test.js",
+        "passed": 10,
+        "total": 10,
+        "coverage": [
+          "Fiscal_Year_Bounds",
+          "Alias_Adapter",
+          "Closed_Year_Guard",
+          "State_Machine",
+          "Quantities_Lifecycle",
+          "QR_Resolution",
+          "Settings_RBAC",
+          "Idempotency",
+          "Last_Admin",
+          "Audit_Sanitization"
+        ]
+      },
+      {
+        "name": "tests/regression_test_suite.js",
+        "passed": 11,
+        "total": 11,
+        "coverage": [
+          "RBAC",
+          "8_Dimension_Filter",
+          "ABC_Pareto",
+          "Decoupled_Deduction",
+          "Stock_Check",
+          "Double_Dispatch",
+          "Mutex_Lock",
+          "Cache_Invalidation",
+          "Hash_Chain",
+          "CSV_Dry_Run",
+          "Rollover"
+        ]
+      }
+    ],
+    "production_deployment_status": "BLOCKED",
+    "block_reason": "Live Google Workspace domain credentials and production OAuth client secrets not provisioned in local environment. Candidate designated for Staging Verification."
+  }
+}

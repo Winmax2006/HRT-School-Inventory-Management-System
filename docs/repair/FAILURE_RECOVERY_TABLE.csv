@@ -1,0 +1,11 @@
+Failure_Scenario,Injected_Point,Observed_Behavior,Recovery_Mechanism,Outcome_Status
+Concurrent same-key request,In-flight reservation,Throws IDEMPOTENCY_IN_FLIGHT,Second request waits or retries after backoff,HANDLED
+Same key with modified payload,Pre-mutation check,Throws IDEMPOTENCY_CONFLICT,Rejected before any mutation,PROTECTED
+ScriptLock acquisition timeout,Entry to handler,Throws CONCURRENCY_LOCK,Client retries with same idempotency key,RECOVERABLE
+Validation failure (invalid qty/item),Pre-mutation validation,Throws VALIDATION_ERROR/NOT_FOUND,In-flight lock cleared; form preserved,SAFE
+Insufficient stock on line 2 of 2,Critical section pre-check,Throws INSUFFICIENT_STOCK,Zero partial writes; line 1 untouched,ATOMIC
+Timeout after server commit,Network transit to client,Client times out,Client retries with same key; receives committed replay,RECOVERED
+Audit log failure on mandatory write,Post-mutation audit,Throws AUDIT_PERSISTENCE_FAILED,Transaction aborted; fail-closed,FAILED_CLOSED
+Attempted write to closed fiscal year,Gateway routing,Throws CLOSED_FISCAL_YEAR,Rejected before any sheet read/write,DENIED
+Double issuance on issued requisition,Issuance handler,Throws DOUBLE_DISPATCH,Prevents duplicate stock deduction,PROTECTED
+Double receipt on received requisition,Receipt handler,Throws INVALID_STATE_TRANSITION,Prevents duplicate receipt status,PROTECTED

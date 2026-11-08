@@ -1,0 +1,346 @@
+/**
+ * HRT School Inventory Management System - UI Components & Government Forms
+ * File: frontend/styles/components.css
+ */
+
+/* ========================================================= */
+/* TAB HIERARCHY TOKENS (Level 1, Level 2, Level 3)          */
+/* ========================================================= */
+.tab-l1 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.15s ease;
+}
+.tab-l1.active {
+    background-color: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 1px 2px 0 rgba(37, 99, 235, 0.2);
+}
+.tab-l2 {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    padding: 0.4rem 0.75rem;
+    border-bottom: 2px solid transparent;
+    color: #64748b;
+    transition: all 0.15s ease;
+}
+.tab-l2.active {
+    color: #1d4ed8;
+    border-bottom-color: #2563eb;
+    font-weight: 600;
+    background-color: #eff6ff;
+    border-radius: 0.375rem 0.375rem 0 0;
+}
+.tab-l3 {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.375rem;
+    color: #64748b;
+}
+.tab-l3.active {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    font-weight: 600;
+}
+
+/* ========================================================= */
+/* FILTER PILLS WITH SEMANTIC DOTS & COUNT BADGES            */
+/* ========================================================= */
+.filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: 1px solid #e2e8f0;
+    background-color: #ffffff;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.filter-pill:hover {
+    border-color: #cbd5e1;
+    background-color: #f8fafc;
+    color: #1e293b;
+}
+.filter-pill.active {
+    background-color: #2563eb !important;
+    border-color: #2563eb !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    box-shadow: 0 1px 2px 0 rgba(37, 99, 235, 0.2);
+}
+.filter-pill.active .filter-count-badge {
+    background-color: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+}
+.filter-pill:active {
+    transform: scale(0.97);
+}
+.filter-pill:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+.filter-count-badge {
+    font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.6875rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 9999px;
+    background-color: #f1f5f9;
+    color: #475569;
+    font-weight: 600;
+}
+
+/* ========================================================= */
+/* CATEGORY BADGE (Neutral / Slate Tint - NEVER Semantic)     */
+/* ========================================================= */
+.cat-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.15rem 0.5rem;
+    border-radius: 0.375rem;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    background-color: var(--cat-bg);
+    color: var(--cat-text);
+    border: 1px solid var(--cat-border);
+}
+
+/* ========================================================= */
+/* STATUS BADGE (WCAG AA Compliant)                          */
+/* ========================================================= */
+.status-badge {
+    padding: 3px 9px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    line-height: 1.35;
+}
+.status-normal { background-color: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+.status-low { background-color: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+.status-critical { background-color: #fff1f2; color: #9f1239; border: 1px solid #fecdd3; }
+
+button.status-badge, .status-badge[role="button"], .status-badge.cursor-pointer {
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+}
+button.status-badge:hover, .status-badge[role="button"]:hover, .status-badge.cursor-pointer:hover {
+    filter: brightness(0.96);
+    transform: translateY(-0.5px);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+button.status-badge:active, .status-badge[role="button"]:active, .status-badge.cursor-pointer:active {
+    transform: scale(0.96);
+}
+button.status-badge:focus-visible, .status-badge[role="button"]:focus-visible, .status-badge.cursor-pointer:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+/* ========================================================= */
+/* SEMANTIC DOTS & ICONS                                     */
+/* ========================================================= */
+.dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.dot-normal { background-color: #059669; }
+.dot-low { background-color: #d97706; }
+.dot-critical { background-color: #e11d48; }
+.dot-info { background-color: #2563eb; }
+
+/* ========================================================= */
+/* SIDEBAR MENU ITEM                                         */
+/* ========================================================= */
+.sidebar-menu-item {
+    font-size: 0.8125rem;
+    padding: 0.55rem 0.875rem;
+    border-radius: 0.5rem;
+    transition: all 0.15s ease-in-out;
+    color: var(--neutral-300);
+}
+.sidebar-menu-item i {
+    font-size: 18px;
+}
+.sidebar-menu-item:hover {
+    background-color: var(--neutral-700);
+    color: #ffffff;
+}
+.sidebar-menu-item.active {
+    background-color: var(--primary-600);
+    color: #ffffff;
+    font-weight: 600;
+}
+.sidebar-menu-item.active i {
+    color: #ffffff;
+}
+
+/* ========================================================= */
+/* TOAST NOTIFICATION ANIMATION                              */
+/* ========================================================= */
+@keyframes toastIn {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+.toast-animate {
+    animation: toastIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ==========================================================================
+   OFFICIAL THAI GOVERNMENT DOCUMENT SYSTEM (แบบ พ.ด. ๑ - ๗)
+   100% TH Sarabun Font • A4 Exact Fit • Monochrome Print • Screen Preview
+   ========================================================================== */
+
+/* Universal TH Sarabun typography for all official printable documents & previews */
+.printable-document,
+.printable-document *,
+.doc-page-sheet,
+.doc-page-sheet *,
+.doc-preview-wrapper * {
+    font-family: 'TH Sarabun New', 'TH Sarabun PSK', 'Sarabun', sans-serif !important;
+}
+
+/* Base Printable Document Sheet */
+.printable-document {
+    box-sizing: border-box !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+    margin: 0 auto;
+    line-height: 1.35;
+    position: relative;
+}
+
+/* A4 Portrait Screen Dimensions (แบบ พ.ด. ๑) */
+.doc-portrait-a4 {
+    width: 210mm !important;
+    max-width: 100% !important;
+    min-height: 297mm;
+    padding: 10mm 12mm !important;
+}
+
+/* A4 Landscape Screen Dimensions (แบบ พ.ด. ๒, ๓, ๔, ๕, ๖, ๗) */
+.doc-landscape-a4 {
+    width: 297mm !important;
+    max-width: 100% !important;
+    min-height: 210mm;
+    padding: 7mm 9mm !important;
+}
+
+/* Standardized Thai Government Typography Scale */
+.printable-document .doc-title {
+    font-size: 16pt !important;
+    font-weight: 700 !important;
+    line-height: 1.25 !important;
+}
+.printable-document .doc-subtitle {
+    font-size: 13pt !important;
+    font-weight: 600 !important;
+    line-height: 1.3 !important;
+}
+.printable-document .doc-meta {
+    font-size: 11pt !important;
+    line-height: 1.35 !important;
+}
+.printable-document .doc-small {
+    font-size: 10pt !important;
+    line-height: 1.25 !important;
+}
+.printable-document .font-mono,
+.printable-document .font-num {
+    font-family: 'TH Sarabun New', 'TH Sarabun PSK', 'Sarabun', sans-serif !important;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Table Architecture */
+.printable-document table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    table-layout: fixed !important;
+    margin-bottom: 6px !important;
+}
+.printable-document th {
+    font-size: 11pt !important;
+    font-weight: 700 !important;
+    padding: 2.5px 3.5px !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    border: 1px solid #000000 !important;
+    background-color: #f1f5f9;
+    color: #000000 !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    line-height: 1.2 !important;
+}
+.printable-document td {
+    font-size: 10pt !important;
+    padding: 2px 3.5px !important;
+    vertical-align: middle !important;
+    border: 1px solid #000000 !important;
+    color: #000000 !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    line-height: 1.25 !important;
+}
+.printable-document tfoot td {
+    font-size: 10.5pt !important;
+    font-weight: 700 !important;
+    padding: 2.5px 3.5px !important;
+    border: 1px solid #000000 !important;
+    background-color: #f8fafc;
+}
+
+/* Official Control Box (Top-Right) */
+.printable-document .doc-control-box {
+    border: 1.5px solid #000000 !important;
+    border-radius: 3px;
+    padding: 3px 8px !important;
+    line-height: 1.2 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    display: inline-block;
+}
+
+/* Running Header & Footer */
+.printable-document .doc-print-header-meta,
+.printable-document .doc-print-footer-meta {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    font-size: 8.5pt !important;
+    line-height: 1.2 !important;
+    color: #475569;
+    width: 100% !important;
+}
+.printable-document .doc-print-header-meta {
+    border-bottom: 0.5px solid #cbd5e1;
+    padding-bottom: 2px !important;
+    margin-bottom: 4px !important;
+}
+.printable-document .doc-print-footer-meta {
+    border-top: 0.5px solid #cbd5e1;
+    padding-top: 2px !important;
+    margin-top: 4px !important;
+}
+
+/* Signature Sections */
+.printable-document .signature-section {
+    font-size: 11pt !important;
+    line-height: 1.3 !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    border-top: 1px solid #cbd5e1;
+    padding-top: 6px !important;
+    margin-top: 6px !important;
+}
+.printable-document .signature-section div {
+    font-size: 11pt !important;
+}

@@ -1,0 +1,114 @@
+<!-- ========================================== -->
+<!-- VIEW 1.5: YEAR-END PHYSICAL AUDIT & CLOSING -->
+<!-- (ตรวจนับพัสดุ สิ้นปีงบประมาณ และปิดบัญชีพัสดุประจำปีงบ) -->
+<!-- ========================================== -->
+<main id="viewYearEndAudit" class="flex-1 overflow-y-auto p-4 lg:p-6 hidden flex-col gap-4">
+    <!-- Header & Official Status Banner -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+            <div class="flex items-center gap-2 flex-wrap">
+                <h2 class="font-bold text-slate-900 text-base sm:text-lg flex items-center gap-2">
+                    <i class="ph-fill ph-clipboard-text text-amber-500 text-xl"></i>
+                    <span>ระบบตรวจนับพัสดุ ณ วันสิ้นปีงบประมาณ</span>
+                </h2>
+                <span id="auditFiscalYearBadge" class="bg-amber-100 text-amber-900 text-xs font-bold px-2.5 py-0.5 rounded-full border border-amber-300">
+                    ปีงบประมาณ พ.ศ. 2567
+                </span>
+                <span id="auditStatusBadge" class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2 py-0.5 rounded-full">
+                    รอบ 30 กันยายน
+                </span>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">
+                ดำเนินการตามระเบียบกระทรวงการคลังว่าด้วยการจัดซื้อจัดจ้างและการบริหารพัสดุภาครัฐ พ.ศ. 2560 และ พรบ.วินัยการเงินการคลังฯ พ.ศ. 2561
+            </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center gap-2 flex-wrap">
+            <button onclick="saveAuditProgress()" class="inline-flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg text-xs font-bold transition">
+                <i class="ph-bold ph-floppy-disk text-sm"></i>
+                <span>บันทึกผลการตรวจนับ</span>
+            </button>
+            <button onclick="goToYearEndDocs()" class="inline-flex items-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-3 py-2 rounded-lg text-xs font-bold transition">
+                <i class="ph-bold ph-printer text-sm"></i>
+                <span>พิมพ์รายงาน (พ.ด. ๕-๗)</span>
+            </button>
+            <button onclick="openCloseFiscalYearModal()" id="btnCloseFiscalYearBtn" class="inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white px-3.5 py-2 rounded-lg text-xs font-bold transition">
+                <i class="ph-bold ph-lock-key text-sm"></i>
+                <span>ปิดบัญชีพัสดุประจำปีงบ</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 4 Audit KPI Summary Cards -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="bg-white rounded-xl border border-slate-200 p-4">
+            <div class="text-xs text-slate-500 font-medium">รายการพัสดุที่ตรวจนับ</div>
+            <div class="text-2xl font-bold font-num text-slate-800 mt-0.5" id="auditKpiTotalItems">100 / 100</div>
+            <div class="text-[11px] text-emerald-600 font-medium mt-0.5">ครบถ้วน 100% ทุกรายการ</div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-4">
+            <div class="text-xs text-slate-500 font-medium">มูลค่าคงคลังตามบัญชี (30 ก.ย.)</div>
+            <div class="text-2xl font-bold font-num text-blue-700 mt-0.5" id="auditKpiBookVal">฿0.00</div>
+            <div class="text-[11px] text-slate-400 mt-0.5">คำนวณตามราคาต่อหน่วย</div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-4">
+            <div class="text-xs text-slate-500 font-medium">มูลค่าที่ตรวจนับจริง (Physical)</div>
+            <div class="text-2xl font-bold font-num text-emerald-700 mt-0.5" id="auditKpiActualVal">฿0.00</div>
+            <div class="text-[11px] text-emerald-600 font-medium mt-0.5" id="auditKpiDiffVal">ผลต่าง: ฿0.00 (ถูกต้อง)</div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-4">
+            <div class="text-xs text-slate-500 font-medium">ผลการตรวจสภาพพัสดุ</div>
+            <div class="text-xs font-bold text-slate-800 mt-1 flex flex-col gap-0.5" id="auditKpiConditionSummary">
+                <div class="text-emerald-700 font-medium">ปกติพร้อมใช้: <b class="font-num" id="auditCountNormal">96</b> รายการ</div>
+                <div class="text-amber-700 font-medium">ชำรุดซ่อมได้: <b class="font-num" id="auditCountRepair">3</b> รายการ</div>
+                <div class="text-red-700 font-medium">เสื่อมสภาพ/จำหน่าย: <b class="font-num" id="auditCountDisposed">1</b> รายการ</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audit Filter & Search Bar -->
+    <div class="bg-white rounded-xl border border-slate-200 p-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div class="relative flex-1">
+            <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none"></i>
+            <input type="text" id="auditSearchInput" oninput="filterAuditTable()" aria-label="ค้นหารหัส FSN หรือชื่อพัสดุที่ตรวจนับ" placeholder="ค้นหารหัส, FSN, ชื่อพัสดุ, หรือสถานที่ตรวจนับ..." class="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 bg-slate-50/50 focus:bg-white min-h-[40px]">
+        </div>
+        <div class="flex items-center gap-2 text-xs">
+            <span class="text-slate-500 font-medium">กรองตามสภาพ:</span>
+            <select id="auditConditionFilter" onchange="filterAuditTable()" aria-label="กรองสภาพพัสดุที่ตรวจนับ" class="border border-slate-300 rounded-lg px-2.5 py-2 text-xs bg-white min-h-[40px]">
+                <option value="">ทุกสภาพ (100 รายการ)</option>
+                <option value="normal">ปกติพร้อมใช้งาน</option>
+                <option value="repair">ชำรุดซ่อมได้</option>
+                <option value="disposed">เสื่อมสภาพรอจำหน่าย</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Audit Data Table -->
+    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-table-cell">
+                <thead>
+                    <tr class="bg-slate-50/90 border-b border-slate-200 text-slate-700 font-semibold text-xs">
+                        <th class="py-2 px-3 text-center w-12">ลำดับ</th>
+                        <th class="py-2 px-3 text-center w-36">รหัสพัสดุ / FSN</th>
+                        <th class="py-2 px-3">รายการพัสดุ & หมวดหมู่</th>
+                        <th class="py-2 px-3 text-left">สถานที่จัดเก็บ</th>
+                        <th class="py-2 px-3 text-right">ยอดตามบัญชี</th>
+                        <th class="py-2 px-3 text-center w-28">ยอดตรวจนับจริง</th>
+                        <th class="py-2 px-3 text-center">ผลต่าง</th>
+                        <th class="py-2 px-3 text-center w-36">สภาพพัสดุ</th>
+                        <th class="py-2 px-3 text-right">ราคา/หน่วย</th>
+                        <th class="py-2 px-3 text-right">มูลค่าคงเหลือ (฿)</th>
+                    </tr>
+                </thead>
+                <tbody id="auditTableBody" class="divide-y divide-slate-100 text-table-cell">
+                    <!-- Injected by JS -->
+                </tbody>
+                <tfoot id="auditTableFoot" class="bg-slate-50 border-t-2 border-slate-900 font-bold text-xs">
+                    <!-- Injected by JS -->
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</main>

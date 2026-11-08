@@ -1,0 +1,1009 @@
+<!-- ========================================== -->
+        <!-- VIEW 4: SETTINGS HUB (LEVEL 3 ADVANCED - 8 CATEGORIES) -->
+        <!-- ========================================== -->
+        <main id="viewSettings" class="flex-1 overflow-y-auto p-4 lg:p-6 hidden flex-col gap-4">
+            <!-- Settings Header with Environment Badge & Status -->
+            <div class="border-b border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h2 class="font-bold text-slate-900 text-xl flex items-center gap-2">
+                            <i class="ph-fill ph-gear-six text-blue-600"></i>
+                            <span>ตั้งค่าระบบและการเชื่อมต่อข้อมูล</span>
+                        </h2>
+                        <span id="settingsEnvBadge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200">
+                            STAGING CANDIDATE
+                        </span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-500 mt-0.5">จัดการข้อมูลโครงสร้างสถานศึกษา สิทธิ์ผู้ใช้งาน กติกาการเบิกจ่าย และระบบ QR Code (8 หมวดหมู่)</p>
+                </div>
+
+                <!-- System Quick Stat Pills -->
+                <div class="flex items-center gap-2 flex-wrap text-xs">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold" title="สถานะฐานข้อมูล">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>Google Sheets DB</span>
+                    </span>
+                    <span id="settingsActiveFyPill" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-mono font-bold border border-slate-200" title="ปีงบประมาณที่เปิดทำธุรกรรม">
+                        <i class="ph ph-calendar text-blue-600"></i>
+                        <span>ปี 2569</span>
+                    </span>
+                    <span id="settingsUserRolePill" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-50 text-purple-700 font-bold border border-purple-200">
+                        <i class="ph ph-user-circle"></i>
+                        <span id="settingsCurrentRoleText">ADMIN</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Mobile Navigation: Responsive Dropdown & Scrollable Pill Selector (Min Touch Target 44px) -->
+            <div class="block lg:hidden space-y-2">
+                <label for="mobileSettingsCategorySelect" class="text-xs font-bold text-slate-700 block">เลือกหมวดการตั้งค่า:</label>
+                <div class="relative">
+                    <select id="mobileSettingsCategorySelect" onchange="switchSettingsCategory(this.value)" class="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-bold text-slate-800 focus:outline-none focus:border-blue-600 min-h-[44px] cursor-pointer shadow-xs">
+                        <option value="school">1. ข้อมูลสถานศึกษาและเอกสาร</option>
+                        <option value="users">2. ผู้ใช้ การเข้าสู่ระบบ และสิทธิ์ (RBAC)</option>
+                        <option value="fiscal">3. ปีงบประมาณ (Fiscal Year)</option>
+                        <option value="masterData">4. ข้อมูลกลางพัสดุ (Master Data)</option>
+                        <option value="rules">5. กติกาการเบิกและสต็อก (Business Rules)</option>
+                        <option value="miniui">6. MiniUI และ QR Code Generator</option>
+                        <option value="connection">7. การเชื่อมต่อ นำเข้า และสำรองข้อมูล</option>
+                        <option value="audit">8. ประวัติและการตรวจสอบระบบ (Audit & About)</option>
+                    </select>
+                </div>
+                <!-- Scrollable Horizontal Tabs for Fast Tablet/Mobile Tap -->
+                <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
+                    <button type="button" onclick="switchSettingsCategory('school')" id="mNav_school" class="m-settings-btn px-3 py-2 rounded-lg bg-blue-600 text-white font-bold whitespace-nowrap min-h-[44px] flex items-center gap-1.5">
+                        <i class="ph-fill ph-graduation-cap"></i> 1. สถานศึกษา
+                    </button>
+                    <button type="button" onclick="switchSettingsCategory('users')" id="mNav_users" class="m-settings-btn px-3 py-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap min-h-[44px] flex items-center gap-1.5">
+                        <i class="ph-fill ph-users-three"></i> 2. ผู้ใช้และสิทธิ์
+                    </button>
+                    <button type="button" onclick="switchSettingsCategory('fiscal')" id="mNav_fiscal" class="m-settings-btn px-3 py-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap min-h-[44px] flex items-center gap-1.5">
+                        <i class="ph-fill ph-calendar"></i> 3. ปีงบประมาณ
+                    </button>
+                    <button type="button" onclick="switchSettingsCategory('masterData')" id="mNav_masterData" class="m-settings-btn px-3 py-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap min-h-[44px] flex items-center gap-1.5">
+                        <i class="ph-fill ph-buildings"></i> 4. ข้อมูลกลาง
+                    </button>
+                    <button type="button" onclick="switchSettingsCategory('rules')" id="mNav_rules" class="m-settings-btn px-3 py-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap min-h-[44px] flex items-center gap-1.5">
+                        <i class="ph-fill ph-sliders"></i> 5. กติกาเบิกจ่าย
+                    </button>
+                    <button type="button" onclick="switchSettingsCategory('miniui')" id="mNav_miniui" class="m-settings-btn px-3 py-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap min-h-[44px] flex items-center gap-1.5">
+                        <i class="ph-fill ph-qr-code"></i> 6. MiniUI & QR
+                    </button>
+                    <button type="button" onclick="switchSettingsCategory('connection')" id="mNav_connection" class="m-settings-btn px-3 py-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap min-h-[44px] flex items-center gap-1.5">
+                        <i class="ph-fill ph-database"></i> 7. เชื่อมต่อ/สำรอง
+                    </button>
+                    <button type="button" onclick="switchSettingsCategory('audit')" id="mNav_audit" class="m-settings-btn px-3 py-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap min-h-[44px] flex items-center gap-1.5">
+                        <i class="ph-fill ph-shield-check"></i> 8. บันทึกตรวจรับ
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2-Column Responsive Layout for Desktop & Tablet -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- Left Column: Vertical Sub-Navigation Menu (Desktop) -->
+                <aside class="hidden lg:block lg:col-span-3 bg-white border border-slate-200 rounded-2xl p-3 shadow-xs space-y-1.5 sticky top-2">
+                    <div class="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">หมวดหมู่การตั้งค่า</div>
+                    
+                    <button type="button" id="setNav_school" onclick="switchSettingsCategory('school')" class="settings-nav-btn w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2.5 bg-blue-600 text-white shadow-2xs">
+                        <i class="ph-fill ph-graduation-cap text-base"></i>
+                        <div class="flex-1 min-w-0">
+                            <div class="truncate">1. ข้อมูลสถานศึกษาและเอกสาร</div>
+                            <div class="text-[10px] font-normal opacity-80 truncate">ชื่อโรงเรียน, ผู้ลงนาม, เลขที่เอกสาร</div>
+                        </div>
+                    </button>
+
+                    <button type="button" id="setNav_users" onclick="switchSettingsCategory('users')" class="settings-nav-btn w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition flex items-center gap-2.5">
+                        <i class="ph-fill ph-users-three text-base text-slate-400"></i>
+                        <div class="flex-1 min-w-0">
+                            <div class="font-bold truncate">2. ผู้ใช้ การเข้าสู่ระบบ และสิทธิ์</div>
+                            <div class="text-[10px] text-slate-400 truncate">บัญชีบุคลากร, RBAC, Last-Admin</div>
+                        </div>
+                    </button>
+
+                    <button type="button" id="setNav_fiscal" onclick="switchSettingsCategory('fiscal')" class="settings-nav-btn w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition flex items-center gap-2.5">
+                        <i class="ph-fill ph-calendar text-base text-slate-400"></i>
+                        <div class="flex-1 min-w-0">
+                            <div class="font-bold truncate">3. ปีงบประมาณ</div>
+                            <div class="text-[10px] text-slate-400 truncate">รอบปฏิทินหลวง, เปิดปีใหม่, ปิดปี</div>
+                        </div>
+                    </button>
+
+                    <button type="button" id="setNav_masterData" onclick="switchSettingsCategory('masterData')" class="settings-nav-btn w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition flex items-center gap-2.5">
+                        <i class="ph-fill ph-buildings text-base text-slate-400"></i>
+                        <div class="flex-1 min-w-0">
+                            <div class="font-bold truncate">4. ข้อมูลกลางพัสดุ</div>
+                            <div class="text-[10px] text-slate-400 truncate">ฝ่ายงาน, คลัง, หมวดหมู่, หน่วยนับ, FSN</div>
+                        </div>
+                    </button>
+
+                    <button type="button" id="setNav_rules" onclick="switchSettingsCategory('rules')" class="settings-nav-btn w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition flex items-center gap-2.5">
+                        <i class="ph-fill ph-sliders text-base text-slate-400"></i>
+                        <div class="flex-1 min-w-0">
+                            <div class="font-bold truncate">5. กติกาการเบิกและสต็อก</div>
+                            <div class="text-[10px] text-slate-400 truncate">Workflow, Min/ROP, พาเรโต ABC</div>
+                        </div>
+                    </button>
+
+                    <button type="button" id="setNav_miniui" onclick="switchSettingsCategory('miniui')" class="settings-nav-btn w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition flex items-center gap-2.5">
+                        <i class="ph-fill ph-qr-code text-base text-slate-400"></i>
+                        <div class="flex-1 min-w-0">
+                            <div class="font-bold truncate">6. MiniUI และ QR Code</div>
+                            <div class="text-[10px] text-slate-400 truncate">สร้างป้าย QR 4 แบบ, สารบบ QR</div>
+                        </div>
+                    </button>
+
+                    <button type="button" id="setNav_connection" onclick="switchSettingsCategory('connection')" class="settings-nav-btn w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition flex items-center gap-2.5">
+                        <i class="ph-fill ph-database text-base text-slate-400"></i>
+                        <div class="flex-1 min-w-0">
+                            <div class="font-bold truncate">7. การเชื่อมต่อ นำเข้า สำรอง</div>
+                            <div class="text-[10px] text-slate-400 truncate">ชีตฐานข้อมูล, นำเข้า CSV, Full Backup</div>
+                        </div>
+                    </button>
+
+                    <button type="button" id="setNav_audit" onclick="switchSettingsCategory('audit')" class="settings-nav-btn w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition flex items-center gap-2.5">
+                        <i class="ph-fill ph-shield-check text-base text-slate-400"></i>
+                        <div class="flex-1 min-w-0">
+                            <div class="font-bold truncate">8. ประวัติและการตรวจสอบ</div>
+                            <div class="text-[10px] text-slate-400 truncate">Audit Trail, Hash Chain, ข้อมูลระบบ</div>
+                        </div>
+                    </button>
+                </aside>
+
+                <!-- Right Column: Settings Content Panels -->
+                <div class="lg:col-span-9 space-y-4">
+                    
+                    <!-- Section Header & Action Toolbar -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <h3 id="settingsSectionTitle" class="font-bold text-slate-900 text-base flex items-center gap-2">
+                                1. ข้อมูลสถานศึกษาและเอกสาร
+                            </h3>
+                            <p id="settingsSectionDesc" class="text-xs text-slate-500 mt-0.5">
+                                กำหนดชื่อสถานศึกษา ที่อยู่ ผู้ลงนามในใบเบิก และรูปแบบการออกเลขที่เอกสาร
+                            </p>
+                        </div>
+
+                        <!-- Action Toolbar: Dirty State Guard, Cancel & Save -->
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span id="settingsDirtyIndicator" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                <span id="settingsDirtyText">ข้อมูลตรงกับระบบ</span>
+                            </span>
+                            <button type="button" id="btnCancelSettings" onclick="cancelCurrentSectionChanges()" class="px-3.5 py-2 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-100 font-bold text-xs transition cursor-pointer min-h-[44px]">
+                                ยกเลิก
+                            </button>
+                            <button type="button" id="btnSaveSettings" onclick="saveCurrentSectionChanges()" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-xs min-h-[44px]">
+                                <i class="ph-bold ph-floppy-disk"></i>
+                                <span id="btnSaveSettingsText">บันทึกข้อมูล</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="settingsLoadingState" class="hidden bg-white border border-slate-200 rounded-2xl p-8 text-center text-slate-500">
+                        <i class="ph-bold ph-spinner animate-spin text-2xl text-blue-600 mb-2"></i>
+                        <div class="text-xs font-semibold">กำลังโหลดข้อมูลการตั้งค่า...</div>
+                    </div>
+
+                    <!-- Error Alert -->
+                    <div id="settingsErrorAlert" class="hidden bg-rose-50 border border-rose-200 rounded-2xl p-4 text-xs text-rose-700 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="ph-fill ph-warning-circle text-rose-600 text-lg"></i>
+                            <span id="settingsErrorMessage">ข้อผิดพลาดในการโหลดข้อมูล</span>
+                        </div>
+                        <button type="button" onclick="document.getElementById('settingsErrorAlert').classList.add('hidden')" class="text-rose-500 hover:text-rose-700 font-bold">ปิด</button>
+                    </div>
+
+                    <!-- ============================================== -->
+                    <!-- PANEL 1: ข้อมูลองค์กรและเอกสาร (School & Documents) -->
+                    <!-- ============================================== -->
+                    <div id="setSec_school" class="settings-section space-y-4">
+                        <!-- School Profile Card -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
+                            <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+                                <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                                    <i class="ph-fill ph-graduation-cap text-lg"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm">ข้อมูลสถานศึกษา (School Profile)</h4>
+                                    <p class="text-xs text-slate-500">ระบุชื่อและข้อมูลสำหรับหัวเอกสารราชการ</p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                                <div class="space-y-1">
+                                    <label class="font-bold text-slate-700">ชื่อเต็มสถานศึกษา <span class="text-rose-500">*</span></label>
+                                    <input type="text" id="setSchool_name" oninput="markSettingsDirty()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="font-bold text-slate-700">ชื่อย่อสถานศึกษา</label>
+                                    <input type="text" id="setSchool_shortName" oninput="markSettingsDirty()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="หรเทพ">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="font-bold text-slate-700">องค์กรต้นสังกัด</label>
+                                    <input type="text" id="setSchool_org" oninput="markSettingsDirty()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="องค์การบริหารส่วนจังหวัดสระบุรี">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="font-bold text-slate-700">หน่วยงานกำกับดูแล</label>
+                                    <input type="text" id="setSchool_agency" oninput="markSettingsDirty()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="สำนักงานเขตพื้นที่การศึกษาสระบุรี">
+                                </div>
+                                <div class="sm:col-span-2 space-y-1">
+                                    <label class="font-bold text-slate-700">ที่อยู่สถานศึกษา</label>
+                                    <input type="text" id="setSchool_address" oninput="markSettingsDirty()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="ต.หรเทพ อ.บ้านหมอ จ.สระบุรี 18130">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="font-bold text-slate-700">เบอร์โทรศัพท์ติดต่อ</label>
+                                    <input type="text" id="setSchool_phone" oninput="markSettingsDirty()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="036-200-xxx">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="font-bold text-slate-700">อีเมลทางการ</label>
+                                    <input type="email" id="setSchool_email" oninput="markSettingsDirty()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="contact@hrt.ac.th">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Document Signatories Card -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
+                            <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+                                <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
+                                    <i class="ph-fill ph-signature text-lg"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm">ผู้ลงนามในเอกสารราชการ (Signatories)</h4>
+                                    <p class="text-xs text-slate-500">ข้อมูลผู้ลงนามจะถูกแช่แข็งในใบเบิก ณ วันที่ทำรายการ (Frozen Signatory Snapshot)</p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                                <div class="space-y-1">
+                                    <label class="font-bold text-slate-700">ตำแหน่งผู้ขอเบิก (Requester Title)</label>
+                                    <input type="text" id="setSign_requesterTitle" oninput="markSettingsDirty()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="ผู้ขอเบิกพัสดุ">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="font-bold text-slate-700">วันที่มีผลบังคับใช้ (Effective Date)</label>
+                                    <input type="text" id="setSign_effectiveDate" oninput="markSettingsDirty()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="2568-10-01">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="font-bold text-slate-700">ชื่อหัวหน้างาน/ผู้ตรวจสอบ</label>
+                                    <input type="text" id="setSign_approverName" oninput="markSettingsDirty()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="นางกัลยาณี เกษมสุข">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="font-bold text-slate-700">ตำแหน่งหัวหน้างาน/ผู้ตรวจสอบ</label>
+                                    <input type="text" id="setSign_approverTitle" oninput="markSettingsDirty()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="หัวหน้ากลุ่มบริหารงานงบประมาณ">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="font-bold text-slate-700">ชื่อผู้อำนวยการโรงเรียน (Director)</label>
+                                    <input type="text" id="setSign_directorName" oninput="markSettingsDirty()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="นายสมศักดิ์ รุ่งเรือง">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="font-bold text-slate-700">ตำแหน่งผู้อำนวยการ</label>
+                                    <input type="text" id="setSign_directorTitle" oninput="markSettingsDirty()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="ผู้อำนวยการโรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Document Numbering & Pattern -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
+                            <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+                                    <i class="ph-fill ph-hash text-lg"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm">รูปแบบเลขที่เอกสาร (Document Number Pattern)</h4>
+                                    <p class="text-xs text-slate-500">กำหนดรูปแบบและรหัสคำนำหน้าสำหรับใบเบิกพัสดุ</p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                                <div class="space-y-1">
+                                    <label class="font-bold text-slate-700">คำนำหน้าเลขที่เอกสาร (Prefix)</label>
+                                    <input type="text" id="setDoc_prefix" oninput="markSettingsDirty(); updateDocPatternPreview();" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="REQ-">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="font-bold text-slate-700">รูปแบบการเรียงลำดับ (Pattern)</label>
+                                    <input type="text" id="setDoc_pattern" oninput="markSettingsDirty(); updateDocPatternPreview();" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="REQ-{YYYY}/{NNNN}">
+                                </div>
+                                <div class="sm:col-span-2 bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-center justify-between">
+                                    <div class="space-y-0.5">
+                                        <div class="text-[11px] text-slate-500">ตัวอย่างเลขที่เอกสารถัดไป (Preview ไม่ตัดรหัสจริง):</div>
+                                        <div id="setDoc_previewText" class="font-mono font-bold text-blue-700 text-sm">REQ-2569/0001</div>
+                                    </div>
+                                    <span class="text-[11px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">ปีงบ 2569</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Government Forms พ.ด. ๑–๗ Mapping Preview -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                    <i class="ph-fill ph-file-text text-blue-600"></i>
+                                    <span>สถานะแบบฟอร์มเอกสารทางราชการ (พ.ด. ๑ ถึง พ.ด. ๗)</span>
+                                </h4>
+                                <span class="text-[11px] text-slate-400">ระเบียบกระทรวงการคลัง</span>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs">
+                                    <thead class="bg-slate-50 font-bold text-slate-700 border-b border-slate-200">
+                                        <tr>
+                                            <th class="py-2 px-3">รหัสแบบฟอร์ม</th>
+                                            <th class="py-2 px-3">ชื่อแบบพิมพ์ทางราชการ</th>
+                                            <th class="py-2 px-3">สถานะแม่แบบ</th>
+                                            <th class="py-2 px-3 text-right">การจัดพิมพ์</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        <tr>
+                                            <td class="py-2 px-3 font-mono font-bold text-blue-600">พ.ด. ๑</td>
+                                            <td class="py-2 px-3 font-medium text-slate-800">ทะเบียนคุมทรัพย์สินและพัสดุถาวร</td>
+                                            <td class="py-2 px-3"><span class="bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded text-[10px]">OFFICIAL_VERIFIED</span></td>
+                                            <td class="py-2 px-3 text-right"><button type="button" onclick="printOfficialFormPreview('pd1')" class="text-blue-600 hover:text-blue-800 font-bold">พิมพ์ A4</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-2 px-3 font-mono font-bold text-blue-600">พ.ด. ๒</td>
+                                            <td class="py-2 px-3 font-medium text-slate-800">ใบเบิกพัสดุและสิ่งของ (Requisition Form)</td>
+                                            <td class="py-2 px-3"><span class="bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded text-[10px]">OFFICIAL_VERIFIED</span></td>
+                                            <td class="py-2 px-3 text-right"><button type="button" onclick="printOfficialFormPreview('pd2')" class="text-blue-600 hover:text-blue-800 font-bold">พิมพ์ A4</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-2 px-3 font-mono font-bold text-blue-600">พ.ด. ๓</td>
+                                            <td class="py-2 px-3 font-medium text-slate-800">ใบส่งของและตรวจรับพัสดุ</td>
+                                            <td class="py-2 px-3"><span class="bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded text-[10px]">OFFICIAL_VERIFIED</span></td>
+                                            <td class="py-2 px-3 text-right"><button type="button" onclick="printOfficialFormPreview('pd3')" class="text-blue-600 hover:text-blue-800 font-bold">พิมพ์ A4</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-2 px-3 font-mono font-bold text-blue-600">พ.ด. ๔</td>
+                                            <td class="py-2 px-3 font-medium text-slate-800">รายงานยอดคงเหลือประจำปี ณ 30 กันยายน</td>
+                                            <td class="py-2 px-3"><span class="bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded text-[10px]">OFFICIAL_VERIFIED</span></td>
+                                            <td class="py-2 px-3 text-right"><button type="button" onclick="printOfficialFormPreview('pd4')" class="text-blue-600 hover:text-blue-800 font-bold">พิมพ์ A4</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-2 px-3 font-mono font-bold text-blue-600">พ.ด. ๕</td>
+                                            <td class="py-2 px-3 font-medium text-slate-800">รายงานผลการตรวจสอบพัสดุประจำปี</td>
+                                            <td class="py-2 px-3"><span class="bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded text-[10px]">PENDING_TEMPLATE</span></td>
+                                            <td class="py-2 px-3 text-right"><button type="button" onclick="printOfficialFormPreview('pd5')" class="text-slate-400 hover:text-slate-600 font-bold">ตัวอย่าง</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-2 px-3 font-mono font-bold text-blue-600">พ.ด. ๖</td>
+                                            <td class="py-2 px-3 font-medium text-slate-800">รายงานพัสดุชำรุด เสื่อมสภาพ หรือสูญไป</td>
+                                            <td class="py-2 px-3"><span class="bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded text-[10px]">PENDING_TEMPLATE</span></td>
+                                            <td class="py-2 px-3 text-right"><button type="button" onclick="printOfficialFormPreview('pd6')" class="text-slate-400 hover:text-slate-600 font-bold">ตัวอย่าง</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-2 px-3 font-mono font-bold text-blue-600">พ.ด. ๗</td>
+                                            <td class="py-2 px-3 font-medium text-slate-800">คำสั่งแต่งตั้งคณะกรรมการตรวจสอบพัสดุ</td>
+                                            <td class="py-2 px-3"><span class="bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded text-[10px]">PENDING_TEMPLATE</span></td>
+                                            <td class="py-2 px-3 text-right"><button type="button" onclick="printOfficialFormPreview('pd7')" class="text-slate-400 hover:text-slate-600 font-bold">ตัวอย่าง</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================== -->
+                    <!-- PANEL 2: ผู้ใช้ การเข้าสู่ระบบ และสิทธิ์ (Users & RBAC) -->
+                    <!-- ============================================== -->
+                    <div id="setSec_users" class="settings-section space-y-4 hidden">
+                        <!-- User Table Card -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                        <i class="ph-fill ph-users-three text-blue-600"></i>
+                                        <span>สารบบผู้ใช้งานระบบ (01_Users Directory)</span>
+                                    </h4>
+                                    <p class="text-xs text-slate-500">จัดการรายชื่อผู้มีสิทธิ์ใช้งาน บทบาท และสถานะบัญชี</p>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button type="button" onclick="openAddUserModal()" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition cursor-pointer min-h-[44px]">
+                                        <i class="ph-bold ph-user-plus"></i>
+                                        <span>เพิ่มผู้ใช้งานใหม่</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Search and Role Filter -->
+                            <div class="flex flex-col sm:flex-row items-center gap-3 text-xs">
+                                <div class="w-full sm:w-64 relative">
+                                    <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                    <input type="text" id="setUser_search" oninput="filterUserTable(this.value)" placeholder="ค้นหาชื่อ หรืออีเมล..." class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]">
+                                </div>
+                                <select id="setUser_roleFilter" onchange="filterUserTable()" class="bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 min-h-[44px] cursor-pointer">
+                                    <option value="ALL">ทุกลุ่มบทบาท</option>
+                                    <option value="ADMIN">ADMIN (ผู้ดูแลระบบ)</option>
+                                    <option value="DIRECTOR">DIRECTOR (ผู้อำนวยการ)</option>
+                                    <option value="APPROVER">APPROVER (หัวหน้างาน)</option>
+                                    <option value="OFFICER">OFFICER (เจ้าหน้าที่พัสดุ)</option>
+                                    <option value="REQUESTER">REQUESTER (ครูผู้ขอเบิก)</option>
+                                </select>
+                            </div>
+
+                            <!-- User List Table -->
+                            <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                                <table class="w-full text-left text-xs">
+                                    <thead class="bg-slate-50 font-bold text-slate-700 border-b border-slate-200">
+                                        <tr>
+                                            <th class="py-2.5 px-3">รหัส</th>
+                                            <th class="py-2.5 px-3">ชื่อ - นามสกุล</th>
+                                            <th class="py-2.5 px-3">บัญชีอีเมล (@hrt.ac.th)</th>
+                                            <th class="py-2.5 px-3">ฝ่าย/กลุ่มสาระ</th>
+                                            <th class="py-2.5 px-3">บทบาทในระบบ</th>
+                                            <th class="py-2.5 px-3">สถานะ</th>
+                                            <th class="py-2.5 px-3 text-right">การจัดการ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="setUsers_tableBody" class="divide-y divide-slate-100">
+                                        <!-- Injected by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Last-Admin Protection Alert -->
+                            <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center gap-2.5 text-xs text-amber-800">
+                                <i class="ph-fill ph-shield-warning text-lg text-amber-600 flex-shrink-0"></i>
+                                <span><b>ระบบคุ้มครองผู้ดูแลระบบคนสุดท้าย (Last-Admin Protection):</b> ระบบจะปฏิเสธการถอดสิทธิ์หรือระงับบัญชีผู้ดูแลระบบ (ADMIN) หากเหลือผู้ใช้งานที่ Active เพียงคนเดียว เพื่อป้องกันระบบถูกตัดขาด</span>
+                            </div>
+                        </div>
+
+                        <!-- Google Workspace SSO Details Card -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <div class="flex items-center gap-2">
+                                    <i class="ph-fill ph-google-logo text-emerald-600 text-lg"></i>
+                                    <h4 class="font-bold text-slate-800 text-sm">การยืนยันตัวตน Google Workspace SSO</h4>
+                                </div>
+                                <button type="button" onclick="verifyCurrentUserAuthSession()" class="px-3 py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer min-h-[44px]">
+                                    <i class="ph-bold ph-arrows-clockwise text-blue-600"></i>
+                                    <span>ตรวจการเข้าสู่ระบบ</span>
+                                </button>
+                            </div>
+                            <div class="text-xs text-slate-600 space-y-1">
+                                <div><b>โดเมนองค์กรที่ได้รับอนุญาต:</b> <code class="bg-slate-100 px-1.5 py-0.5 rounded text-blue-700">@hrt.ac.th</code></div>
+                                <div><b>โปรโตคอลความปลอดภัย:</b> OAuth 2.0 / OpenID Connect with Server-Side Identity Verification</div>
+                                <div class="text-slate-400">* บุคลากรใหม่ที่ยังไม่ถูกเพิ่มในระบบ จะไม่ได้รับสิทธิ์ทำธุรกรรมจนกว่าผู้ดูแลระบบจะอนุมัติบัญชี (Fail-Closed Policy)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================== -->
+                    <!-- PANEL 3: ปีงบประมาณ (Fiscal Year Management) -->
+                    <!-- ============================================== -->
+                    <div id="setSec_fiscal" class="settings-section space-y-4 hidden">
+                        <!-- Fiscal Status Card -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                        <i class="ph-fill ph-calendar text-blue-600"></i>
+                                        <span>รอบปีงบประมาณปฏิทินหลวง (12_Fiscal_Years)</span>
+                                    </h4>
+                                    <p class="text-xs text-slate-500">จัดการรอบปีงบประมาณตามระเบียบราชการ (1 ต.ค. – 30 ก.ย.)</p>
+                                </div>
+                                <button type="button" onclick="openNewFiscalYearModal()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition cursor-pointer min-h-[44px]">
+                                    <i class="ph-bold ph-plus-circle"></i>
+                                    <span>เปิดปีงบประมาณใหม่ (Idempotent)</span>
+                                </button>
+                            </div>
+
+                            <!-- Year Highlights -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="bg-blue-50 border border-blue-200 rounded-xl p-3.5 flex items-center justify-between">
+                                    <div>
+                                        <span class="text-[11px] font-bold text-blue-700 block">ปีทำธุรกรรมจริงของระบบ (Active Transaction Year)</span>
+                                        <span class="text-xl font-bold font-mono text-blue-900" id="setFiscal_activeYearDisplay">พ.ศ. 2569</span>
+                                        <div class="text-[11px] text-blue-600">1 ต.ค. 2568 – 30 ก.ย. 2569 (Asia/Bangkok)</div>
+                                    </div>
+                                    <span class="px-2 py-1 rounded bg-blue-600 text-white text-[11px] font-bold">บันทึกสต็อก</span>
+                                </div>
+                                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 flex items-center justify-between">
+                                    <div>
+                                        <span class="text-[11px] font-bold text-slate-600 block">ปีงบประมาณที่เปิดดู (Viewing Year)</span>
+                                        <span class="text-xl font-bold font-mono text-slate-800" id="setFiscal_viewingYearDisplay">พ.ศ. 2569</span>
+                                        <div class="text-[11px] text-slate-500">เลือกดูรายงานและประวัติย้อนหลัง</div>
+                                    </div>
+                                    <button type="button" onclick="switchMainView('audit')" class="px-2.5 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-bold transition">
+                                        ตรวจนับสิ้นปี
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Fiscal Years Table -->
+                            <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                                <table class="w-full text-left text-xs">
+                                    <thead class="bg-slate-50 font-bold text-slate-700 border-b border-slate-200">
+                                        <tr>
+                                            <th class="py-2.5 px-3">ปีงบประมาณ</th>
+                                            <th class="py-2.5 px-3">ช่วงวันที่ตามปฏิทินหลวง</th>
+                                            <th class="py-2.5 px-3">สถานะธุรกรรม</th>
+                                            <th class="py-2.5 px-3">การตรวจนับพัสดุ</th>
+                                            <th class="py-2.5 px-3 text-right">การจัดการ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="setFiscal_tableBody" class="divide-y divide-slate-100">
+                                        <tr>
+                                            <td class="py-2.5 px-3 font-mono font-bold text-slate-800">2568</td>
+                                            <td class="py-2.5 px-3 text-slate-600">1 ต.ค. 2567 – 30 ก.ย. 2568</td>
+                                            <td class="py-2.5 px-3"><span class="bg-slate-100 text-slate-700 font-bold px-1.5 py-0.5 rounded text-[10px]">CLOSED_READONLY</span></td>
+                                            <td class="py-2.5 px-3"><span class="text-emerald-700 font-bold">ตรวจนับแล้ว (30 ก.ย. 68)</span></td>
+                                            <td class="py-2.5 px-3 text-right"><span class="text-slate-400 text-xs">ล็อกการเขียน</span></td>
+                                        </tr>
+                                        <tr class="bg-blue-50/40">
+                                            <td class="py-2.5 px-3 font-mono font-bold text-blue-700">2569</td>
+                                            <td class="py-2.5 px-3 text-slate-600">1 ต.ค. 2568 – 30 ก.ย. 2569</td>
+                                            <td class="py-2.5 px-3"><span class="bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded text-[10px]">ACTIVE_CURRENT</span></td>
+                                            <td class="py-2.5 px-3"><span class="text-blue-700 font-bold">เปิดทำธุรกรรมปกติ</span></td>
+                                            <td class="py-2.5 px-3 text-right"><span class="text-emerald-600 font-bold">กำลังใช้งาน</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-2.5 px-3 font-mono font-bold text-slate-800">2570</td>
+                                            <td class="py-2.5 px-3 text-slate-600">1 ต.ค. 2569 – 30 ก.ย. 2570</td>
+                                            <td class="py-2.5 px-3"><span class="bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded text-[10px]">PREPARED_IDEMPOTENT</span></td>
+                                            <td class="py-2.5 px-3"><span class="text-slate-500">รอยกยอดสต็อก 1 ต.ค.</span></td>
+                                            <td class="py-2.5 px-3 text-right"><button type="button" onclick="openNewFiscalYearModal('2570')" class="text-blue-600 hover:text-blue-800 font-bold">ตรวจสอบ</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Closed Year Write Lock Banner -->
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-600">
+                                <b>🔒 กฎความมั่นคงของข้อมูล (Closed-Year Write Lock):</b> การแก้ไขพัสดุ เบิกจ่าย หรือรับเข้าสต็อกย้อนหลังในรอบปีที่ปิดบัญชีแล้วจะถูกปฏิเสธโดยเซิร์ฟเวอร์ทุกกรณี เพื่อรักษาความถูกต้องของรายงานที่เสนอ อบจ.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================== -->
+                    <!-- PANEL 4: ข้อมูลกลางพัสดุ (Master Reference Data) -->
+                    <!-- ============================================== -->
+                    <div id="setSec_masterData" class="settings-section space-y-4 hidden">
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
+                            <!-- Sub-navigation tabs -->
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                        <i class="ph-fill ph-buildings text-blue-600"></i>
+                                        <span>ข้อมูลอ้างอิงหลัก (Master Reference Data)</span>
+                                    </h4>
+                                    <p class="text-xs text-slate-500">จัดการแผนก, คลัง, หมวดหมู่, หน่วยนับ และรหัสพัสดุภาครัฐ (FSN)</p>
+                                </div>
+                                <button type="button" onclick="openAddMasterDataModal()" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition cursor-pointer min-h-[44px]">
+                                    <i class="ph-bold ph-plus"></i>
+                                    <span id="setMaster_btnAddText">เพิ่มแผนกใหม่</span>
+                                </button>
+                            </div>
+
+                            <!-- Sub Tabs -->
+                            <div class="flex items-center gap-1.5 border-b border-slate-200 text-xs overflow-x-auto pb-1">
+                                <button type="button" id="subTab_depts" onclick="switchMasterDataSubTab('depts')" class="px-3 py-1.5 rounded-lg bg-blue-600 text-white font-bold whitespace-nowrap min-h-[44px]">
+                                    แผนก/กลุ่มสาระฯ (02_Departments)
+                                </button>
+                                <button type="button" id="subTab_warehouses" onclick="switchMasterDataSubTab('warehouses')" class="px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 whitespace-nowrap min-h-[44px]">
+                                    คลังและสถานที่เก็บ (05_Warehouses)
+                                </button>
+                                <button type="button" id="subTab_categories" onclick="switchMasterDataSubTab('categories')" class="px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 whitespace-nowrap min-h-[44px]">
+                                    หมวดหมู่พัสดุ (04_Categories)
+                                </button>
+                                <button type="button" id="subTab_units" onclick="switchMasterDataSubTab('units')" class="px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 whitespace-nowrap min-h-[44px]">
+                                    หน่วยนับ & กฎทศนิยม (Units)
+                                </button>
+                            </div>
+
+                            <!-- Master Table Container -->
+                            <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                                <table class="w-full text-left text-xs">
+                                    <thead class="bg-slate-50 font-bold text-slate-700 border-b border-slate-200">
+                                        <tr id="setMaster_tableHead">
+                                            <th class="py-2.5 px-3">รหัส</th>
+                                            <th class="py-2.5 px-3">ชื่อรายการ</th>
+                                            <th class="py-2.5 px-3">หัวหน้า/รายละเอียด</th>
+                                            <th class="py-2.5 px-3">การอ้างอิงในคลัง (Dependency)</th>
+                                            <th class="py-2.5 px-3">สถานะ</th>
+                                            <th class="py-2.5 px-3 text-right">การจัดการ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="setMaster_tableBody" class="divide-y divide-slate-100">
+                                        <!-- Injected by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="text-[11px] text-slate-400">
+                                * หากรายการใดมีประวัติการเบิกจ่ายหรือพัสดุผูกอยู่ ระบบจะใช้วิธีระงับการใช้งาน (INACTIVE) แทนการลบแถว เพื่อไม่ให้ประวัติทางบัญชีเสียหาย
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================== -->
+                    <!-- PANEL 5: กติกาการเบิกและสต็อก (Business Rules) -->
+                    <!-- ============================================== -->
+                    <div id="setSec_rules" class="settings-section space-y-4 hidden">
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
+                            <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+                                <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+                                    <i class="ph-fill ph-sliders text-lg"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm">กติกาการเบิกจ่ายและนโยบายสต็อก (Business Rules)</h4>
+                                    <p class="text-xs text-slate-500">กำหนดขั้นตอนการอนุมัติ เกณฑ์สต็อกขั้นต่ำ และการจัดกลุ่มพาเรโต</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                                <div class="space-y-1">
+                                    <label class="font-bold text-slate-700">รูปแบบขั้นตอนการเบิกจ่าย (Workflow Mode)</label>
+                                    <select id="setRules_workflowMode" onchange="markSettingsDirty()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]">
+                                        <option value="TWO_STEP">2-Step: เจ้าหน้าที่ตรวจสอบ $ightarrow$ จ่ายพัสดุ (เร็ว)</option>
+                                        <option value="THREE_STEP" selected>3-Step: เจ้าหน้าที่ตรวจ $ightarrow$ ผู้บริหารอนุมัติ $ightarrow$ จ่ายพัสดุ (ราชการ)</option>
+                                    </select>
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label class="font-bold text-slate-700">นโยบายขอเบิกเกินโควตา (Over-quota Policy)</label>
+                                    <select id="setRules_allowOverQuota" onchange="markSettingsDirty()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]">
+                                        <option value="false" selected>ไม่อนุญาต (เบิกได้ไม่เกินยอดคงเหลือในคลัง)</option>
+                                        <option value="true">อนุญาตเฉพาะกรณีเร่งด่วนโดยได้รับอนุมัติพิเศษ</option>
+                                    </select>
+                                </div>
+
+                                <!-- Stock Deduction Decoupled Guarantee Card -->
+                                <div class="sm:col-span-2 bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-800">
+                                    <b>✅ กฎการตัดสต็อกที่พิสูจน์แล้ว (Stock Invariant Guarantee):</b> สต็อกในระบบจะถูกตัดลดยอดจริง<b>เฉพาะในขั้นตอนจ่ายพัสดุ (ISSUED)</b> เท่านั้น การยื่นคำร้องหรือการอนุมัติจะไม่ลดสต็อก และการกดยืนยันรับพัสดุจะไม่ตัดสต็อกซ้ำ
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label class="font-bold text-slate-700">เกณฑ์แจ้งเตือนสต็อกต่ำ (Default Min Stock)</label>
+                                    <input type="number" id="setRules_lowStockThreshold" oninput="markSettingsDirty()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="10">
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label class="font-bold text-slate-700">ตัวคูณจุดสั่งซื้อซ้ำ (ROP Multiplier Factor)</label>
+                                    <input type="number" step="0.1" id="setRules_ropFactor" oninput="markSettingsDirty()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="1.5">
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label class="font-bold text-slate-700">เกณฑ์จัดกลุ่มมูลค่าพาเรโต กลุ่ม A (%)</label>
+                                    <input type="number" id="setRules_abcA" oninput="markSettingsDirty()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="80">
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label class="font-bold text-slate-700">เกณฑ์จัดกลุ่มมูลค่าพาเรโต กลุ่ม B (%)</label>
+                                    <input type="number" id="setRules_abcB" oninput="markSettingsDirty()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="15">
+                                </div>
+
+                                <!-- Disabled Placeholder Features -->
+                                <div class="sm:col-span-2 border-t border-slate-100 pt-3 space-y-2">
+                                    <div class="text-xs font-bold text-slate-400">ฟังก์ชันขั้นสูงที่อยู่ในแผนการพัฒนา:</div>
+                                    <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl text-xs text-slate-500">
+                                        <span>ระบบจองสต็อกล่วงหน้า (Stock Reservation)</span>
+                                        <span class="bg-slate-200 text-slate-600 font-bold px-2 py-0.5 rounded text-[10px]">ยังไม่รองรับ (Disabled)</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl text-xs text-slate-500">
+                                        <span>การจ่ายพัสดุบางส่วน (Partial Issue)</span>
+                                        <span class="bg-slate-200 text-slate-600 font-bold px-2 py-0.5 rounded text-[10px]">ยังไม่รองรับ (Disabled)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================== -->
+                    <!-- PANEL 6: MiniUI และ QR Code Generator -->
+                    <!-- ============================================== -->
+                    <div id="setSec_miniui" class="settings-section space-y-4 hidden">
+                        <!-- MiniUI Configuration -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                                        <i class="ph-fill ph-device-mobile text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-slate-800 text-sm">ตั้งค่าระบบ HRT MiniUI</h4>
+                                        <p class="text-xs text-slate-500">ส่วนต่อประสานแบบย่อสำหรับสมาร์ตโฟนของครูและบุคลากร</p>
+                                    </div>
+                                </div>
+                                <button type="button" onclick="toggleMiniUi()" class="px-3.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 min-h-[44px]">
+                                    <i class="ph-bold ph-eye"></i>
+                                    <span>เปิดดูตัวอย่าง MiniUI</span>
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                                <div class="space-y-1">
+                                    <label class="font-bold text-slate-700">สถานะเปิดให้เบิกผ่าน MiniUI</label>
+                                    <select id="setMini_enabled" onchange="markSettingsDirty()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]">
+                                        <option value="true" selected>เปิดใช้งานปกติ (Active)</option>
+                                        <option value="false">ปิดชั่วคราวระหว่างตรวจนับสิ้นปี</option>
+                                    </select>
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="font-bold text-slate-700">กลุ่มสาระที่อนุญาตให้เข้าใช้งาน</label>
+                                    <input type="text" id="setMini_allowedDepts" oninput="markSettingsDirty()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="ALL (ทุกกลุ่มสาระการเรียนรู้)">
+                                </div>
+                                <div class="sm:col-span-2 space-y-1">
+                                    <label class="font-bold text-slate-700">ข้อความต้อนรับและคำแนะนำการเบิก</label>
+                                    <textarea id="setMini_welcomeMessage" oninput="markSettingsDirty()" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500" placeholder="ยินดีต้อนรับสู่ระบบเบิกพัสดุโรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- QR Code Generator Engine -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
+                            <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+                                    <i class="ph-fill ph-qr-code text-lg"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm">เครื่องมือสร้างป้าย QR Code มาตรฐาน (4 ประเภท)</h4>
+                                    <p class="text-xs text-slate-500">สร้างรหัส QR Code พร้อม Quiet Zone ตามมาตรฐานสากลเพื่อติดบนกล่องพัสดุหรือหน้าห้อง</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
+                                <!-- Generator Form (7 cols) -->
+                                <div class="md:col-span-7 space-y-3 text-xs">
+                                    <div class="space-y-1">
+                                        <label class="font-bold text-slate-700">ประเภท QR Code <span class="text-rose-500">*</span></label>
+                                        <select id="qrGen_type" onchange="handleQrTypeChange(this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]">
+                                            <option value="GENERAL">1. ขอเบิกทั่วไป (General Requisition)</option>
+                                            <option value="ITEM" selected>2. ประจำพัสดุ (Item Spec & Quick Request)</option>
+                                            <option value="ROOM">3. ประจำห้อง/คลัง (Room / Laboratory)</option>
+                                            <option value="TRACKING">4. ติดตามสถานะใบเบิก (Tracking Status)</option>
+                                        </select>
+                                    </div>
+
+                                    <div id="qrGen_targetContainer" class="space-y-1">
+                                        <label id="qrGen_targetLabel" class="font-bold text-slate-700">รหัสพัสดุเป้าหมาย (Item Code)</label>
+                                        <input type="text" id="qrGen_targetRef" oninput="updateLiveQrPreview()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="เช่น OFF-001 หรือ SCI-012">
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label class="font-bold text-slate-700">ข้อความป้ายกำกับ (Label Caption)</label>
+                                        <input type="text" id="qrGen_label" oninput="updateLiveQrPreview()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]" placeholder="กระดาษ A4 80g Double A">
+                                    </div>
+
+                                    <div class="flex items-center gap-2 pt-2">
+                                        <button type="button" onclick="submitCreateQrCode()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 transition cursor-pointer min-h-[44px]">
+                                            <i class="ph-bold ph-plus-circle"></i>
+                                            <span>สร้างและบันทึกลงสารบบ</span>
+                                        </button>
+                                        <button type="button" onclick="printQrBadge()" class="px-3.5 py-2.5 border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold rounded-xl text-xs flex items-center gap-1.5 transition cursor-pointer min-h-[44px]">
+                                            <i class="ph-bold ph-printer"></i>
+                                            <span>พิมพ์ป้าย A4</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Live SVG Preview (5 cols) -->
+                                <div class="md:col-span-5 flex flex-col items-center justify-center p-4 bg-slate-50 border border-slate-200 rounded-2xl gap-3">
+                                    <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">ตัวอย่างภาพ QR Code (SVG Live Preview)</div>
+                                    <div id="qrGen_previewBox" class="bg-white p-3 rounded-xl shadow-xs border border-slate-200 flex items-center justify-center min-w-[180px] min-h-[180px]">
+                                        <!-- SVG Rendered Here -->
+                                    </div>
+                                    <div class="text-[10px] text-slate-400 font-mono" id="qrGen_tokenPreview">QR:ITEM:OFF-001</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- QR Code Registry Table -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                    <i class="ph-fill ph-list-numbers text-blue-600"></i>
+                                    <span>สารบบรหัส QR Code ในระบบ (14_QR_Registry)</span>
+                                </h4>
+                                <span class="text-xs text-slate-500" id="setQr_countText">0 รายการ</span>
+                            </div>
+
+                            <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                                <table class="w-full text-left text-xs">
+                                    <thead class="bg-slate-50 font-bold text-slate-700 border-b border-slate-200">
+                                        <tr>
+                                            <th class="py-2 px-3">ประเภท</th>
+                                            <th class="py-2 px-3">โทเค็น (Opaque Token)</th>
+                                            <th class="py-2 px-3">เป้าหมาย</th>
+                                            <th class="py-2 px-3">ป้ายกำกับ</th>
+                                            <th class="py-2 px-3">สถานะ</th>
+                                            <th class="py-2 px-3 text-right">การจัดการ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="setQr_tableBody" class="divide-y divide-slate-100">
+                                        <!-- Injected by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================== -->
+                    <!-- PANEL 7: การเชื่อมต่อ นำเข้า และสำรอง (Connection & Backup) -->
+                    <!-- ============================================== -->
+                    <div id="setSec_connection" class="settings-section space-y-4 hidden">
+                        <!-- Connection & Diagnostics Card -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                        <i class="ph-fill ph-database text-blue-600"></i>
+                                        <span>การเชื่อมต่อฐานข้อมูล Google Sheets (Diagnostics)</span>
+                                    </h4>
+                                    <p class="text-xs text-slate-500">ตรวจสอบความพร้อมของตาราง 16 Canonical Sheets</p>
+                                </div>
+                                <button type="button" onclick="testDatabaseConnection()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition cursor-pointer min-h-[44px]">
+                                    <i class="ph-bold ph-activity"></i>
+                                    <span>ทดสอบการเชื่อมต่อ (Read-Only)</span>
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                                <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                                    <span class="text-slate-400 block font-semibold">Spreadsheet ID:</span>
+                                    <span class="font-mono font-bold text-slate-800 truncate block" id="setConn_maskedId">1BxiM...***</span>
+                                </div>
+                                <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                                    <span class="text-slate-400 block font-semibold">สถานะสิทธิ์การอ่าน:</span>
+                                    <span class="font-bold text-emerald-600 flex items-center gap-1">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                        <span>พร้อมใช้งาน (Ready)</span>
+                                    </span>
+                                </div>
+                                <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                                    <span class="text-slate-400 block font-semibold">โครงสร้างตาราง:</span>
+                                    <span class="font-bold text-blue-700">16 Canonical Sheets</span>
+                                </div>
+                            </div>
+
+                            <div id="setConn_diagOutput" class="hidden bg-slate-900 text-emerald-400 p-3 rounded-xl font-mono text-[11px] overflow-x-auto">
+                                <!-- Health check result -->
+                            </div>
+                        </div>
+
+                        <!-- CSV Import Wizard -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                        <i class="ph-fill ph-file-arrow-up text-emerald-600"></i>
+                                        <span>ระบบนำเข้าข้อมูลพัสดุ (CSV Import & Sanitization)</span>
+                                    </h4>
+                                    <p class="text-xs text-slate-500">ตรวจสอบความปลอดภัย ป้องกัน Formula Injection และปรับปรุงยอดอย่างปลอดภัย</p>
+                                </div>
+                                <button type="button" onclick="exportDatabaseTemplate()" class="px-3 py-1.5 border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5 min-h-[44px]">
+                                    <i class="ph-bold ph-file-csv text-emerald-600"></i>
+                                    <span>ดาวน์โหลดไฟล์ต้นแบบ</span>
+                                </button>
+                            </div>
+
+                            <div class="border-2 border-dashed border-slate-300 hover:border-blue-400 rounded-2xl p-6 text-center space-y-2 bg-slate-50/50 cursor-pointer" onclick="document.getElementById('setImport_fileInput').click()">
+                                <i class="ph-fill ph-cloud-arrow-up text-3xl text-blue-600"></i>
+                                <div class="text-xs font-bold text-slate-800">คลิกเพื่อเลือกไฟล์ CSV หรือลากไฟล์มาวาง</div>
+                                <div class="text-[11px] text-slate-400">รองรับ UTF-8 with BOM และไฟล์จาก Microsoft Excel</div>
+                                <input type="file" id="setImport_fileInput" accept=".csv" class="hidden" onchange="handleSettingsCsvSelected(event)">
+                            </div>
+
+                            <div id="setImport_previewArea" class="hidden space-y-3">
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="font-bold text-slate-800" id="setImport_summaryText">ผลการตรวจสอบล่วงหน้า (Dry-Run)</span>
+                                    <button type="button" onclick="commitSettingsCsvImport()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition">
+                                        ยืนยันการนำเข้าข้อมูล
+                                    </button>
+                                </div>
+                                <div class="overflow-x-auto border border-slate-200 rounded-xl max-h-48">
+                                    <table class="w-full text-left text-xs">
+                                        <thead class="bg-slate-50 font-bold text-slate-700 border-b border-slate-200 sticky top-0">
+                                            <tr>
+                                                <th class="py-2 px-3">แถว</th>
+                                                <th class="py-2 px-3">รหัสพัสดุ</th>
+                                                <th class="py-2 px-3">ชื่อรายการ</th>
+                                                <th class="py-2 px-3">หน่วยนับ</th>
+                                                <th class="py-2 px-3">จำนวน</th>
+                                                <th class="py-2 px-3">ผลการตรวจ</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="setImport_previewTableBody" class="divide-y divide-slate-100">
+                                            <!-- Preview rows -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Backup & Disaster Recovery -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                        <i class="ph-fill ph-shield-check text-purple-600"></i>
+                                        <span>การสำรองและกู้คืนข้อมูล (Backup & Disaster Recovery)</span>
+                                    </h4>
+                                    <p class="text-xs text-slate-500">สำรองชุดข้อมูล 16 แผ่นงานมาตรฐาน (แยก Credentials ออกจากชุดข้อมูล)</p>
+                                </div>
+                                <button type="button" onclick="triggerFullBackup()" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition cursor-pointer min-h-[44px]">
+                                    <i class="ph-bold ph-download-simple"></i>
+                                    <span>สร้างชุดข้อมูลสำรองทันที</span>
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-center justify-between text-xs">
+                                <div>
+                                    <div class="font-bold text-slate-800">นโยบายความปลอดภัยการกู้คืน (Restore Policy):</div>
+                                    <div class="text-slate-500">อนุญาตเฉพาะการทดสอบกู้คืนในสภาพแวดล้อม Staging เท่านั้น การกู้คืนสู่ระบบจริงต้องได้รับอนุมัติพิเศษ</div>
+                                </div>
+                                <button type="button" onclick="openRestoreDryRunModal()" class="px-3 py-1.5 border border-slate-300 hover:bg-slate-200 text-slate-700 rounded-lg font-bold text-xs">
+                                    ทดสอบกู้คืน (Dry-Run)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================== -->
+                    <!-- PANEL 8: ประวัติและการตรวจสอบ (Audit & About) -->
+                    <!-- ============================================== -->
+                    <div id="setSec_audit" class="settings-section space-y-4 hidden">
+                        <!-- Audit Log Card -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                        <i class="ph-fill ph-shield-check text-blue-600"></i>
+                                        <span>บันทึกการตรวจสอบระบบ (11_Audit_Trail)</span>
+                                    </h4>
+                                    <p class="text-xs text-slate-500">บันทึกธุรกรรมพร้อมการตรวจจับการดัดแปลง (SHA-256 Hash Chain)</p>
+                                </div>
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                    <span>Hash Chain Verified</span>
+                                </span>
+                            </div>
+
+                            <!-- Audit Filter Bar -->
+                            <div class="flex flex-col sm:flex-row items-center gap-3 text-xs">
+                                <input type="text" id="setAudit_search" oninput="filterAuditLogs(this.value)" placeholder="ค้นหาผู้กระทำ หรือรายละเอียด..." class="w-full sm:w-64 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-none focus:border-blue-500 min-h-[44px]">
+                                <select id="setAudit_actionFilter" onchange="filterAuditLogs()" class="bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 min-h-[44px] cursor-pointer">
+                                    <option value="ALL">ทุกการกระทำ (Actions)</option>
+                                    <option value="UPDATE_SETTINGS">แก้ไขการตั้งค่า</option>
+                                    <option value="CREATE_USER">เพิ่มผู้ใช้งาน</option>
+                                    <option value="ISSUE_STOCK">จ่ายพัสดุ</option>
+                                    <option value="CREATE_QR">สร้าง QR Code</option>
+                                    <option value="BACKUP_SYSTEM">สำรองข้อมูล</option>
+                                </select>
+                            </div>
+
+                            <!-- Audit Table -->
+                            <div class="overflow-x-auto border border-slate-200 rounded-xl max-h-72">
+                                <table class="w-full text-left text-xs">
+                                    <thead class="bg-slate-50 font-bold text-slate-700 border-b border-slate-200 sticky top-0">
+                                        <tr>
+                                            <th class="py-2.5 px-3">วัน-เวลา</th>
+                                            <th class="py-2.5 px-3">ผู้กระทำ (Actor)</th>
+                                            <th class="py-2.5 px-3">การกระทำ (Action)</th>
+                                            <th class="py-2.5 px-3">เป้าหมาย (Entity)</th>
+                                            <th class="py-2.5 px-3">รายละเอียด (Sanitized)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="setAudit_tableBody" class="divide-y divide-slate-100">
+                                        <!-- Injected by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- System About Card -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3">
+                            <div class="flex items-center gap-2 border-b border-slate-100 pb-2">
+                                <i class="ph-fill ph-info text-blue-600 text-lg"></i>
+                                <h4 class="font-bold text-slate-800 text-sm">ข้อมูลเกี่ยวกับระบบ (System Specifications)</h4>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-600">
+                                <div><b>ระบบ:</b> HRT School Inventory Management System</div>
+                                <div><b>รุ่น (Canonical Version):</b> <span id="setAbout_version" class="font-bold text-blue-600">v2.7.0-rc.1</span></div>
+                                <div><b>สถาปัตยกรรม:</b> Google Sheets DB + Apps Script + HTML5/Tailwind SPA</div>
+                                <div><b>โซนเวลา:</b> Asia/Bangkok (UTC+07:00)</div>
+                                <div><b>สิทธิ์การใช้งาน:</b> โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี) อบจ.สระบุรี</div>
+                                <div><b>การคุ้มครองข้อมูล:</b> พระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล (PDPA)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>

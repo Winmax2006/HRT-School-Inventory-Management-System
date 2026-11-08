@@ -1,0 +1,170 @@
+{
+  "report_metadata": {
+    "report_timestamp": "2026-10-30T06:06:16+07:00",
+    "timezone": "Asia/Bangkok",
+    "git_branch": "main",
+    "git_head_commit": "dd000c0 Merge remote main: include implementation brief, prototype, and scripts",
+    "working_tree_state": "DIRTY (3 modified tracked files, 37 untracked files/directories)",
+    "audit_type": "READ_ONLY_INSPECTION_AND_VERIFICATION",
+    "environment": {
+      "node_version": "v24.19.0",
+      "os": "Windows_NT x64"
+    }
+  },
+  "declared_version_discrepancies": {
+    "Config.gs": "2.7.0-rc.4 (CONFIG.VERSION)",
+    "Code.gs": "CONFIG.APP_NAME + ' v' + CONFIG.APP_VERSION (DEFECT: CONFIG.APP_VERSION is undefined)",
+    "index.html": "v2.7.0-rc.4 (Lines 1125, 13527)",
+    "MiniUI.html": "v2.7.0-rc.4 (Header) / v2.7.0 (Line 327)",
+    "README.md": "Version 2.6.0 / Fiscal Year 2569 (Line 2)",
+    "releases_archive": "v2.7.0-rc.5 (released 2026-10-28T09:36:29Z)",
+    "repair_progress_claim": "v2.7.0-rc.5 (Working Tree) -> Candidate v2.7.0-rc.6",
+    "verdict": "VERSION_MISMATCH_CONFIRMED: Working tree source contains rc.4 labels in code/UI, despite having an rc.5 archive in releases/ and repair progress claiming working tree is rc.5 candidate for rc.6."
+  },
+  "canonical_components": {
+    "backend_canonical": [
+      "Config.gs",
+      "Api.gs",
+      "Read.gs",
+      "Write.gs",
+      "Audit.gs",
+      "Code.gs"
+    ],
+    "frontend_canonical": [
+      "index.html",
+      "MiniUI.html",
+      "frontend/main/App.js"
+    ],
+    "platform_manifest": "appsscript.json"
+  },
+  "source_files": [
+    {
+      "path": "Code.gs",
+      "bytes": 16020,
+      "sha256": "572a18c285ed211acbeb250e15080ddf5ef0cc293248b11f5114ac581e7170c1",
+      "last_modified": "2026-10-28T22:58:13+07:00"
+    },
+    {
+      "path": "Api.gs",
+      "bytes": 56341,
+      "sha256": "d4970e44cbabce60c14a924a5da7049c8cd98e00d5061dab36580821c92fa222",
+      "last_modified": "2026-10-29T19:47:49+07:00"
+    },
+    {
+      "path": "Read.gs",
+      "bytes": 82768,
+      "sha256": "c72f388901ae7deab8017803e78b0ff57a3f8b57e0f429dc04f74a461a4f1161",
+      "last_modified": "2026-10-29T19:58:04+07:00"
+    },
+    {
+      "path": "Write.gs",
+      "bytes": 100852,
+      "sha256": "911df9a21c4d35a51b6a74bd30105ed1f84ab75448c30ae9370b01412b835812",
+      "last_modified": "2026-10-29T19:53:43+07:00"
+    },
+    {
+      "path": "Audit.gs",
+      "bytes": 16712,
+      "sha256": "00d914bcbd2c953062e9fbe5dd2e9e9d93597685e370a9b0ba5031c20fab9e47",
+      "last_modified": "2026-10-28T22:48:03+07:00"
+    },
+    {
+      "path": "Config.gs",
+      "bytes": 18736,
+      "sha256": "90e6f46cca58c00538f8249dc1313e05c547ae7dddd857e9d941275782c09460",
+      "last_modified": "2026-10-29T19:58:04+07:00"
+    },
+    {
+      "path": "index.html",
+      "bytes": 985263,
+      "sha256": "eae57dd41192b5ad5f9dd6020ed2d796b9e3709fb6488f5022be5fb43f84a40b",
+      "last_modified": "2026-10-29T19:44:56+07:00"
+    },
+    {
+      "path": "MiniUI.html",
+      "bytes": 67574,
+      "sha256": "715ccf4e77ad452da0d3e6763f7bb91a9a0fc4ba2afd67e667c96ace2cb15a05",
+      "last_modified": "2026-10-28T23:08:52+07:00"
+    },
+    {
+      "path": "frontend/main/App.js",
+      "bytes": 148994,
+      "sha256": "514f774a00428cb987263d0d67d6faeb265c361756d01159b409b86fca16f536",
+      "last_modified": "2026-10-28T15:11:53+07:00"
+    },
+    {
+      "path": "appsscript.json",
+      "bytes": 381,
+      "sha256": "2e88517c17942abd0a15f3c99383a12c11f04080ccd2d573d1d1449f4609e092",
+      "last_modified": "2026-10-28T18:28:45+07:00"
+    },
+    {
+      "path": "README.md",
+      "bytes": 44917,
+      "sha256": "0b49431f629cebcff94328e9274478fa3ccd85892aba8d6ed9cc318698671c63",
+      "last_modified": "2026-10-22T16:43:36+07:00"
+    }
+  ],
+  "baseline_rc5_files": [
+    {
+      "path": "releases/v2.7.0-rc.5/Code_v2.7.0-rc.5.gs",
+      "bytes": 15261,
+      "sha256": "cc5ac5e9d8d7e72c6621cb6580f3440d812ea4be9322b4fb5ec879f3eedcaa11",
+      "last_modified": "2026-10-28T16:36:29+07:00"
+    },
+    {
+      "path": "releases/v2.7.0-rc.5/Api_v2.7.0-rc.5.gs",
+      "bytes": 38763,
+      "sha256": "0eedc734fbc116b5d934eafd1f75016b2f207ab6d1213dcdbe51c0bbc7877d20",
+      "last_modified": "2026-10-28T16:36:29+07:00"
+    },
+    {
+      "path": "releases/v2.7.0-rc.5/Read_v2.7.0-rc.5.gs",
+      "bytes": 66760,
+      "sha256": "35588b03594aa28d09261f022a9452e93c87a220699605bae4ec1e73ff9d3289",
+      "last_modified": "2026-10-28T16:36:29+07:00"
+    },
+    {
+      "path": "releases/v2.7.0-rc.5/Write_v2.7.0-rc.5.gs",
+      "bytes": 84406,
+      "sha256": "8effd42809ba8d189421abc3da7f2dfd84ab44ee28f2a5cc2289c9e57100b9ed",
+      "last_modified": "2026-10-28T16:36:29+07:00"
+    },
+    {
+      "path": "releases/v2.7.0-rc.5/Audit_v2.7.0-rc.5.gs",
+      "bytes": 16016,
+      "sha256": "43b1d6c8c45256d8eb0fa164860134061128262567141b953c295e418e4258f8",
+      "last_modified": "2026-10-28T16:36:29+07:00"
+    },
+    {
+      "path": "releases/v2.7.0-rc.5/Config_v2.7.0-rc.5.gs",
+      "bytes": 18829,
+      "sha256": "d51be46c308611d9a1259758efab12ec86fabfd9c0b67d4131a5fcd1ccee357b",
+      "last_modified": "2026-10-28T16:36:29+07:00"
+    },
+    {
+      "path": "releases/v2.7.0-rc.5/index_v2.7.0-rc.5.html",
+      "bytes": 1109517,
+      "sha256": "26bbe94a966387150a5c698dded345286e9d55d1ef30729a745c59ba970aec8d",
+      "last_modified": "2026-10-28T16:36:29+07:00"
+    },
+    {
+      "path": "releases/v2.7.0-rc.5/MiniUI_v2.7.0-rc.5.html",
+      "bytes": 66284,
+      "sha256": "0acd6f688bd32cfb741ed3a6708ea31a1fdccc95ec9cb7f87f04ce6205e0e642",
+      "last_modified": "2026-10-28T16:36:29+07:00"
+    },
+    {
+      "path": "releases/v2.7.0-rc.5/App_v2.7.0-rc.5.js",
+      "bytes": 148994,
+      "sha256": "514f774a00428cb987263d0d67d6faeb265c361756d01159b409b86fca16f536",
+      "last_modified": "2026-10-28T16:36:29+07:00"
+    },
+    {
+      "path": "releases/v2.7.0-rc.5/VERSION_MANIFEST_v2.7.0-rc.5.json",
+      "bytes": 1936,
+      "sha256": "1dec5ca30a28da98fcbc221cf1eab12531db0665737fd153025cff2df6f58dd8",
+      "last_modified": "2026-10-28T16:36:29+07:00"
+    }
+  ]
+}

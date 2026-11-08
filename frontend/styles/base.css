@@ -1,0 +1,183 @@
+/**
+ * HRT School Inventory Management System - Base Design Tokens & Typography
+ * File: frontend/styles/base.css
+ */
+
+:root {
+    /* Design Tokens: Typography Scale (clamp-based) */
+    --font-display: clamp(1.75rem, 1.4rem + 1.2vw, 2.25rem); /* 28-36px */
+    --font-h1: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);       /* 20-24px */
+    --font-h2: clamp(1.05rem, 1rem + 0.25vw, 1.15rem);       /* 16.8-18.4px */
+    --font-h3: 1rem;                                          /* 16px */
+    --font-body: 0.875rem;                                    /* 14px */
+    --font-label: 0.8125rem;                                  /* 13px */
+    --font-caption: 0.75rem;                                  /* 12px */
+
+    /* ==========================================================================
+       1. COLOR ANCHOR & NEUTRAL SYSTEM (70% of UI)
+       Anchor: #1e293b (Slate 800 - Sidebar Color Anchor)
+       Clean, sophisticated slate neutral family for canvases, surfaces, text, borders
+       ========================================================================== */
+    --color-anchor: #1e293b;
+
+    /* Neutral Scale (Slate based) */
+    --neutral-50: #f8fafc;   /* App background canvas */
+    --neutral-100: #f1f5f9;  /* Secondary surface / subtle cards / hovered items */
+    --neutral-200: #e2e8f0;  /* Standard borders / divider lines */
+    --neutral-300: #cbd5e1;  /* Stronger borders / scrollbars / inactive indicators */
+    --neutral-400: #94a3b8;  /* Muted text / placeholder / secondary icons */
+    --neutral-500: #64748b;  /* Supporting labels / metadata */
+    --neutral-600: #475569;  /* Table headers / secondary text / body medium */
+    --neutral-700: #334155;  /* Sidebar borders / dark neutral borders */
+    --neutral-800: #1e293b;  /* Sidebar background / Dark card / Anchor */
+    --neutral-900: #0f172a;  /* Main headings / High-contrast text / Sidebar deepest */
+    --neutral-white: #ffffff;/* Clean card background / standard container */
+
+    /* Semantic Aliases for Neutral System */
+    --bg-canvas: var(--neutral-50);
+    --bg-surface: var(--neutral-white);
+    --bg-surface-subtle: var(--neutral-100);
+    --border-default: var(--neutral-200);
+    --border-strong: var(--neutral-300);
+    --text-primary: var(--neutral-900);
+    --text-secondary: var(--neutral-600);
+    --text-muted: var(--neutral-400);
+
+    /* ==========================================================================
+       2. PRIMARY COLOR FAMILY & SHADES (20% of UI)
+       Created from Brand Color (#2563eb / Royal Blue)
+       Strictly used for Navigation, Interactive Controls, Focus States & Primary Actions
+       ========================================================================== */
+    --primary-50: #eff6ff;   /* Primary subtle tint / active tab background */
+    --primary-100: #dbeafe;  /* Primary badge background / active highlight border */
+    --primary-200: #bfdbfe;  /* Primary light border / interactive focus ring */
+    --primary-300: #93c5fd;  /* Light interactive accent */
+    --primary-400: #60a5fa;  /* Accent hover */
+    --primary-500: #3b82f6;  /* Secondary interactive */
+    --primary-600: #2563eb;  /* PRIMARY BASE - Primary Buttons, Active Navigation, Brand */
+    --primary-700: #1d4ed8;  /* Primary Button Hover / Active Tab Text */
+    --primary-800: #1e40af;  /* Primary Button Pressed */
+    --primary-900: #1e3a8a;  /* Deep Primary / High contrast text */
+    --primary-foreground: #ffffff;
+
+    /* ==========================================================================
+       3. SEMANTIC SYSTEM (10% of UI)
+       Strictly functional. Never used for pure decoration!
+       - Green = Normal / Success
+       - Amber = Warning
+       - Red = Critical
+       - Blue = Information
+       ========================================================================== */
+    /* Semantic Success / Normal (Green) */
+    --semantic-success-50: #ecfdf5;
+    --semantic-success-100: #d1fae5;
+    --semantic-success-200: #a7f3d0;
+    --semantic-success-500: #10b981;  /* Status dot & indicator */
+    --semantic-success-600: #059669;
+    --semantic-success-700: #047857;  /* Status text */
+    --semantic-success-border: #a7f3d0;
+
+    /* Semantic Warning (Amber) */
+    --semantic-warning-50: #fffbeb;
+    --semantic-warning-100: #fef3c7;
+    --semantic-warning-200: #fde68a;
+    --semantic-warning-500: #f59e0b;  /* Warning dot & indicator */
+    --semantic-warning-600: #d97706;
+    --semantic-warning-700: #b45309;  /* Warning text */
+    --semantic-warning-border: #fde68a;
+
+    /* Semantic Critical (Red) */
+    --semantic-critical-50: #fef2f2;
+    --semantic-critical-100: #fee2e2;
+    --semantic-critical-200: #fecaca;
+    --semantic-critical-500: #ef4444;  /* Critical dot & indicator */
+    --semantic-critical-600: #dc2626;
+    --semantic-critical-700: #b91c1c;  /* Critical text */
+    --semantic-critical-border: #fecaca;
+
+    /* Semantic Information (Blue) */
+    --semantic-info-50: #eff6ff;
+    --semantic-info-100: #dbeafe;
+    --semantic-info-200: #bfdbfe;
+    --semantic-info-500: #3b82f6;  /* Info dot & indicator */
+    --semantic-info-600: #2563eb;
+    --semantic-info-700: #1d4ed8;  /* Info text */
+    --semantic-info-border: #bfdbfe;
+
+    /* Category Tokens (Neutral Slate - MUST NOT clash with Status!) */
+    --cat-bg: var(--neutral-100);
+    --cat-text: var(--neutral-700);
+    --cat-border: var(--neutral-200);
+
+    /* ==========================================================================
+       4. SPACING DESIGN SYSTEM SCALE (4, 8, 12, 16, 20, 24, 32, 40 px)
+       ========================================================================== */
+    --space-1: 4px;    /* 0.25rem - Micro gap, badge margin, icon offset */
+    --space-2: 8px;    /* 0.5rem  - Compact element gap, button py */
+    --space-3: 12px;   /* 0.75rem - Standard inner gap, small card padding */
+    --space-4: 16px;   /* 1.0rem  - Main container padding, grid gap */
+    --space-5: 20px;   /* 1.25rem - Section padding medium */
+    --space-6: 24px;   /* 1.5rem  - View padding, major card spacing */
+    --space-8: 32px;   /* 2.0rem  - Section separation large */
+    --space-10: 40px;  /* 2.5rem  - Page-level top/bottom hero spacing */
+
+    /* ==========================================================================
+       5. SYSTEMATIC 3-TIER BORDER RADIUS (Small, Medium, Large)
+       ========================================================================== */
+    --radius-sm: 8px;      /* Small: Buttons, Inputs, Selects, Badges, Search controls (rounded-lg) */
+    --radius-md: 12px;     /* Medium: Inner Cards, Sub-panels, Dropdowns, Tables (rounded-xl) */
+    --radius-lg: 16px;     /* Large: Main Section Cards, Modals, Drawers (rounded-2xl) */
+    --radius-full: 9999px; /* Full: Avatar Circles, Status Dots (.dot) */
+
+    /* ==========================================================================
+       6. ELEVATION SHADOW SYSTEM (Strict Policy: Dropdown, Floating, Drawer, Modal ONLY)
+       Cards have ZERO heavy shadow (Flat enterprise UI). Whitespace > Border.
+       ========================================================================== */
+    --shadow-none: none;
+    --shadow-dropdown: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    --shadow-floating: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --shadow-drawer: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    --shadow-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+body {
+    font-family: 'Noto Sans Thai', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: var(--font-body);
+    font-weight: 400;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #f8fafc;
+    color: #0f172a;
+}
+
+.font-num {
+    font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Typography Hierarchy Tokens */
+.type-display { font-size: var(--font-display); font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
+.type-h1 { font-size: var(--font-h1); font-weight: 700; line-height: 1.3; letter-spacing: -0.01em; }
+.type-h2 { font-size: var(--font-h2); font-weight: 600; line-height: 1.4; }
+.type-h3 { font-size: var(--font-h3); font-weight: 600; line-height: 1.4; }
+.type-body { font-size: var(--font-body); font-weight: 400; line-height: 1.6; }
+.type-label { font-size: var(--font-label); font-weight: 500; }
+.type-caption { font-size: var(--font-caption); font-weight: 400; }
+
+/* Legacy typography support */
+.text-heading1 { font-size: var(--font-h1); line-height: 2rem; font-weight: 700; }
+.text-heading2 { font-size: var(--font-h2); line-height: 1.75rem; font-weight: 600; }
+.text-heading3 { font-size: var(--font-h3); line-height: 1.5rem; font-weight: 600; }
+.text-body { font-size: var(--font-body); line-height: 1.5rem; font-weight: 400; }
+.text-small { font-size: var(--font-label); line-height: 1.25rem; font-weight: 400; }
+.text-xsmall { font-size: var(--font-caption); line-height: 1rem; font-weight: 400; }
+.text-table-header { font-size: 0.8125rem; line-height: 1.25rem; font-weight: 600; color: #475569; }
+.text-table-cell { font-size: 0.8125rem; line-height: 1.25rem; font-weight: 400; }
+.text-stock {
+    font-size: 0.9375rem;
+    line-height: 1.25rem;
+    font-weight: 700;
+    font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+    font-variant-numeric: tabular-nums;
+}

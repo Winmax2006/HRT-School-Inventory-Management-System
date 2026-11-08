@@ -1,0 +1,18 @@
+# ==============================================================================
+# .claspignore - Allowlist for Google Apps Script Runtime Deployment
+# HRT School Inventory Management System (v2.7.0-rc.6)
+# ==============================================================================
+# Rule: Ignore all repository files by default, allowlist only 9 runtime files.
+
+**
+
+# Canonical 9 Runtime Files
+!appsscript.json
+!Config.gs
+!Api.gs
+!Read.gs
+!Write.gs
+!Audit.gs
+!Code.gs
+!index.html
+!MiniUI.html

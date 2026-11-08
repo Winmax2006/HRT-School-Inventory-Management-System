@@ -1,0 +1,126 @@
+<!-- Mobile Sidebar Backdrop -->
+<div id="sidebarBackdrop" class="fixed inset-0 bg-slate-900/50 z-30 hidden md:hidden transition-opacity" onclick="toggleSidebar()" role="button" tabindex="-1" aria-hidden="true" aria-label="ปิดแถบเมนูด้านข้าง"></div>
+
+<!-- ========================================== -->
+<!-- 1. STREAMLINED SIDEBAR (PROGRESSIVE DISCLOSURE) -->
+<!-- Desktop: w-64 full sidebar | Tablet: md:w-16 icon rail | Mobile: slide-over drawer -->
+<!-- ========================================== -->
+<aside id="mainSidebar" class="fixed md:static inset-y-0 left-0 w-64 md:w-16 lg:w-64 bg-[#1e293b] text-slate-300 flex flex-col h-full flex-shrink-0 transition-all duration-300 z-40 -translate-x-full md:translate-x-0 border-r border-slate-700/80" aria-label="แถบเมนูหลัก">
+    
+    <!-- Sidebar Brand Header -->
+    <div class="p-3 lg:p-4 flex items-center justify-between border-b border-slate-700/80">
+        <div class="flex items-center gap-3 w-full justify-center lg:justify-start">
+            <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white text-lg font-bold flex-shrink-0" title="HRT Inventory">
+                <i class="ph-fill ph-warehouse"></i>
+            </div>
+            <div class="hidden lg:block overflow-hidden">
+                <h1 class="text-white font-bold text-sm tracking-wide flex items-center gap-1.5 leading-normal">
+                    HRT Inventory
+                    <span class="text-[10px] bg-blue-500/20 text-blue-400 font-semibold px-1.5 py-0.5 rounded">v2.5</span>
+                </h1>
+                <span class="text-[11px] text-slate-400 font-medium truncate block">ระบบบริหารคลังพัสดุ</span>
+            </div>
+        </div>
+        <button type="button" class="text-slate-400 hover:text-white md:hidden p-2 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg hover:bg-slate-700/50 transition-colors" onclick="toggleSidebar()" aria-label="ปิดเมนูแถบข้าง" title="ปิดเมนู">
+            <i class="ph ph-x text-lg"></i>
+        </button>
+    </div>
+
+    <!-- Task-First Navigation Menu -->
+    <div class="flex-1 overflow-y-auto px-2 lg:px-3 py-4 flex flex-col gap-1 text-sm">
+        <div class="px-3 pb-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider hidden lg:block">ภารกิจหลัก</div>
+        
+        <!-- 0. Dashboard (ภาพรวม) -->
+        <a href="javascript:void(0)" id="menuItemDashboard" onclick="switchMainView('dashboard')" class="sidebar-menu-item active flex items-center justify-center lg:justify-between rounded-lg text-slate-300 hover:text-white p-2.5 lg:px-3 lg:py-2.5" title="ภาพรวมระบบคลัง">
+            <div class="flex items-center gap-2.5">
+                <i class="ph-fill ph-squares-four text-blue-400 text-lg"></i>
+                <span class="font-medium text-sm hidden lg:inline">ภาพรวมระบบคลัง</span>
+            </div>
+        </a>
+
+        <!-- 1. Inventory -->
+        <a href="javascript:void(0)" id="menuItemInventory" onclick="switchMainView('inventory')" class="sidebar-menu-item flex items-center justify-center lg:justify-between rounded-lg text-slate-300 hover:text-white p-2.5 lg:px-3 lg:py-2.5" title="คลังพัสดุคงคลัง">
+            <div class="flex items-center gap-2.5">
+                <i class="ph-fill ph-package text-lg"></i>
+                <span class="font-medium text-sm hidden lg:inline">คลังพัสดุคงคลัง</span>
+            </div>
+            <span class="bg-blue-500/20 text-blue-300 font-bold font-num text-xs px-2 py-0.5 rounded-full hidden lg:inline" id="sidebarTotalBadge">100</span>
+        </a>
+        
+        <!-- 2. Requisition Workflow Action Hub -->
+        <a href="javascript:void(0)" id="menuItemRequisition" onclick="switchMainView('requisition')" class="sidebar-menu-item flex items-center justify-center lg:justify-between hover:bg-slate-800 rounded-lg text-slate-300 hover:text-white p-2.5 lg:px-3 lg:py-2.5" title="เบิก–จ่ายพัสดุ">
+            <div class="flex items-center gap-2.5">
+                <i class="ph-bold ph-hand-pointing text-blue-400 text-lg"></i>
+                <span class="font-medium text-sm hidden lg:inline">เบิก–จ่ายพัสดุ</span>
+            </div>
+            <span class="bg-blue-500/20 text-blue-300 font-bold font-num text-xs px-2 py-0.5 rounded-full hidden lg:inline" id="sidebarReqBadge">5</span>
+        </a>
+
+        <!-- 3. Action Needed (Filter) -->
+        <a href="javascript:void(0)" id="menuItemActionNeeded" onclick="filterByActionNeeded()" class="sidebar-menu-item flex items-center justify-center lg:justify-between hover:bg-slate-800 rounded-lg text-slate-300 hover:text-white p-2.5 lg:px-3 lg:py-2.5" title="ต้องดำเนินการ (ต่ำกว่าเกณฑ์ Min Stock)">
+            <div class="flex items-center gap-2.5">
+                <i class="ph ph-warning-circle text-rose-400 text-lg"></i>
+                <span class="font-medium text-sm hidden lg:inline">ต้องดำเนินการ</span>
+            </div>
+            <span class="bg-rose-500/20 text-rose-300 font-bold font-num text-xs px-2 py-0.5 rounded-full hidden lg:inline" id="sidebarCriticalBadge">0</span>
+        </a>
+
+        <div class="mt-4 px-3 pb-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider hidden lg:block">ทะเบียนภาครัฐ</div>
+        
+        <!-- 4. FSN Module -->
+        <a href="javascript:void(0)" id="menuItemFsn" onclick="switchMainView('fsn')" class="sidebar-menu-item flex items-center justify-center lg:justify-between hover:bg-slate-800 rounded-lg text-slate-300 hover:text-white p-2.5 lg:px-3 lg:py-2.5" title="ทะเบียนพัสดุ FSN">
+            <div class="flex items-center gap-2.5">
+                <i class="ph-fill ph-tag text-slate-400 text-lg"></i>
+                <span class="font-medium text-sm hidden lg:inline">ทะเบียนพัสดุ FSN</span>
+            </div>
+            <span class="bg-slate-700 text-slate-300 font-bold font-num text-xs px-2 py-0.5 rounded-full hidden lg:inline" id="sidebarFsnBadge">7</span>
+        </a>
+
+        <!-- 5. Documents Management Hub -->
+        <a href="javascript:void(0)" id="menuItemDocs" onclick="switchMainView('docs')" class="sidebar-menu-item flex items-center justify-center lg:justify-between hover:bg-slate-800 rounded-lg text-slate-300 hover:text-white p-2.5 lg:px-3 lg:py-2.5" title="เอกสารราชการ (พ.ด.)">
+            <div class="flex items-center gap-2.5">
+                <i class="ph-fill ph-file-text text-slate-400 text-lg"></i>
+                <span class="font-medium text-sm hidden lg:inline">เอกสารราชการ (พ.ด.)</span>
+            </div>
+            <span class="bg-slate-700 text-slate-300 font-bold font-num text-xs px-2 py-0.5 rounded-full hidden lg:inline" id="sidebarDocsBadge">7</span>
+        </a>
+
+        <!-- 6. Year-End Audit Submenu -->
+        <a href="javascript:void(0)" id="menuItemYearEndAudit" onclick="switchMainView('yearEndAudit')" class="sidebar-menu-item flex items-center justify-center lg:justify-between hover:bg-slate-800 rounded-lg text-slate-300 hover:text-white p-2.5 lg:px-3 lg:py-2.5" title="ตรวจนับพัสดุ สิ้นปีงบ">
+            <div class="flex items-center gap-2.5">
+                <i class="ph-fill ph-clipboard-text text-amber-400 text-lg"></i>
+                <span class="font-medium text-sm hidden lg:inline">ตรวจนับพัสดุ สิ้นปีงบ</span>
+            </div>
+            <span class="bg-amber-500/20 text-amber-300 font-bold font-num text-[11px] px-1.5 py-0.5 rounded hidden lg:inline" id="sidebarAuditBadge">30 ก.ย.</span>
+        </a>
+
+        <div class="mt-4 px-3 pb-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider hidden lg:block">ระบบและการจัดการ</div>
+
+        <!-- 7. Settings Hub -->
+        <a href="javascript:void(0)" id="menuItemSettings" onclick="switchMainView('settings')" class="sidebar-menu-item flex items-center justify-center lg:justify-between hover:bg-slate-800 rounded-lg text-slate-300 hover:text-white p-2.5 lg:px-3 lg:py-2.5" title="ตั้งค่าระบบ">
+            <div class="flex items-center gap-2.5">
+                <i class="ph ph-gear text-slate-400 text-lg"></i>
+                <span class="font-medium text-sm hidden lg:inline">ตั้งค่าระบบ</span>
+            </div>
+            <span class="text-xs bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-mono hidden lg:inline">DB</span>
+        </a>
+    </div>
+    
+    <!-- Sidebar Bottom Status & School Branding -->
+    <div class="p-2 lg:p-3 border-t border-slate-800/80 flex flex-col gap-2">
+        <!-- Connection Status -->
+        <div class="px-2 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700/50 flex items-center justify-center lg:justify-between text-xs" title="ระบบเชื่อมต่อปกติ ปีงบประมาณ 2569">
+            <div class="flex items-center gap-1.5 text-emerald-400 font-medium">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span class="hidden lg:inline">ระบบเชื่อมต่อปกติ</span>
+            </div>
+            <span class="text-xs text-slate-400 hidden lg:inline">2569</span>
+        </div>
+
+        <!-- School Organization Info -->
+        <div class="px-1 lg:px-2 py-1 text-slate-400 leading-snug hidden lg:block">
+            <div class="font-semibold text-slate-200 truncate text-base" title="โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)">ร.ร.หรเทพ(รุ่งเรืองประชาสามัคคี)</div>
+            <div class="text-xs text-slate-400">กลุ่มบริหารงานงบประมาณ • อบจ.สระบุรี</div>
+        </div>
+    </div>
+</aside>

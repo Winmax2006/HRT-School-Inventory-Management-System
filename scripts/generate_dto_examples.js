@@ -1,0 +1,402 @@
+const fs = require('fs');
+const path = require('path');
+
+const dtoExamples = {
+  $schema: "https://json-schema.org/draft/2020-12/schema",
+  title: "HRT Inventory System DTO Contract Examples",
+  version: "v2.7.0-rc.5-p14",
+  description: "Standardized Data Transfer Object (DTO) examples for HRT Inventory System canonical RPC interface.",
+  examples: {
+    dashboard_kpis_dto: {
+      description: "Response envelope and data payload for dashboard.metrics (apiGetDashboardKPIs)",
+      success: true,
+      data: {
+        fiscalYear: "2567",
+        totalItems: 42,
+        totalSKUs: 42,
+        totalStockUnits: 3850,
+        totalValue: 125430.50,
+        filteredValue: 125430.50,
+        totalUniverseValue: 125430.50,
+        normalCount: 35,
+        lowCount: 5,
+        criticalCount: 2,
+        kpis: {
+          totalSKU: 42,
+          totalStockQty: 3850,
+          totalAssetValue: 125430.50,
+          lowStockCount: 5,
+          criticalStockCount: 2,
+          healthyCount: 35
+        }
+      },
+      metrics: {
+        totalSKU: 42,
+        totalStockQty: 3850,
+        totalAssetValue: 125430.50,
+        lowStockCount: 5,
+        criticalStockCount: 2,
+        healthyCount: 35
+      },
+      kpis: {
+        totalSKU: 42,
+        totalStockQty: 3850,
+        totalAssetValue: 125430.50,
+        lowStockCount: 5,
+        criticalStockCount: 2,
+        healthyCount: 35
+      },
+      timestamp: "2026-10-28T13:45:00.000Z"
+    },
+
+    requisition_list_dto: {
+      description: "Response envelope and array payload for requisitions.list (apiGetRequisitions)",
+      success: true,
+      data: [
+        {
+          req_id: "REQ-2567-0012",
+          req_no: "REQ-2567-0012",
+          req_date: "2026-10-27T08:30:00.000Z",
+          user_id: "teacher.prasert@hortherp.ac.th",
+          dept: "วิทยาศาสตร์และเทคโนโลยี",
+          purpose: "ใช้สำหรับการเรียนการสอนวิชาเคมี ม.4",
+          status: "SUBMITTED",
+          source: "MINI_QR",
+          fiscal_year: "2567",
+          total_items: 2,
+          urgency: "MEDIUM",
+          required_date: "2026-11-01",
+          approver_id: null,
+          approved_at: null,
+          issued_at: null,
+          items: [
+            {
+              item_code: "SCI-GLS-001",
+              item_name: "บีกเกอร์แก้ว 250 มล.",
+              qty_requested: 10,
+              unit: "ใบ",
+              unit_cost: 45.00
+            },
+            {
+              item_code: "SCI-CHM-003",
+              item_name: "กระดาษลิตมัส สีน้ำเงิน",
+              qty_requested: 5,
+              unit: "กล่อง",
+              unit_cost: 35.00
+            }
+          ]
+        }
+      ],
+      requisitions: [
+        {
+          req_id: "REQ-2567-0012",
+          req_no: "REQ-2567-0012",
+          req_date: "2026-10-27T08:30:00.000Z",
+          user_id: "teacher.prasert@hortherp.ac.th",
+          dept: "วิทยาศาสตร์และเทคโนโลยี",
+          purpose: "ใช้สำหรับการเรียนการสอนวิชาเคมี ม.4",
+          status: "SUBMITTED",
+          source: "MINI_QR",
+          fiscal_year: "2567",
+          total_items: 2,
+          urgency: "MEDIUM",
+          required_date: "2026-11-01",
+          approver_id: null,
+          approved_at: null,
+          issued_at: null,
+          items: [
+            {
+              item_code: "SCI-GLS-001",
+              item_name: "บีกเกอร์แก้ว 250 มล.",
+              qty_requested: 10,
+              unit: "ใบ",
+              unit_cost: 45.00
+            },
+            {
+              item_code: "SCI-CHM-003",
+              item_name: "กระดาษลิตมัส สีน้ำเงิน",
+              qty_requested: 5,
+              unit: "กล่อง",
+              unit_cost: 35.00
+            }
+          ]
+        }
+      ],
+      timestamp: "2026-10-28T13:45:00.000Z"
+    },
+
+    requisition_detail_dto: {
+      description: "Detailed requisition record with master item enrichment (apiGetRequisitionDetail)",
+      success: true,
+      data: {
+        req_id: "REQ-2567-0012",
+        req_no: "REQ-2567-0012",
+        req_date: "2026-10-27T08:30:00.000Z",
+        user_id: "teacher.prasert@hortherp.ac.th",
+        dept: "วิทยาศาสตร์และเทคโนโลยี",
+        purpose: "ใช้สำหรับการเรียนการสอนวิชาเคมี ม.4",
+        status: "SUBMITTED",
+        source: "MINI_QR",
+        fiscal_year: "2567",
+        total_items: 2,
+        urgency: "MEDIUM",
+        required_date: "2026-11-01",
+        approver_id: null,
+        approved_at: null,
+        issued_at: null,
+        items: [
+          {
+            item_code: "SCI-GLS-001",
+            item_name: "บีกเกอร์แก้ว 250 มล.",
+            qty_requested: 10,
+            unit: "ใบ",
+            unit_cost: 45.00
+          },
+          {
+            item_code: "SCI-CHM-003",
+            item_name: "กระดาษลิตมัส สีน้ำเงิน",
+            qty_requested: 5,
+            unit: "กล่อง",
+            unit_cost: 35.00
+          }
+        ]
+      },
+      timestamp: "2026-10-28T13:45:00.000Z"
+    },
+
+    item_list_dto: {
+      description: "Paginated item list with universe metrics and ABC classifications (apiGetItems)",
+      success: true,
+      data: {
+        items: [
+          {
+            code: "OFF-PAP-A4",
+            fsn_code: "7530-00-123-4567",
+            name: "กระดาษถ่ายเอกสาร A4 80 แกรม Double A",
+            category: "วัสดุสำนักงาน",
+            unit: "รีม",
+            warehouse: "WH-CENTRAL",
+            unit_cost: 125.00,
+            min: 20,
+            rop: 30,
+            stock: 85,
+            supplier: "บจก. สยามเครื่องเขียน",
+            status: "ACTIVE",
+            abcTier: "A",
+            totalValuation: 10625.00
+          }
+        ],
+        totalCount: 1,
+        totalUniverseCount: 42,
+        totalUniverseValue: 125430.50,
+        filteredValue: 10625.00,
+        filteredQuantity: 85,
+        page: 1,
+        limit: 50,
+        totalPages: 1,
+        summary: {
+          countA: 10,
+          countB: 15,
+          countC: 17,
+          lowStockCount: 5,
+          criticalStockCount: 2,
+          normalCount: 35
+        }
+      },
+      timestamp: "2026-10-28T13:45:00.000Z"
+    },
+
+    audit_trail_dto: {
+      description: "Cryptographically linked audit trail entries with SHA-256 chain (apiGetAuditTrail)",
+      success: true,
+      data: [
+        {
+          audit_id: "AUD-2567-00891",
+          timestamp: "2026-10-28T09:15:22.104Z",
+          actor_id: "admin.somchai@hortherp.ac.th",
+          email: "admin.somchai@hortherp.ac.th",
+          action: "SETTINGS_UPDATE",
+          module: "SETTINGS",
+          prev_hash: "3a7b1c4e8f9d0e2a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a",
+          record_hash: "a4f89d34c1b72e098df41e52bc034d98a123bc45de67fa89012345bcde678901",
+          details: {
+            section: "rules",
+            updatedKeys: ["allow_negative_stock", "low_stock_threshold"],
+            revisionId: "REV-20261028-091522"
+          }
+        }
+      ],
+      audit: [
+        {
+          audit_id: "AUD-2567-00891",
+          timestamp: "2026-10-28T09:15:22.104Z",
+          actor_id: "admin.somchai@hortherp.ac.th",
+          email: "admin.somchai@hortherp.ac.th",
+          action: "SETTINGS_UPDATE",
+          module: "SETTINGS",
+          prev_hash: "3a7b1c4e8f9d0e2a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a",
+          record_hash: "a4f89d34c1b72e098df41e52bc034d98a123bc45de67fa89012345bcde678901",
+          details: {
+            section: "rules",
+            updatedKeys: ["allow_negative_stock", "low_stock_threshold"],
+            revisionId: "REV-20261028-091522"
+          }
+        }
+      ],
+      timestamp: "2026-10-28T13:45:00.000Z"
+    },
+
+    qr_resolve_item_dto: {
+      description: "QR resolution payload for an ITEM token (apiResolveQr)",
+      success: true,
+      data: {
+        type: "ITEM",
+        ref: "OFF-PAP-A4",
+        item: {
+          code: "OFF-PAP-A4",
+          name: "กระดาษถ่ายเอกสาร A4 80 แกรม Double A",
+          category: "วัสดุสำนักงาน",
+          unit: "รีม",
+          unit_cost: 125.00,
+          stock: 85,
+          min: 20,
+          warehouse: "WH-CENTRAL",
+          status: "ACTIVE"
+        }
+      },
+      timestamp: "2026-10-28T13:45:00.000Z"
+    },
+
+    qr_resolve_warehouse_dto: {
+      description: "QR resolution payload for a WAREHOUSE location token (apiResolveQr)",
+      success: true,
+      data: {
+        type: "WAREHOUSE",
+        ref: "WH-CENTRAL",
+        warehouse: {
+          code: "WH-CENTRAL",
+          name: "คลังพัสดุกลาง (อาคาร 2 ชั้น 1)",
+          status: "ACTIVE"
+        }
+      },
+      timestamp: "2026-10-28T13:45:00.000Z"
+    },
+
+    qr_resolve_tracking_dto: {
+      description: "QR resolution payload for a TRACKING requisition token (apiResolveQr)",
+      success: true,
+      data: {
+        type: "TRACKING",
+        ref: "REQ-2567-0012",
+        requisition: {
+          req_id: "REQ-2567-0012",
+          status: "SUBMITTED",
+          user_id: "teacher.prasert@hortherp.ac.th",
+          req_date: "2026-10-27T08:30:00.000Z"
+        }
+      },
+      timestamp: "2026-10-28T13:45:00.000Z"
+    },
+
+    qr_resolve_revoked_dto: {
+      description: "QR resolution error envelope for a REVOKED token (apiResolveQr)",
+      success: false,
+      error: {
+        code: "QR_REVOKED",
+        message: "รหัสคิวอาร์โค้ดนี้ถูกยกเลิกการใช้งานแล้ว",
+        status: 410,
+        timestamp: "2026-10-28T13:45:00.000Z"
+      }
+    },
+
+    qr_resolve_invalid_dto: {
+      description: "QR resolution error envelope for a non-existent token (apiResolveQr)",
+      success: false,
+      error: {
+        code: "NOT_FOUND",
+        message: "ไม่พบข้อมูลสำหรับคิวอาร์โค้ดที่ระบุ",
+        status: 404,
+        timestamp: "2026-10-28T13:45:00.000Z"
+      }
+    },
+
+    settings_dto: {
+      description: "Settings object demonstrating preservation of boolean false, number 0, and revisionId (apiGetSettings / apiUpdateSettings)",
+      success: true,
+      data: {
+        schoolProfile: {
+          organization: "โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)",
+          province: "สระบุรี",
+          area_code: "สพป.สระบุรี เขต 1",
+          contact_email: "contact@hortherp.ac.th"
+        },
+        documents: {
+          fiscal_year_prefix: "2567",
+          req_prefix: "REQ-",
+          signatory_approver_name: "นายสมศักดิ์ รักเรียน",
+          signatory_approver_position: "ผู้อำนวยการโรงเรียน"
+        },
+        rules: {
+          allow_negative_stock: false,
+          require_officer_review: true,
+          low_stock_threshold: 10,
+          critical_stock_threshold: 0,
+          auto_approve_threshold: 0
+        },
+        connection: {
+          deployment_mode: "SHEETS_GAS",
+          backup_frequency_hours: 24,
+          maintenance_mode: false
+        },
+        revisionId: "REV-20261028-134500"
+      },
+      settings: {
+        schoolProfile: {
+          organization: "โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)",
+          province: "สระบุรี",
+          area_code: "สพป.สระบุรี เขต 1",
+          contact_email: "contact@hortherp.ac.th"
+        },
+        documents: {
+          fiscal_year_prefix: "2567",
+          req_prefix: "REQ-",
+          signatory_approver_name: "นายสมศักดิ์ รักเรียน",
+          signatory_approver_position: "ผู้อำนวยการโรงเรียน"
+        },
+        rules: {
+          allow_negative_stock: false,
+          require_officer_review: true,
+          low_stock_threshold: 10,
+          critical_stock_threshold: 0,
+          auto_approve_threshold: 0
+        },
+        connection: {
+          deployment_mode: "SHEETS_GAS",
+          backup_frequency_hours: 24,
+          maintenance_mode: false
+        },
+        revisionId: "REV-20261028-134500"
+      },
+      timestamp: "2026-10-28T13:45:00.000Z"
+    },
+
+    error_envelope_dto: {
+      description: "Canonical business error response envelope",
+      success: false,
+      error: {
+        code: "VALIDATION_ERROR",
+        message: "รายการขอเบิกต้องประกอบด้วยรายการพัสดุอย่างน้อย 1 รายการ",
+        details: {
+          field: "items",
+          constraint: "min_items_1"
+        },
+        status: 400,
+        timestamp: "2026-10-28T13:45:00.000Z"
+      }
+    }
+  }
+};
+
+const outputPath = path.join(__dirname, '..', 'docs', 'repair', 'DTO_EXAMPLES.json');
+fs.writeFileSync(outputPath, JSON.stringify(dtoExamples, null, 2), 'utf8');
+console.log('Successfully generated ' + outputPath);

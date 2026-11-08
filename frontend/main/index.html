@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบบริหารจัดการพัสดุและคลังวัสดุโรงเรียน - โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- External CDNs -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Modular Stylesheets -->
+    <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet" href="../styles/layout.css">
+    <link rel="stylesheet" href="../styles/components.css">
+    <link rel="stylesheet" href="../styles/print.css">
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased font-sans">
+
+    <!-- Top Loading Progress Bar (Progressive View Transitions) -->
+    <div id="viewLoadingBar" class="fixed top-0 left-0 h-0.5 bg-blue-600 z-50 transition-all duration-300 w-0 hidden" role="progressbar" aria-label="กำลังโหลดข้อมูลหน้า"></div>
+
+    <!-- Accessibility Skip Link -->
+    <a href="#viewContainer" class="skip-link sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg focus:shadow-lg focus:text-xs focus:font-bold">
+        ข้ามไปยังเนื้อหาหลัก (Skip to content)
+    </a>
+
+    <!-- App Shell Container -->
+    <div class="flex h-screen overflow-hidden bg-slate-50">
+        
+        <!-- Mobile Sidebar Backdrop -->
+        <div id="sidebarBackdrop" class="fixed inset-0 bg-slate-900/50 z-30 hidden md:hidden transition-opacity" onclick="toggleSidebar()" role="button" tabindex="-1" aria-hidden="true" aria-label="ปิดแถบเมนูด้านข้าง"></div>
+
+        <!-- 1. STREAMLINED SIDEBAR (Desktop: w-64 | Tablet: md:w-16 | Mobile: drawer) -->
+        <aside id="mainSidebar" class="fixed md:static inset-y-0 left-0 w-64 md:w-16 lg:w-64 bg-[#1e293b] text-slate-300 flex flex-col h-full flex-shrink-0 transition-all duration-300 z-40 -translate-x-full md:translate-x-0 border-r border-slate-700/80" aria-label="แถบเมนูหลัก">
+            <!-- Sidebar Brand Header -->
+            <div class="p-3 lg:p-4 flex items-center justify-between border-b border-slate-700/80">
+                <div class="flex items-center gap-3 w-full justify-center lg:justify-start">
+                    <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white text-lg font-bold flex-shrink-0" title="HRT Inventory">
+                        <i class="ph-fill ph-warehouse"></i>
+                    </div>
+                    <div class="hidden lg:block overflow-hidden">
+                        <h1 class="text-white font-bold text-sm tracking-wide flex items-center gap-1.5 leading-normal">
+                            HRT Inventory
+                            <span class="text-[10px] bg-blue-500/20 text-blue-400 font-semibold px-1.5 py-0.5 rounded">v2.6.0</span>
+                        </h1>
+                        <span class="text-[11px] text-slate-400 font-medium truncate block">ระบบบริหารคลังพัสดุ</span>
+                    </div>
+                </div>
+                <button type="button" class="text-slate-400 hover:text-white md:hidden p-2 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg hover:bg-slate-700/50 transition-colors" onclick="toggleSidebar()" aria-label="ปิดเมนูแถบข้าง" title="ปิดเมนู">
+                    <i class="ph ph-x text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Task-First Navigation Menu -->
+            <div class="flex-1 overflow-y-auto px-2 lg:px-3 py-4 flex flex-col gap-1 text-sm">
+                <div class="px-3 pb-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider hidden lg:block">ภารกิจหลัก</div>
+                
+                <!-- 0. Dashboard -->
+                <a href="javascript:void(0)" id="menuItemDashboard" onclick="switchMainView('dashboard')" class="sidebar-menu-item active flex items-center justify-center lg:justify-between rounded-lg text-slate-300 hover:text-white p-2.5 lg:px-3 lg:py-2.5" title="ภาพรวมระบบคลัง">
+                    <div class="flex items-center gap-2.5">
+                        <i class="ph-fill ph-squares-four text-blue-400 text-lg"></i>
+                        <span class="font-medium text-sm hidden lg:inline">ภาพรวมระบบคลัง</span>
+                    </div>
+                </a>
+
+                <!-- 1. Inventory -->
+                <a href="javascript:void(0)" id="menuItemInventory" onclick="switchMainView('inventory')" class="sidebar-menu-item flex items-center justify-center lg:justify-between rounded-lg text-slate-300 hover:text-white p-2.5 lg:px-3 lg:py-2.5" title="คลังพัสดุคงคลัง">
+                    <div class="flex items-center gap-2.5">
+                        <i class="ph-fill ph-package text-lg"></i>
+                        <span class="font-medium text-sm hidden lg:inline">คลังพัสดุคงคลัง</span>
+                    </div>
+                    <span class="bg-blue-500/20 text-blue-300 font-bold font-num text-xs px-2 py-0.5 rounded-full hidden lg:inline" id="sidebarTotalBadge">100</span>
+                </a>
+                
+                <!-- 2. Requisition Workflow Action Hub -->
+                <a href="javascript:void(0)" id="menuItemRequisition" onclick="switchMainView('requisition')" class="sidebar-menu-item flex items-center justify-center lg:justify-between hover:bg-slate-800 rounded-lg text-slate-300 hover:text-white p-2.5 lg:px-3 lg:py-2.5" title="เบิก–จ่ายพัสดุ">
+                    <div class="flex items-center gap-2.5">
+                        <i class="ph-bold ph-hand-pointing text-blue-400 text-lg"></i>
+                        <span class="font-medium text-sm hidden lg:inline">เบิก–จ่ายพัสดุ</span>
+                    </div>
+                    <span class="bg-blue-500/20 text-blue-300 font-bold font-num text-xs px-2 py-0.5 rounded-full hidden lg:inline" id="sidebarReqBadge">5</span>
+                </a>
+
+                <!-- 3. Action Needed -->
+                <a href="javascript:void(0)" id="menuItemActionNeeded" onclick="setQuickStatusFilter('critical')" class="sidebar-menu-item flex items-center justify-center lg:justify-between hover:bg-slate-800 rounded-lg text-slate-300 hover:text-white p-2.5 lg:px-3 lg:py-2.5" title="ต้องดำเนินการ (ต่ำกว่าเกณฑ์ Min Stock)">
+                    <div class="flex items-center gap-2.5">
+                        <i class="ph ph-warning-circle text-rose-400 text-lg"></i>
+                        <span class="font-medium text-sm hidden lg:inline">ต้องดำเนินการ</span>
+                    </div>
+                    <span class="bg-rose-500/20 text-rose-300 font-bold font-num text-xs px-2 py-0.5 rounded-full hidden lg:inline" id="sidebarCriticalBadge">0</span>
+                </a>
+
+                <div class="mt-4 px-3 pb-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider hidden lg:block">ทะเบียนภาครัฐ</div>
+                
+                <!-- 4. FSN Module -->
+                <a href="javascript:void(0)" id="menuItemFsn" onclick="switchMainView('fsn')" class="sidebar-menu-item flex items-center justify-center lg:justify-between hover:bg-slate-800 rounded-lg text-slate-300 hover:text-white p-2.5 lg:px-3 lg:py-2.5" title="ทะเบียนพัสดุ FSN">
+                    <div class="flex items-center gap-2.5">
+                        <i class="ph-fill ph-tag text-slate-400 text-lg"></i>
+                        <span class="font-medium text-sm hidden lg:inline">ทะเบียนพัสดุ FSN</span>
+                    </div>
+                    <span class="bg-slate-700 text-slate-300 font-bold font-num text-xs px-2 py-0.5 rounded-full hidden lg:inline" id="sidebarFsnBadge">7</span>
+                </a>
+
+                <!-- 5. Documents Management Hub -->
+                <a href="javascript:void(0)" id="menuItemDocs" onclick="switchMainView('docs')" class="sidebar-menu-item flex items-center justify-center lg:justify-between hover:bg-slate-800 rounded-lg text-slate-300 hover:text-white p-2.5 lg:px-3 lg:py-2.5" title="เอกสารราชการ (พ.ด.)">
+                    <div class="flex items-center gap-2.5">
+                        <i class="ph-fill ph-file-text text-slate-400 text-lg"></i>
+                        <span class="font-medium text-sm hidden lg:inline">เอกสารราชการ (พ.ด.)</span>
+                    </div>
+                    <span class="bg-slate-700 text-slate-300 font-bold font-num text-xs px-2 py-0.5 rounded-full hidden lg:inline" id="sidebarDocsBadge">7</span>
+                </a>
+
+                <!-- 6. Year-End Audit Submenu -->
+                <a href="javascript:void(0)" id="menuItemYearEndAudit" onclick="switchMainView('yearEndAudit')" class="sidebar-menu-item flex items-center justify-center lg:justify-between hover:bg-slate-800 rounded-lg text-slate-300 hover:text-white p-2.5 lg:px-3 lg:py-2.5" title="ตรวจนับพัสดุ สิ้นปีงบ">
+                    <div class="flex items-center gap-2.5">
+                        <i class="ph-fill ph-clipboard-text text-amber-400 text-lg"></i>
+                        <span class="font-medium text-sm hidden lg:inline">ตรวจนับพัสดุ สิ้นปีงบ</span>
+                    </div>
+                    <span class="bg-amber-500/20 text-amber-300 font-bold font-num text-[11px] px-1.5 py-0.5 rounded hidden lg:inline" id="sidebarAuditBadge">30 ก.ย.</span>
+                </a>
+
+                <div class="mt-4 px-3 pb-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider hidden lg:block">ระบบและการจัดการ</div>
+
+                <!-- 7. Settings Hub -->
+                <a href="javascript:void(0)" id="menuItemSettings" onclick="switchMainView('settings')" class="sidebar-menu-item flex items-center justify-center lg:justify-between hover:bg-slate-800 rounded-lg text-slate-300 hover:text-white p-2.5 lg:px-3 lg:py-2.5" title="ตั้งค่าระบบ">
+                    <div class="flex items-center gap-2.5">
+                        <i class="ph-fill ph-gear text-slate-400 text-lg"></i>
+                        <span class="font-medium text-sm hidden lg:inline">ตั้งค่าระบบ</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Sidebar Footer: Organization Identity -->
+            <div class="p-3 border-t border-slate-700/80 bg-slate-900/40 text-xs text-slate-400 hidden lg:block">
+                <div class="font-bold text-slate-300 truncate">โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)</div>
+                <div class="text-[11px] text-slate-400 truncate mt-0.5">สังกัด อบจ.สระบุรี</div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace Area -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+            
+            <!-- Minimal User-Focused Topbar -->
+            <header class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-3 sm:px-4 lg:px-6 flex-shrink-0 z-20 gap-2 sm:gap-4">
+                <!-- 1. Menu Toggle (Mobile) -->
+                <button type="button" class="text-slate-600 hover:text-slate-900 p-2 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg hover:bg-slate-100 md:hidden flex-shrink-0 transition" onclick="toggleSidebar()" aria-label="เปิด/ปิด เมนูแถบข้าง" title="เปิด/ปิด เมนู">
+                    <i class="ph ph-list text-xl"></i>
+                </button>
+
+                <!-- 2. Page Title -->
+                <div class="flex items-center gap-2 flex-shrink-0 min-w-0">
+                    <span class="font-bold text-slate-800 text-base sm:text-lg truncate" id="topbarHeading">ภาพรวมคลังพัสดุ</span>
+                    <span class="text-xs text-slate-300 hidden xl:inline">•</span>
+                    <span class="text-xs text-slate-500 hidden xl:inline truncate max-w-[220px]" id="topbarSub">ศูนย์ควบคุมและติดตามสถานะพัสดุสถานศึกษา</span>
+                </div>
+
+                <!-- 3. Global Search -->
+                <div class="relative flex-1 max-w-xs sm:max-w-sm md:max-w-md mx-1 sm:mx-2">
+                    <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs sm:text-sm pointer-events-none"></i>
+                    <input type="text" id="searchInput" aria-label="ค้นหาพัสดุด่วน (กด Ctrl+K)" placeholder="ค้นหาพัสดุด่วน... (Ctrl+K)" class="w-full pl-8 sm:pl-9 pr-7 sm:pr-8 py-2 text-xs bg-slate-100 hover:bg-slate-200/60 focus:bg-white border border-slate-200/80 focus:border-blue-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100 transition text-slate-700 placeholder:text-slate-400">
+                </div>
+
+                <!-- 4. Primary Action -->
+                <button type="button" onclick="openRequisitionModal(null)" aria-label="ทำเรื่องขอเบิกพัสดุ" class="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-3 sm:px-4 py-2 min-h-[40px] rounded-lg text-xs sm:text-sm font-semibold transition flex-shrink-0 cursor-pointer">
+                    <i class="ph-bold ph-hand-pointing text-xs sm:text-sm"></i>
+                    <span class="hidden sm:inline">+ ขอเบิกพัสดุ</span>
+                    <span class="sm:hidden">+ เบิก</span>
+                </button>
+
+                <!-- 5. User Profile & Role Switcher -->
+                <div class="relative flex-shrink-0">
+                    <div class="flex items-center gap-2 p-1.5 rounded-lg bg-slate-50 border border-slate-200 min-h-[40px]">
+                        <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs">
+                            อน
+                        </div>
+                        <div class="hidden md:block text-xs text-left leading-none pr-1">
+                            <div class="font-bold text-slate-800 text-[11px]">นายอนันต์ มั่นคง</div>
+                            <div class="text-[10px] text-slate-400 mt-0.5"><span id="currentRoleBadge">เจ้าหน้าที่พัสดุ</span></div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dynamic View Containers Area -->
+            <div id="viewContainer" class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+                <!-- View 0: Dashboard -->
+                <div id="viewDashboard" data-component="../pages/Dashboard.html" class="flex-1 flex flex-col min-w-0 overflow-hidden">
+                    <?!= include('pages/Dashboard') ?>
+                </div>
+
+                <!-- View 1: Inventory -->
+                <div id="viewInventory" data-component="../pages/Inventory.html" class="flex-1 flex flex-col min-w-0 overflow-hidden hidden">
+                    <?!= include('pages/Inventory') ?>
+                </div>
+
+                <!-- View 2: Requisition -->
+                <div id="viewRequisition" data-component="../pages/Requisition.html" class="flex-1 flex flex-col min-w-0 overflow-hidden hidden">
+                    <?!= include('pages/Requisition') ?>
+                </div>
+
+                <!-- View 2.5: Approval Queue -->
+                <div id="viewApproval" data-component="../pages/Approval.html" class="flex-1 flex flex-col min-w-0 overflow-hidden hidden">
+                    <?!= include('pages/Approval') ?>
+                </div>
+
+                <!-- View 3: FSN Catalog / Stock -->
+                <div id="viewStock" data-component="../pages/Stock.html" class="flex-1 flex flex-col min-w-0 overflow-hidden hidden">
+                    <?!= include('pages/Stock') ?>
+                </div>
+
+                <!-- View 3.5: Ledger (Stock Card) -->
+                <div id="viewLedger" data-component="../pages/Ledger.html" class="flex-1 flex flex-col min-w-0 overflow-hidden hidden">
+                    <?!= include('pages/Ledger') ?>
+                </div>
+
+                <!-- View 3.8: Year-End Audit -->
+                <div id="viewAudit" data-component="../pages/Audit.html" class="flex-1 flex flex-col min-w-0 overflow-hidden hidden">
+                    <?!= include('pages/Audit') ?>
+                </div>
+
+                <!-- View 3.9: Reports & Official Documents -->
+                <div id="viewReports" data-component="../pages/Reports.html" class="flex-1 flex flex-col min-w-0 overflow-hidden hidden">
+                    <?!= include('pages/Reports') ?>
+                </div>
+
+                <!-- View 4: Settings -->
+                <div id="viewSettings" data-component="../pages/Settings.html" class="flex-1 flex flex-col min-w-0 overflow-hidden hidden">
+                    <?!= include('pages/Settings') ?>
+                </div>
+            </div>
+
+            <!-- Modals & Drawers Container -->
+            <div id="modalContainer" data-component="../components/Modal.html">
+                <?!= include('components/Modal') ?>
+            </div>
+
+            <!-- Global Toast Container -->
+            <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 transition-all duration-300 flex items-center gap-3 bg-white border border-slate-200 shadow-xl rounded-xl px-4 py-3 max-w-sm pointer-events-none" role="alert" aria-live="assertive">
+                <i id="toastIcon" class="ph-fill ph-check-circle text-emerald-500 text-lg"></i>
+                <div class="flex-1 text-xs text-slate-800 font-medium leading-relaxed" id="toastMsg">ดำเนินการสำเร็จ</div>
+                <button onclick="closeToast()" class="text-slate-400 hover:text-slate-600 transition p-1" aria-label="ปิดการแจ้งเตือน" title="ปิดการแจ้งเตือน">
+                    <i class="ph ph-x text-xs"></i>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Client-Side Asynchronous Component Loader for Dev Server -->
+    <script>
+        (async function() {
+            const slots = document.querySelectorAll('[data-component]');
+            const loadPromises = Array.from(slots).map(async (slot) => {
+                const currentContent = slot.innerHTML.trim();
+                // Only load if not pre-rendered by Google Apps Script template
+                if (!currentContent || currentContent.startsWith('<?!=')) {
+                    const url = slot.getAttribute('data-component');
+                    try {
+                        const res = await fetch(url);
+                        if (res.ok) {
+                            const html = await res.text();
+                            slot.outerHTML = html;
+                        }
+                    } catch (e) {
+                        console.info(`[DevLoader] Skipping auto-fetch for ${url} (CORS or serverless environment)`);
+                    }
+                }
+            });
+            await Promise.all(loadPromises);
+
+            // Re-trigger App initialization after component injection
+            if (window.App && typeof window.App.init === 'function') {
+                window.App.init();
+            }
+        })();
+    </script>
+
+    <!-- Modular Script Layers (In Execution Order) -->
+    <script src="../utils/DateUtils.js"></script>
+    <script src="../utils/NumberUtils.js"></script>
+    <script src="../utils/FormatUtils.js"></script>
+    <script src="../utils/DomUtils.js"></script>
+    <script src="../state/AppState.js"></script>
+    <script src="../state/CacheStore.js"></script>
+    <script src="../services/ApiService.js"></script>
+    <script src="../services/ItemApi.js"></script>
+    <script src="../services/RequisitionApi.js"></script>
+    <script src="../services/StockApi.js"></script>
+    <script src="../services/UserApi.js"></script>
+    <script src="../services/DashboardApi.js"></script>
+    <script src="./Router.js"></script>
+    <script src="./App.js"></script>
+</body>
+</html>

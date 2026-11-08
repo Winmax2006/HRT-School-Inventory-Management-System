@@ -1,0 +1,39 @@
+Report_Form,Document_Title,Field_Name,Source_Sheet,Source_Column,Lineage_Rule,Fallback_Behavior
+แบบ พ.ด. ๑,ใบเบิกพัสดุสถานศึกษา,req_no,07_Requisitions,col 2,Canonical display doc number,Error if blank
+แบบ พ.ด. ๑,ใบเบิกพัสดุสถานศึกษา,req_date,07_Requisitions,col 3,ISO submission timestamp,Formatted Thai Buddhist date
+แบบ พ.ด. ๑,ใบเบิกพัสดุสถานศึกษา,requester_name,02_Users,col 4,Verified user full name from user_id,User ID
+แบบ พ.ด. ๑,ใบเบิกพัสดุสถานศึกษา,dept,07_Requisitions,col 5,Requisition department,General
+แบบ พ.ด. ๑,ใบเบิกพัสดุสถานศึกษา,purpose,07_Requisitions,col 6,Purpose of requisition,Unspecified
+แบบ พ.ด. ๑,ใบเบิกพัสดุสถานศึกษา,item_code,08_Requisition_Items,col 3,Master item code,Error if blank
+แบบ พ.ด. ๑,ใบเบิกพัสดุสถานศึกษา,item_name,03_Master_Items,col 3,Master item descriptive name,Item code
+แบบ พ.ด. ๑,ใบเบิกพัสดุสถานศึกษา,qty_requested,08_Requisition_Items,col 4,Requested units,0
+แบบ พ.ด. ๑,ใบเบิกพัสดุสถานศึกษา,qty_approved,08_Requisition_Items,col 5,Officially approved quantity,0
+แบบ พ.ด. ๑,ใบเบิกพัสดุสถานศึกษา,unit,08_Requisition_Items,col 6,Packaging unit,ชิ้น
+แบบ พ.ด. ๒,รายงานการรับจ่ายพัสดุประจำวัน,date,09_Stock_Transactions,col 2,Transaction timestamp within day,Filtered Date
+แบบ พ.ด. ๒,รายงานการรับจ่ายพัสดุประจำวัน,item_code,09_Stock_Transactions,col 5,Transaction item code,Error if blank
+แบบ พ.ด. ๒,รายงานการรับจ่ายพัสดุประจำวัน,qty_in,09_Stock_Transactions,col 6,Inbound received quantity,0
+แบบ พ.ด. ๒,รายงานการรับจ่ายพัสดุประจำวัน,qty_out,09_Stock_Transactions,col 6,Outbound issued quantity,0
+แบบ พ.ด. ๒,รายงานการรับจ่ายพัสดุประจำวัน,doc_ref,09_Stock_Transactions,col 3,PO or Requisition reference,Internal ref
+แบบ พ.ด. ๓,รายงานการรับจ่ายและคงเหลือพัสดุประจำเดือน,category,04_Categories,col 2,Official 8 Thai Government Categories,Unknown
+แบบ พ.ด. ๓,รายงานการรับจ่ายและคงเหลือพัสดุประจำเดือน,opening_val,Calculated,Math,Opening = Closing + Out - In,Exact formula
+แบบ พ.ด. ๓,รายงานการรับจ่ายและคงเหลือพัสดุประจำเดือน,incoming_val,10_Stock_Ledger,col 5 * col 8,Sum of committed RECEIVE movements,0
+แบบ พ.ด. ๓,รายงานการรับจ่ายและคงเหลือพัสดุประจำเดือน,outgoing_val,10_Stock_Ledger,col 6 * col 8,Sum of committed ISSUE movements,0
+แบบ พ.ด. ๓,รายงานการรับจ่ายและคงเหลือพัสดุประจำเดือน,closing_val,03_Master_Items,col 10 * col 7,Stock * Unit Cost,0
+แบบ พ.ด. ๔,ทะเบียนคุมพัสดุ (Stock Card),item_code,03_Master_Items,col 1,Master item code,Error if blank
+แบบ พ.ด. ๔,ทะเบียนคุมพัสดุ (Stock Card),fsn_code,03_Master_Items,col 2,Official 13-digit FSN if registered,-
+แบบ พ.ด. ๔,ทะเบียนคุมพัสดุ (Stock Card),unit_cost,03_Master_Items,col 7,Authoritative acquisition cost,0
+แบบ พ.ด. ๔,ทะเบียนคุมพัสดุ (Stock Card),balance,10_Stock_Ledger,col 7,Double-entry running balance,Master stock
+แบบ พ.ด. ๕,รายงานผลการตรวจสอบพัสดุประจำปี (สรุปภาพรวม),fiscal_year,12_Fiscal_Years,col 1,Active or viewed fiscal year,Active year
+แบบ พ.ด. ๕,รายงานผลการตรวจสอบพัสดุประจำปี (สรุปภาพรวม),book_qty,13_Year_End_Audits,col 4,Frozen closing book quantity,Master stock
+แบบ พ.ด. ๕,รายงานผลการตรวจสอบพัสดุประจำปี (สรุปภาพรวม),physical_qty,13_Year_End_Audits,col 5,Verified physically counted quantity,Book quantity
+แบบ พ.ด. ๕,รายงานผลการตรวจสอบพัสดุประจำปี (สรุปภาพรวม),variance,13_Year_End_Audits,col 6,Physical count minus book stock,0
+แบบ พ.ด. ๕,รายงานผลการตรวจสอบพัสดุประจำปี (สรุปภาพรวม),condition,13_Year_End_Audits,col 7,Condition assessment (ปกติ/ชำรุด/จำหน่าย),ปกติ
+แบบ พ.ด. ๖,รายงานผลการตรวจสอบพัสดุประจำปี (แยก 8 หมวด),category_name,04_Categories,col 2,Government commodity classification,General
+แบบ พ.ด. ๖,รายงานผลการตรวจสอบพัสดุประจำปี (แยก 8 หมวด),total_items,Calculated,Count,Count of items in category,0
+แบบ พ.ด. ๖,รายงานผลการตรวจสอบพัสดุประจำปี (แยก 8 หมวด),closing_val,Calculated,Sum,Sum of endingVal in category,0
+แบบ พ.ด. ๗,บัญชีตรวจนับพัสดุคงเหลือทุกรายการสิ้นปี,item_code,13_Year_End_Audits,col 3,Master item code,Error if blank
+แบบ พ.ด. ๗,บัญชีตรวจนับพัสดุคงเหลือทุกรายการสิ้นปี,fsn_code,03_Master_Items,col 2,Registered FSN or empty string,-
+แบบ พ.ด. ๗,บัญชีตรวจนับพัสดุคงเหลือทุกรายการสิ้นปี,item_name,03_Master_Items,col 3,Escaped item name (XSS protected),Item code
+แบบ พ.ด. ๗,บัญชีตรวจนับพัสดุคงเหลือทุกรายการสิ้นปี,book_stock,13_Year_End_Audits,col 4,Audited book quantity,Master stock
+แบบ พ.ด. ๗,บัญชีตรวจนับพัสดุคงเหลือทุกรายการสิ้นปี,physical_count,13_Year_End_Audits,col 5,Audited physically counted quantity,Book stock
+แบบ พ.ด. ๗,บัญชีตรวจนับพัสดุคงเหลือทุกรายการสิ้นปี,variance,13_Year_End_Audits,col 6,Net physical discrepancy,0

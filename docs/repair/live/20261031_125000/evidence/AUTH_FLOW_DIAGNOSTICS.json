@@ -1,0 +1,94 @@
+{
+  "inspectionTimestamp": "2026-10-31T12:50:00+07:00",
+  "canonicalVersion": "v2.7.0-rc.6",
+  "sourceCommit": "dd000c0",
+  "sourceHashes": {
+    "Config.gs": "4cd1ef31d89849147075795e5666779c27ee36cd8ffc68fe022ea93f3bd37d7f",
+    "Api.gs": "55a463864208431bfa8e21b4d8369d0589ec83547efddcd5afb269a39cdd1b2a",
+    "Read.gs": "791bf5fc5693c35a2a5b8192addee270f6c2c6f0833433ad52700b02d961f825",
+    "Write.gs": "575ab957c86bfe8fca6a2376dd3d492ce5a2277e594fc68651ea4c0664097857",
+    "Audit.gs": "00d914bcbd2c953062e9fbe5dd2e9e9d93597685e370a9b0ba5031c20fab9e47",
+    "Code.gs": "8e00de0fc095036d7001a228dc65f2d8ff9ede07b484b2eeac8786cfcf69aa1b",
+    "index.html": "0d468f6e8ad6b61baf4cac46da4951448ae2689213a0af567b9f57d969feb298",
+    "MiniUI.html": "e4d7a4e52ae65fa588ef4e4fda14a94566c77548c1507323c102f80f115c9523",
+    "appsscript.json": "2e88517c17942abd0a15f3c99383a12c11f04080ccd2d573d1d1449f4609e092"
+  },
+  "runtimeArchitecture": {
+    "manifestExecutionMode": "USER_DEPLOYING",
+    "manifestAccessMode": "DOMAIN",
+    "oauthScopes": [
+      "https://www.googleapis.com/auth/spreadsheets",
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/script.external_request"
+    ]
+  },
+  "frontendAuthAnalysis": {
+    "index_html": {
+      "loginButtonId": "btnGoogleSignIn",
+      "loginButtonLine": 1059,
+      "loginFunction": "executeGoogleLogin()",
+      "loginFunctionLine": 12042,
+      "mechanism": "NATIVE_APPS_SCRIPT_SESSION_POLL",
+      "hasGISScriptTag": false,
+      "hasGoogleAccountsIdInitialize": false,
+      "hasCredentialCallback": false,
+      "status": "NATIVE_SESSION_ONLY",
+      "gisFrontendStatus": "CODE_NOT_IMPLEMENTED"
+    },
+    "MiniUI_html": {
+      "loginButtonClass": "google-btn",
+      "loginButtonLine": 353,
+      "loginFunction": "signInWithGoogle()",
+      "loginFunctionLine": 1448,
+      "mechanism": "WINDOW_RELOAD_UNDER_APPS_SCRIPT",
+      "hasGISScriptTag": false,
+      "hasGoogleAccountsIdInitialize": false,
+      "status": "NATIVE_SESSION_ONLY",
+      "gisFrontendStatus": "CODE_NOT_IMPLEMENTED"
+    }
+  },
+  "backendAuthAnalysis": {
+    "file": "Api.gs",
+    "functions": {
+      "resolveAuthenticatedUser": {
+        "line": 287,
+        "step1_nativeSession": "Session.getActiveUser().getEmail()",
+        "step2_tokenCheck": "if (!email && idToken)",
+        "step3_testHarness": "if (!email && process.env.NODE_ENV === 'test' && rawPayload._testCaller)",
+        "step4_failClosed": "if (!email) throw UNAUTHORIZED",
+        "step5_domainPolicy": "allowedDomains.includes(emailDomain)",
+        "step6_sheetLookup": "01_Users lookup by email",
+        "step7_statusCheck": "status === 'ACTIVE' (blank or SUSPENDED fails)",
+        "step8_externalDomainCheck": "if (!isPrimaryDomain && !foundUserRow) throw FORBIDDEN_DOMAIN",
+        "step9_unregisteredCheck": "if (!foundUserRow) throw UNREGISTERED_USER"
+      },
+      "verifyGoogleIdToken": {
+        "line": 413,
+        "remoteEndpoint": "https://oauth2.googleapis.com/tokeninfo?id_token=",
+        "verifiedClaims": [
+          "iss in ['accounts.google.com', 'https://accounts.google.com']",
+          "exp * 1000 > Date.now()",
+          "aud === CONFIG.GOOGLE_CLIENT_ID",
+          "email_verified === true || email_verified === 'true'"
+        ]
+      }
+    },
+    "tokenPrecedence": {
+      "rule": "Session email takes absolute precedence over token",
+      "evidence": "In Api.gs:302, idToken is evaluated ONLY if (!email). When Session email is present, token is never checked or evaluated.",
+      "implication": "A valid Apps Script Session completely bypasses ID token verification, and any passed token (valid or invalid) is ignored."
+    },
+    "googleClientIdRequirement": {
+      "nativeSessionFlow": "NOT_REQUIRED (Session.getActiveUser().getEmail() does not inspect GOOGLE_CLIENT_ID)",
+      "tokenFlow": "REQUIRED (Api.gs:303 throws CONFIGURATION_ERROR if GOOGLE_CLIENT_ID is empty when idToken is passed)"
+    }
+  },
+  "databaseConfiguration": {
+    "source": "Config.gs: getConfiguredSpreadsheetId_()",
+    "scriptPropertyKey": "SPREADSHEET_ID",
+    "defaultHardcodedValue": "",
+    "docsPlaceholder": "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms",
+    "fiscalYearModel": "SINGLE_DATABASE_MULTI_YEAR_PARTITIONED (12_Fiscal_Years flags, canonical sheets)",
+    "isolationStatus": "ENVIRONMENT_ISOLATION_BLOCKED (No separate staging spreadsheet ID provisioned)"
+  }
+}

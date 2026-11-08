@@ -1,0 +1,65 @@
+{
+  "version": "v2.7.0-rc.6",
+  "releaseDate": "2026-11-08T10:14:02.520Z",
+  "baseline": "v2.7.0-rc.5",
+  "targetCandidate": "v2.7.0-rc.6",
+  "status": "CANDIDATE_RELEASE_CONSOLIDATED",
+  "scope": "HRT Inventory System - Prompts 13-20 Release Consolidation, MiniUI Responsive QR, ACID Ledger & Audit Verification",
+  "runtimeAllowlistCount": 9,
+  "runtimeFiles": [
+    {
+      "file": "Config.gs",
+      "bytes": 19273,
+      "sha256": "dea84213c1f5d66fb4f7483efdc00b18bb9214ade12022cf257b96fdae67cdfe",
+      "target": "runtime_allowlist"
+    },
+    {
+      "file": "Api.gs",
+      "bytes": 59567,
+      "sha256": "74294633b68b3a0258aa28681b79f583893c1d714a34de0574bf261c8fa16f5f",
+      "target": "runtime_allowlist"
+    },
+    {
+      "file": "Read.gs",
+      "bytes": 85581,
+      "sha256": "10994918e8fadbb50e9810d8c00f6b13d24f8dadc0f4fa23da818d114f7a83b4",
+      "target": "runtime_allowlist"
+    },
+    {
+      "file": "Write.gs",
+      "bytes": 105414,
+      "sha256": "89bbffcb309b3af50aec12468ccf7d4941b8d13bbfc68ab98864a7a7a32bfc7a",
+      "target": "runtime_allowlist"
+    },
+    {
+      "file": "Audit.gs",
+      "bytes": 16712,
+      "sha256": "00d914bcbd2c953062e9fbe5dd2e9e9d93597685e370a9b0ba5031c20fab9e47",
+      "target": "runtime_allowlist"
+    },
+    {
+      "file": "Code.gs",
+      "bytes": 17186,
+      "sha256": "d63350a580f5585335eccabeefb7373726278cfc70f2df6519b134e44fe5b2c7",
+      "target": "runtime_allowlist"
+    },
+    {
+      "file": "index.html",
+      "bytes": 1135774,
+      "sha256": "de02b399cf2cc1d4c832404c367253648e2566232734e3b49b96de3cf2216185",
+      "target": "runtime_allowlist"
+    },
+    {
+      "file": "MiniUI.html",
+      "bytes": 84248,
+      "sha256": "e4d7a4e52ae65fa588ef4e4fda14a94566c77548c1507323c102f80f115c9523",
+      "target": "runtime_allowlist"
+    },
+    {
+      "file": "appsscript.json",
+      "bytes": 381,
+      "sha256": "2250eab50d8cae6cd2d217c2ad8422cf0d9989c9314825cc8d2f0b6ff639954e",
+      "target": "runtime_allowlist"
+    }
+  ]
+}

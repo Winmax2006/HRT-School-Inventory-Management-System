@@ -1,0 +1,48 @@
+name: CI Quality Gate & Test Verification
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  verify:
+    name: Lint, Syntax & Automated Test Verification
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Verify JavaScript Syntax of Runtime Files
+        run: |
+          node -c Config.gs
+          node -c Api.gs
+          node -c Read.gs
+          node -c Write.gs
+          node -c Audit.gs
+          node -c Code.gs
+
+      - name: Build Release Packages & Checksums
+        run: |
+          node scripts/build_release_packages.js
+
+      - name: Run Core Test Suites (In-Memory Mock Isolated)
+        run: |
+          node tests/release_consolidation_test.js
+          node tests/stock_transaction_idempotency_test.js
+          node tests/auth_rbac_test.js
+          node tests/rpc_contract_test.js
+          node tests/stock_issuance_fix_test.js
+
+      - name: Verify Manifest & Clasp Allowlist
+        run: |
+          test -f appsscript.json
+          test -f .claspignore
+          test -f .clasp.example.json

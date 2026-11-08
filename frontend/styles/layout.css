@@ -1,0 +1,118 @@
+/**
+ * HRT School Inventory Management System - Layout & Responsive Styles
+ * File: frontend/styles/layout.css
+ */
+
+/* ========================================================= */
+/* SCROLLBAR CUSTOMIZATION                                  */
+/* ========================================================= */
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--neutral-300);
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--neutral-400);
+}
+
+/* ========================================================= */
+/* RESPONSIVE TYPOGRAPHY & LAYOUT BREAKPOINTS                */
+/* ========================================================= */
+
+/* Responsive Typography for Small Screens (< 640px) */
+@media (max-width: 639px) {
+    body { font-size: 13px; }
+    .text-table-header, .text-table-cell, th, td { font-size: 12px !important; }
+    #kpiTotal, #kpiActionNeeded, #kpiValue { font-size: 20px !important; }
+    #drawerStock { font-size: 24px !important; }
+    .sidebar-menu-item { font-size: 13px !important; }
+}
+
+/* Tablet Icon Rail (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .sidebar-menu-item {
+        padding: 0.625rem 0 !important;
+        justify-content: center !important;
+    }
+    .sidebar-menu-item i {
+        font-size: 20px !important;
+        margin: 0 auto;
+    }
+}
+
+/* ========================================================= */
+/* SLIDE-OVER DRAWER LAYOUT                                  */
+/* ========================================================= */
+.drawer-overlay {
+    transition: opacity 0.25s ease-in-out;
+}
+.drawer-content {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ========================================================= */
+/* ACCESSIBILITY (A11Y) & FOCUS VISIBLE (WCAG AA COMPLIANCE) */
+/* ========================================================= */
+:focus-visible {
+    outline: 2px solid #2563eb !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25) !important;
+}
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid #2563eb !important;
+    outline-offset: 2px !important;
+}
+/* Keyboard-accessible row focus */
+tr[role="button"]:focus-visible, div[role="button"]:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: -2px;
+}
+/* Buttons, inputs, interactive elements touch target minimum */
+.touch-target {
+    min-height: 40px;
+    min-width: 40px;
+}
+/* Screen Reader Only Utility */
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border-width: 0 !important;
+}
+.focus\:not-sr-only:focus-visible {
+    position: fixed !important;
+    top: 12px !important;
+    left: 12px !important;
+    z-index: 9999 !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 8px 16px !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    clip: auto !important;
+    white-space: normal !important;
+}
+
+/* ========================================================= */
+/* DOCUMENT PREVIEW LAYOUT WRAPPER                           */
+/* ========================================================= */
+.doc-preview-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    padding: 8px 0 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+}

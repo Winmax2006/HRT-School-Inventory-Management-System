@@ -1,0 +1,855 @@
+<!-- ========================================== -->
+<!-- CONTEXTUAL SLIDE-OVER DRAWERS & MODALS -->
+<!-- ========================================== -->
+
+<!-- Backdrop Overlay for Item Drawer -->
+<div id="drawerBackdrop" class="fixed inset-0 bg-slate-900/40 z-50 hidden drawer-overlay" onclick="closeDrawer()" role="button" tabindex="-1" aria-hidden="true" aria-label="ปิดแถบรายละเอียดพัสดุ"></div>
+
+<!-- Side-over Drawer Panel (Item Inspector) -->
+<aside id="itemDrawer" aria-label="แถบรายละเอียดพัสดุ" class="fixed inset-y-0 right-0 w-full sm:w-[400px] md:w-[420px] lg:w-[450px] bg-white shadow-2xl z-50 transform translate-x-full drawer-content flex flex-col h-full border-l border-slate-200">
+    <!-- Drawer Header -->
+    <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/70 flex-shrink-0">
+        <div class="flex items-center gap-2">
+            <span id="drawerItemCodeBadge" class="font-mono text-xs font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded">
+                OFF-001
+            </span>
+            <span id="drawerStatusBadge"></span>
+        </div>
+        <button type="button" onclick="closeDrawer()" aria-label="ปิดหน้ารายละเอียดพัสดุ" title="ปิดหน้ารายละเอียดพัสดุ (Esc)" class="text-slate-500 hover:text-slate-800 p-2 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg hover:bg-slate-200 transition">
+            <i class="ph-bold ph-x text-base"></i>
+        </button>
+    </div>
+
+    <!-- Drawer Body (Scrollable) -->
+    <div class="flex-1 overflow-y-auto p-5 flex flex-col gap-4 text-sm">
+        
+        <!-- Item Title & Category -->
+        <div>
+            <h3 class="font-bold text-slate-900 text-lg leading-snug" id="drawerItemName">ชื่อพัสดุ</h3>
+            <div class="flex items-center gap-2 mt-1.5" id="drawerCategoryContainer">
+                <span class="px-2 py-0.5 rounded-lg text-xs font-semibold flex items-center gap-1" id="drawerCategoryBadge">
+                    <i id="drawerCategoryIcon" class="ph-fill ph-tag"></i>
+                    <span id="drawerCategoryText">หมวดหมู่</span>
+                </span>
+                <span class="text-slate-400 text-xs">•</span>
+                <span class="text-slate-500 text-xs flex items-center gap-1" id="drawerWarehouse">
+                    <i class="ph ph-map-pin"></i> สถานที่จัดเก็บ
+                </span>
+            </div>
+        </div>
+
+        <!-- Level 1 Stock Metric Highlight -->
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
+            <div>
+                <span class="text-xs text-slate-400 block font-medium">ยอดคงเหลือปัจจุบัน</span>
+                <div class="flex items-baseline gap-1 mt-0.5">
+                    <span class="text-[32px] font-bold font-num text-slate-900 leading-tight" id="drawerStock">0</span>
+                    <span class="text-xs text-slate-500 font-medium" id="drawerUnit">หน่วย</span>
+                </div>
+            </div>
+            <div class="text-right">
+                <span class="text-xs text-slate-400 block font-medium">เกณฑ์ Min Stock</span>
+                <span class="text-base font-bold font-num text-slate-700" id="drawerMin">0</span>
+                <span class="text-xs text-slate-500 ml-0.5" id="drawerMinUnit">หน่วย</span>
+            </div>
+        </div>
+
+        <!-- Primary Task Actions -->
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="drawerActionRequisition()" class="py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm flex items-center justify-center gap-1.5 transition min-h-[44px] cursor-pointer">
+                <i class="ph-bold ph-hand-pointing"></i>
+                <span>ทำเรื่องเบิกพัสดุ</span>
+            </button>
+            <button onclick="drawerActionRestock()" class="py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-sm flex items-center justify-center gap-1.5 transition min-h-[44px] cursor-pointer">
+                <i class="ph-bold ph-plus"></i>
+                <span>รับเข้าสต็อก</span>
+            </button>
+        </div>
+
+        <hr class="border-slate-100 my-1">
+
+        <!-- LEVEL 2 PROGRESSIVE DISCLOSURE ACCORDIONS -->
+        
+        <!-- Accordion 1: Pricing & Inventory Value -->
+        <div class="border border-slate-200 rounded-xl overflow-hidden bg-white">
+            <button onclick="toggleAccordion('accValue')" class="w-full p-3 flex items-center justify-between text-left font-semibold text-slate-800 hover:bg-slate-50 transition text-sm">
+                <div class="flex items-center gap-2">
+                    <i class="ph-bold ph-currency-dollar text-emerald-600"></i>
+                    <span>มูลค่าและข้อมูลสต็อกเชิงลึก</span>
+                </div>
+                <i class="ph ph-caret-down text-slate-400 transition-transform duration-200" id="accValueCaret"></i>
+            </button>
+            <div id="accValueContent" class="hidden p-3 border-t border-slate-100 bg-slate-50/50 space-y-2 text-sm text-slate-600">
+                <div class="flex justify-between">
+                    <span class="text-xs text-slate-400">ราคาต่อหน่วย:</span>
+                    <span class="font-bold font-num text-slate-800 text-sm" id="drawerUnitPrice">฿0.00</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-xs text-slate-400">มูลค่าคงคลังรวม:</span>
+                    <span class="font-bold font-num text-emerald-700 text-sm" id="drawerTotalValue">฿0.00</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-xs text-slate-400">จุดสั่งซื้อซ้ำ (ROP):</span>
+                    <span class="font-num font-medium text-slate-700 text-sm" id="drawerRop">0</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-xs text-slate-400">ผู้จัดจำหน่าย / ร้านค้า:</span>
+                    <span class="font-medium text-slate-700 text-sm" id="drawerSupplier">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accordion 2: Linked FSN & Spec Sheet PDF -->
+        <div class="border border-slate-200 rounded-xl overflow-hidden bg-white">
+            <button onclick="toggleAccordion('accFsn')" class="w-full p-3 flex items-center justify-between text-left font-semibold text-slate-800 hover:bg-slate-50 transition">
+                <div class="flex items-center gap-2">
+                    <i class="ph-bold ph-tag text-amber-500"></i>
+                    <span>ข้อมูลมาตรฐานและรหัสพัสดุ FSN</span>
+                </div>
+                <i class="ph ph-caret-down text-slate-400 transition-transform duration-200" id="accFsnCaret"></i>
+            </button>
+            <div id="accFsnContent" class="hidden p-3 border-t border-slate-100 bg-slate-50/50 space-y-2.5 text-slate-600">
+                <div id="drawerFsnDetails">
+                    <!-- Populated by JS: FSN code and PDF view button -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Accordion 3: Recent Requisition History -->
+        <div class="border border-slate-200 rounded-xl overflow-hidden bg-white">
+            <button onclick="toggleAccordion('accHistory')" class="w-full p-3 flex items-center justify-between text-left font-semibold text-slate-800 hover:bg-slate-50 transition">
+                <div class="flex items-center gap-2">
+                    <i class="ph-bold ph-clock-counter-clockwise text-blue-500"></i>
+                    <span>ประวัติการเบิก-จ่ายล่าสุด</span>
+                </div>
+                <i class="ph ph-caret-down text-slate-400 transition-transform duration-200" id="accHistoryCaret"></i>
+            </button>
+            <div id="accHistoryContent" class="hidden p-3 border-t border-slate-100 bg-slate-50/50">
+                <ul id="drawerHistoryList" class="space-y-2">
+                    <!-- Injected by JS -->
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</aside>
+
+
+<!-- ========================================== -->
+<!-- REQUISITION WORKFLOW MODALS & DRAWER -->
+<!-- ========================================== -->
+
+<!-- Requisition Detail Drawer (แผงควบคุมรายละเอียดคำขอเบิก) -->
+<div id="reqDrawerBackdrop" class="fixed inset-0 bg-slate-900/40 z-40 hidden backdrop-blur-2xs transition-opacity" onclick="closeRequisitionDrawer()"></div>
+<aside id="reqDetailDrawer" class="fixed top-0 right-0 h-full w-full max-w-lg bg-white z-50 shadow-2xl border-l border-slate-200 flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out" aria-label="แผงรายละเอียดคำขอเบิกพัสดุ">
+    <!-- Drawer Header -->
+    <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
+        <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-lg">
+                <i class="ph-bold ph-clipboard-text"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-slate-900 font-num text-sm sm:text-base" id="reqDrawerDocId">REQ-2567/012</span>
+                    <span id="reqDrawerStatusBadge" class="px-2 py-0.5 rounded-full text-xs font-bold">รออนุมัติ</span>
+                </div>
+                <span class="text-slate-500 text-xs font-num" id="reqDrawerDate">15 พฤษภาคม 2567</span>
+            </div>
+        </div>
+        <button type="button" onclick="closeRequisitionDrawer()" aria-label="ปิดแผงรายละเอียด" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 flex items-center justify-center transition cursor-pointer">
+            <i class="ph ph-x text-lg"></i>
+        </button>
+    </div>
+
+    <!-- Drawer Content (Scrollable with Accordions) -->
+    <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 text-xs sm:text-sm text-slate-700">
+        <!-- Accordion 1: ข้อมูลคำขอและผู้ขอเบิก -->
+        <div class="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+            <button type="button" onclick="toggleReqAccordion('reqAccReqInfo', 'reqAccReqCaret')" class="w-full p-3.5 bg-slate-50 hover:bg-slate-100 flex items-center justify-between font-bold text-slate-800 transition cursor-pointer">
+                <div class="flex items-center gap-2">
+                    <i class="ph-bold ph-user text-blue-600 text-base"></i>
+                    <span>ข้อมูลคำขอและผู้ขอเบิก</span>
+                </div>
+                <i class="ph ph-caret-down text-xs transition-transform duration-200" id="reqAccReqCaret"></i>
+            </button>
+            <div id="reqAccReqInfo" class="p-3.5 space-y-2.5 bg-white border-t border-slate-200">
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-500 text-xs">ผู้ขอเบิกพัสดุ:</span>
+                    <span class="font-bold text-slate-900 text-xs sm:text-sm" id="reqDrawerTeacher">-</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-500 text-xs">กลุ่มสาระฯ / ฝ่ายงาน:</span>
+                    <span class="font-medium text-slate-800 text-xs" id="reqDrawerDept">-</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-500 text-xs">คลังพัสดุปลายทาง:</span>
+                    <span class="font-medium text-slate-800 text-xs" id="reqDrawerWarehouse">-</span>
+                </div>
+                <div class="pt-2 border-t border-slate-100">
+                    <span class="text-slate-500 text-xs block mb-1">วัตถุประสงค์ในการเบิก:</span>
+                    <p class="text-slate-800 bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-xs leading-relaxed" id="reqDrawerPurpose">-</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accordion 2: รายการพัสดุ & ผลกระทบต่อ Stock (Stock Impact) -->
+        <div class="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+            <button type="button" onclick="toggleReqAccordion('reqAccItemsInfo', 'reqAccItemsCaret')" class="w-full p-3.5 bg-slate-50 hover:bg-slate-100 flex items-center justify-between font-bold text-slate-800 transition cursor-pointer">
+                <div class="flex items-center gap-2">
+                    <i class="ph-bold ph-package text-blue-600 text-base"></i>
+                    <span>รายการพัสดุ & ผลกระทบต่อ Stock</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 font-num" id="reqDrawerItemCount">0 รายการ</span>
+                    <i class="ph ph-caret-down text-xs transition-transform duration-200" id="reqAccItemsCaret"></i>
+                </div>
+            </button>
+            <div id="reqAccItemsInfo" class="p-3.5 space-y-3 bg-white border-t border-slate-200">
+                <div id="reqDrawerStockImpactCards" class="space-y-3">
+                    <!-- Injected by JS: Stock Impact Preview Box per item -->
+                </div>
+                <table class="hidden">
+                    <tbody id="reqDrawerItemsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Accordion 3: การลงนามและผู้รับผิดชอบ -->
+        <div class="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+            <button type="button" onclick="toggleReqAccordion('reqAccSignInfo', 'reqAccSignCaret')" class="w-full p-3.5 bg-slate-50 hover:bg-slate-100 flex items-center justify-between font-bold text-slate-800 transition cursor-pointer">
+                <div class="flex items-center gap-2">
+                    <i class="ph-bold ph-signature text-blue-600 text-base"></i>
+                    <span>การลงนามและผู้รับผิดชอบ</span>
+                </div>
+                <i class="ph ph-caret-down text-xs transition-transform duration-200 rotate-180" id="reqAccSignCaret"></i>
+            </button>
+            <div id="reqAccSignInfo" class="hidden p-3.5 space-y-2 bg-white border-t border-slate-200 text-xs">
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                        <span class="text-slate-400 block text-[11px] mb-0.5">เจ้าหน้าที่พัสดุ (ผู้จ่าย)</span>
+                        <span class="font-semibold text-slate-800" id="reqDrawerStaff">นายอนันต์ มั่นคง</span>
+                    </div>
+                    <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                        <span class="text-slate-400 block text-[11px] mb-0.5">ผู้อำนวยการ (ผู้อนุมัติ)</span>
+                        <span class="font-semibold text-slate-800" id="reqDrawerApprover">นายสมศักดิ์ รุ่งเรือง</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Drawer Footer Actions -->
+    <div class="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between gap-2" id="reqDrawerFooterActions">
+        <!-- Injected by JS based on Status -->
+    </div>
+</aside>
+
+<!-- Multi-item Requisition Modal (ฟอร์มขอเบิกพัสดุหลายรายการ) -->
+<div id="multiItemRequisitionModal" class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-3 sm:p-4 hidden backdrop-blur-xs overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-4 sm:p-6 shadow-2xl border border-slate-100 flex flex-col gap-4 my-auto max-h-[92vh] overflow-y-auto">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-lg">
+                    <i class="ph-bold ph-hand-pointing"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-900 text-sm sm:text-base">แบบฟอร์มขอเบิกพัสดุ (หลายรายการ)</h3>
+                    <p class="text-[11px] text-slate-500">ระบบบริหารคลังพัสดุ โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeMultiItemRequisitionModal()" aria-label="ปิดหน้าต่างขอเบิก" class="text-slate-400 hover:text-slate-700 p-2 rounded-lg hover:bg-slate-100 transition">
+                <i class="ph ph-x text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Form Inputs: Requester Meta -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div>
+                <label for="multiReqTeacher" class="block font-semibold text-slate-700 mb-1">ชื่อผู้ขอเบิก (ครู / บุคลากร) <span class="text-rose-500">*</span></label>
+                <input type="text" id="multiReqTeacher" placeholder="เช่น ครูกัญญา สร้อยสว่าง" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500 bg-white">
+            </div>
+            <div>
+                <label for="multiReqDept" class="block font-semibold text-slate-700 mb-1">กลุ่มสาระการเรียนรู้ / ฝ่ายงาน <span class="text-rose-500">*</span></label>
+                <select id="multiReqDept" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500 bg-white text-slate-700">
+                    <!-- Injected by JS -->
+                </select>
+            </div>
+            <div class="sm:col-span-2">
+                <label for="multiReqPurpose" class="block font-semibold text-slate-700 mb-1">วัตถุประสงค์ในการเบิก <span class="text-rose-500">*</span></label>
+                <input type="text" id="multiReqPurpose" placeholder="เช่น ใช้จัดการเรียนการสอนและผลิตสื่อใบงาน ภาคเรียนที่ 1/2567" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500 bg-white">
+            </div>
+        </div>
+
+        <!-- Multi-item Rows Container -->
+        <div class="space-y-2">
+            <div class="flex items-center justify-between">
+                <label class="block font-bold text-slate-800 text-xs">รายการพัสดุที่ขอเบิก <span class="text-rose-500">*</span></label>
+                <button type="button" onclick="addMultiReqRow()" class="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold inline-flex items-center gap-1 transition">
+                    <i class="ph-bold ph-plus"></i>
+                    <span>เพิ่มพัสดุ</span>
+                </button>
+            </div>
+
+            <div class="border border-slate-200 rounded-xl overflow-x-auto">
+                <table class="w-full text-left text-xs" id="multiReqTable">
+                    <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold text-[11px]">
+                        <tr>
+                            <th class="py-2.5 px-3">พัสดุ</th>
+                            <th class="py-2.5 px-2 text-right w-24">สต็อกคงเหลือ</th>
+                            <th class="py-2.5 px-2 text-center w-28">จำนวนขอเบิก</th>
+                            <th class="py-2.5 px-2 text-center w-28">ผลสต็อก</th>
+                            <th class="py-2.5 px-2 text-center w-12">ลบ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="multiReqRowsBody" class="divide-y divide-slate-100">
+                        <!-- Dynamic Rows Injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Summary Bar & Impact Warning -->
+        <div id="multiReqImpactBox" class="bg-slate-50 p-3 rounded-xl border border-slate-200/90 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
+            <div>
+                <span class="text-slate-500">รวมทั้งหมด:</span>
+                <span class="font-bold text-slate-800 ml-1 font-num" id="multiReqSummaryCount">0 รายการ</span>
+                <span class="text-slate-400 mx-1">|</span>
+                <span class="text-slate-500">รวมจำนวน:</span>
+                <span class="font-bold text-blue-600 ml-1 font-num" id="multiReqSummaryQty">0 หน่วย</span>
+            </div>
+            <div id="multiReqWarningText" class="text-[11px] font-semibold text-slate-500">
+                พร้อมสร้างคำขอเบิก
+            </div>
+        </div>
+
+        <!-- Modal Actions -->
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+            <button type="button" onclick="closeMultiItemRequisitionModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-medium min-h-[40px]">
+                ยกเลิก
+            </button>
+            <button type="button" id="btnSubmitMultiReq" onclick="submitMultiItemRequisition()" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-bold min-h-[40px] shadow-sm transition">
+                ยืนยันสร้างคำขอเบิก
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Issue Confirmation Modal (บันทึกจ่ายพัสดุและตัดสต็อกจริง) -->
+<div id="confirmIssueModal" class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-3 sm:p-4 hidden backdrop-blur-xs">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-4 sm:p-6 shadow-2xl border border-slate-100 flex flex-col gap-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-lg">
+                    <i class="ph-bold ph-check-square-offset"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-900 text-sm sm:text-base">ยืนยันการจ่ายพัสดุและตัดสต็อก</h3>
+                    <p class="text-[11px] text-slate-500" id="issueModalDocId">เลขที่คำขอ: REQ-2567/018</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeConfirmIssueModal()" aria-label="ปิดหน้าต่างจ่ายพัสดุ" class="text-slate-400 hover:text-slate-700 p-2 rounded-lg hover:bg-slate-100 transition">
+                <i class="ph ph-x text-lg"></i>
+            </button>
+        </div>
+
+        <p class="text-xs text-slate-600">
+            โปรดตรวจสอบและระบุจำนวนที่จ่ายจริง (Actual Quantity) หากสต็อกไม่เพียงพอ สามารถจ่ายบางส่วน (Partial Issue) ได้ ระบบจะตัดสต็อกคงเหลือจริงตามจำนวนที่ระบุ:
+        </p>
+
+        <div class="border border-slate-200 rounded-xl overflow-hidden max-h-60 overflow-y-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold text-[11px]">
+                    <tr>
+                        <th class="py-2.5 px-3">พัสดุ</th>
+                        <th class="py-2.5 px-2 text-right">สต็อก</th>
+                        <th class="py-2.5 px-2 text-right">ขอเบิก</th>
+                        <th class="py-2.5 px-2 text-center w-24">จ่ายจริง</th>
+                    </tr>
+                </thead>
+                <tbody id="issueModalTableBody" class="divide-y divide-slate-100">
+                    <!-- Injected by JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <div>
+            <label for="issueModalNotes" class="block font-semibold text-slate-700 mb-1 text-xs">หมายเหตุการตัดจ่าย (ถ้ามี)</label>
+            <input type="text" id="issueModalNotes" placeholder="เช่น จ่ายครบตามคำขอ / ตัดจ่ายบางส่วนเนื่องจากรอสินค้าเข้า" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500 bg-white">
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+            <button type="button" onclick="closeConfirmIssueModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-medium min-h-[40px]">
+                ยกเลิก
+            </button>
+            <button type="button" onclick="executeIssueConfirmation()" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-bold min-h-[40px] shadow-sm transition">
+                ยืนยันตัดจ่ายพัสดุ
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Requisition Modal (แบบฟอร์มขอเบิกพัสดุเดี่ยว) -->
+<div id="requisitionModal" class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4 hidden backdrop-blur-xs">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 flex flex-col gap-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                    <i class="ph-bold ph-hand-pointing"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-800 text-sm sm:text-base">ทำเรื่องเบิกพัสดุ</h3>
+                    <p class="text-[11px] text-slate-500">กลุ่มบริหารงานงบประมาณ • ร.ร.หรเทพ(รุ่งเรืองประชาสามัคคี)</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeRequisitionModal()" aria-label="ปิดหน้าต่างทำเรื่องเบิกพัสดุ" title="ปิดหน้าต่าง (Esc)" class="text-slate-500 hover:text-slate-700 min-w-[40px] min-h-[40px] flex items-center justify-center p-2 rounded-lg hover:bg-slate-100 transition">
+                <i class="ph ph-x text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Item Info Preview -->
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80 flex items-center justify-between text-xs">
+            <div>
+                <span class="text-blue-600 font-bold font-num" id="reqItemCode">OFF-001</span>
+                <div class="font-semibold text-slate-800 text-xs sm:text-sm mt-0.5" id="reqItemName">กระดาษ Double A</div>
+                <div class="text-slate-400 text-[11px] mt-0.5" id="reqItemLoc">ห้องพัสดุกลาง</div>
+            </div>
+            <div class="text-right">
+                <span class="text-slate-400 block text-[10px]">คงเหลือ</span>
+                <span class="font-bold font-num text-base text-emerald-600" id="reqItemStock">0</span>
+                <span class="text-slate-500 text-xs ml-0.5" id="reqItemUnit">รีม</span>
+            </div>
+        </div>
+
+        <!-- Requisition Form -->
+        <div class="space-y-3 text-xs">
+            <div>
+                <label for="reqQty" class="block font-semibold text-slate-700 mb-1">จำนวนที่ขอเบิก <span class="text-red-500">*</span></label>
+                <div class="relative">
+                    <input type="number" id="reqQty" min="1" value="1" aria-label="จำนวนที่ขอเบิก" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-bold font-num focus:outline-none focus:border-blue-500">
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium" id="reqInputUnit">หน่วย</span>
+                </div>
+            </div>
+
+            <div>
+                <label for="reqTeacher" class="block font-semibold text-slate-700 mb-1">ชื่อผู้ขอเบิก (ครู / เจ้าหน้าที่) <span class="text-red-500">*</span></label>
+                <input type="text" id="reqTeacher" aria-label="ชื่อผู้ขอเบิก" placeholder="เช่น ครูกัญญา (กลุ่มสาระฯ ภาษาไทย)" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500">
+            </div>
+
+            <div>
+                <label for="reqPurpose" class="block font-semibold text-slate-700 mb-1">วัตถุประสงค์ในการเบิก</label>
+                <input type="text" id="reqPurpose" aria-label="วัตถุประสงค์ในการเบิก" placeholder="เช่น ใช้จัดการเรียนการสอน ภาคเรียนที่ 1/2567" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500">
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <button type="button" onclick="closeRequisitionModal()" class="px-3.5 py-2 min-h-[40px] rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-medium">
+                ยกเลิก
+            </button>
+            <button type="button" onclick="submitRequisition()" class="px-4 py-2 min-h-[40px] rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold">
+                ยืนยันการเบิกพัสดุ
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Restock Modal (รับเข้าพัสดุ) -->
+<div id="addStockModal" class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4 hidden backdrop-blur-xs">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 flex flex-col gap-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+                    <i class="ph-bold ph-plus"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-800 text-sm sm:text-base">รับเข้าพัสดุ / สั่งซื้อเพิ่ม</h3>
+                    <p class="text-[11px] text-slate-500">บันทึกรับของเข้าคลังพัสดุ HRT Inventory System</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeAddStockModal()" aria-label="ปิดหน้าต่างรับเข้าพัสดุ" title="ปิดหน้าต่าง (Esc)" class="text-slate-500 hover:text-slate-700 min-w-[40px] min-h-[40px] flex items-center justify-center p-2 rounded-lg hover:bg-slate-100 transition">
+                <i class="ph ph-x text-lg"></i>
+            </button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+            <div>
+                <label for="restockItemSelect" class="block font-semibold text-slate-700 mb-1">เลือกรายการพัสดุ <span class="text-red-500">*</span></label>
+                <select id="restockItemSelect" aria-label="เลือกรายการพัสดุที่จะรับเข้า" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500 bg-white">
+                    <!-- Populated by JS -->
+                </select>
+            </div>
+
+            <div>
+                <label for="restockQty" class="block font-semibold text-slate-700 mb-1">จำนวนที่รับเข้า <span class="text-red-500">*</span></label>
+                <input type="number" id="restockQty" min="1" value="10" aria-label="จำนวนที่รับเข้า" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-bold font-num focus:outline-none focus:border-blue-500">
+            </div>
+
+            <div>
+                <label for="restockStaff" class="block font-semibold text-slate-700 mb-1">เจ้าหน้าที่ผู้ตรวจรับ</label>
+                <input type="text" id="restockStaff" aria-label="เจ้าหน้าที่ผู้ตรวจรับ" value="นายอนันต์ (เจ้าหน้าที่พัสดุ - กลุ่มบริหารงานงบประมาณ)" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500">
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <button type="button" onclick="closeAddStockModal()" class="px-3.5 py-2 min-h-[40px] rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-medium">
+                ยกเลิก
+            </button>
+            <button type="button" onclick="submitRestock()" class="px-4 py-2 min-h-[40px] rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold">
+                บันทึกรับเข้าคลัง
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Year-End Closing Confirmation Modal (ปิดบัญชีพัสดุประจำปีงบ) -->
+<div id="closeFiscalYearModal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 hidden backdrop-blur-xs">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 flex flex-col gap-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-red-100 text-red-600 flex items-center justify-center font-bold text-lg">
+                    <i class="ph-bold ph-lock-key"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-800 text-base">ยืนยันการปิดบัญชีพัสดุประจำปีงบประมาณ</h3>
+                    <p class="text-[11px] text-slate-500">ดำเนินการตามระเบียบพัสดุภาครัฐ พ.ศ. 2560 หมวด 9</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeCloseFiscalYearModal()" aria-label="ปิดหน้าต่างปิดบัญชีพัสดุประจำปี" title="ปิดหน้าต่าง (Esc)" class="text-slate-500 hover:text-slate-700 min-w-[40px] min-h-[40px] flex items-center justify-center p-2 rounded-lg hover:bg-slate-100 transition">
+                <i class="ph ph-x text-lg"></i>
+            </button>
+        </div>
+
+        <div class="space-y-3 text-xs text-slate-600">
+            <div class="p-3.5 bg-amber-50 rounded-xl border border-amber-200 flex flex-col gap-1.5">
+                <div class="font-bold text-amber-900 flex items-center gap-1.5 text-xs">
+                    <i class="ph-fill ph-warning-circle text-amber-600 text-sm"></i>
+                    <span>กระบวนการปิดบัญชีประจำปีงบประมาณ พ.ศ. <span id="modalCloseCurrentYearText">2567</span></span>
+                </div>
+                <ul class="list-disc list-inside space-y-1 text-amber-900 text-[11px] pl-1">
+                    <li>ระบบจะทำการบันทึก <b>Snapshot ข้อมูล ณ วันที่ 30 กันยายน <span id="modalCloseDateText">2567</span></b> ไว้เป็นประวัติถาวร</li>
+                    <li>ยอดตรวจนับจริง (Physical Count) ทั้งหมด 100 รายการ จะถูกคัดลอกไปเป็น <b>"ยอดยกมาเริ่มต้น (Opening Balance) ณ วันที่ 1 ตุลาคม <span id="modalCloseNextYearText">2568</span>"</b> ของปีงบประมาณถัดไปโดยอัตโนมัติ</li>
+                    <li>ระบบจะสร้างและบันทึกรายงาน แบบ พ.ด. ๕, พ.ด. ๖, และ พ.ด. ๗ ประจำปีงบประมาณนี้</li>
+                </ul>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs">
+                <div>
+                    <span class="text-slate-400 block text-[11px]">ยอดคงเหลือยกไป 30 ก.ย.:</span>
+                    <span class="font-bold font-num text-slate-900 text-sm" id="modalCloseStockQty">3,980 หน่วย</span>
+                </div>
+                <div>
+                    <span class="text-slate-400 block text-[11px]">มูลค่ารวมยกไป 30 ก.ย.:</span>
+                    <span class="font-bold font-num text-emerald-700 text-sm" id="modalCloseStockVal">฿327,150.00</span>
+                </div>
+                <div>
+                    <span class="text-slate-400 block text-[11px]">ปีงบประมาณที่ปิด:</span>
+                    <span class="font-bold text-slate-900" id="modalCloseFromYear">พ.ศ. 2567</span>
+                </div>
+                <div>
+                    <span class="text-slate-400 block text-[11px]">ปีงบประมาณเริ่มต้นถัดไป:</span>
+                    <span class="font-bold text-blue-700" id="modalCloseToYear">พ.ศ. 2568 (1 ต.ค.)</span>
+                </div>
+            </div>
+
+            <div class="text-[11px] text-slate-500">
+                * เมื่อปิดบัญชีเสร็จสิ้น ระบบจะสลับหน้าจอไปยังปีงบประมาณถัดไป <b id="modalCloseNextYearDisplay">2568</b> พร้อมข้อมูลยอดยกมาเริ่มต้นให้อัตโนมัติ
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <button type="button" onclick="closeCloseFiscalYearModal()" class="px-3.5 py-2 min-h-[40px] rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-semibold">
+                ยกเลิก
+            </button>
+            <button type="button" onclick="confirmCloseFiscalYear()" class="px-4 py-2 min-h-[40px] rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold flex items-center gap-1.5 transition">
+                <i class="ph-bold ph-check"></i>
+                <span>ยืนยันปิดบัญชีพัสดุและยกยอด</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Google Sheets Integration Info Modal -->
+<div id="sheetsModal" class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4 hidden backdrop-blur-xs">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 flex flex-col gap-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">
+                    <i class="ph-fill ph-file-csv"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-800 text-sm sm:text-base">Google Sheets DB (HRT_Inventory_DB_2567)</h3>
+                    <p class="text-[11px] text-slate-400">โครงสร้าง Master_Items (100 รายการ) & Transactions</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeSheetsModal()" aria-label="ปิดหน้าต่าง Google Sheets" title="ปิดหน้าต่าง (Esc)" class="text-slate-500 hover:text-slate-700 min-w-[40px] min-h-[40px] flex items-center justify-center p-2 rounded-lg hover:bg-slate-100 transition">
+                <i class="ph ph-x text-lg"></i>
+            </button>
+        </div>
+
+        <div class="text-xs space-y-3 text-slate-600 leading-relaxed">
+            <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center justify-between">
+                <div>
+                    <span class="font-bold text-emerald-900 block text-xs">พร้อมใช้งานใน Google Drive</span>
+                    <span class="text-[11px] text-emerald-700">มี 2 เวิร์กชีต: Master_Items (100 รายการ) & Transactions</span>
+                </div>
+                <a href="https://script.new" target="_blank" class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-700 transition">
+                    เปิด Apps Script
+                </a>
+            </div>
+
+            <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 space-y-1 text-[11px] font-mono text-slate-600">
+                <div>• C:\Users\Art\.gemini\antigravity\scratch\Master_Items.csv</div>
+                <div>• C:\Users\Art\.gemini\antigravity\scratch\Transactions.csv</div>
+                <div>• C:\Users\Art\.gemini\antigravity\scratch\School_Inventory_DB_2567_AppsScript.js</div>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <button type="button" onclick="exportToCSV()" class="px-3.5 py-2 min-h-[40px] rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold">
+                ดาวน์โหลด CSV
+            </button>
+            <button type="button" onclick="closeSheetsModal()" class="px-3.5 py-2 min-h-[40px] rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-medium">
+                ปิดหน้าต่าง
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: เพิ่มเลขพัสดุ FSN -->
+<div id="addFsnModal" class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4 hidden backdrop-blur-xs">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-base">
+                    <i class="ph-fill ph-tag"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-800 text-sm sm:text-base">เพิ่มเลขพัสดุหลักตามระบบ FSN</h3>
+                    <p class="text-[11px] text-slate-400">ขึ้นทะเบียนรหัสพัสดุมาตรฐาน 13 หลัก พร้อมแนบเอกสารคุณลักษณะ (TOR PDF)</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeAddFsnModal()" aria-label="ปิดหน้าต่างเพิ่มเลขพัสดุ FSN" title="ปิดหน้าต่าง (Esc)" class="text-slate-500 hover:text-slate-700 min-w-[40px] min-h-[40px] flex items-center justify-center p-2 rounded-lg hover:bg-slate-100 transition">
+                <i class="ph ph-x text-lg"></i>
+            </button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+            <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                    <label for="modalFsnGroup" class="block font-semibold text-slate-700 mb-1">กลุ่มพัสดุ (Group 2 หลัก) <span class="text-red-500">*</span></label>
+                    <select id="modalFsnGroup" onchange="updateFsnClassOptions()" aria-label="กลุ่มพัสดุ FSN" class="w-full border border-slate-300 rounded-lg px-2.5 py-2 text-xs bg-white">
+                        <option value="75">75 - เครื่องเขียนและอุปกรณ์สำนักงาน</option>
+                        <option value="70">70 - อุปกรณ์ประมวลผลข้อมูลและไอที</option>
+                        <option value="78">78 - อุปกรณ์กีฬาและนันทนาการ</option>
+                        <option value="79">79 - อุปกรณ์และน้ำยาทำความสะอาด</option>
+                        <option value="65">65 - อุปกรณ์การแพทย์และเวชภัณฑ์</option>
+                        <option value="62">62 - โคมไฟฟ้าและหลอดไฟแสงสว่าง</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="modalFsnClass" class="block font-semibold text-slate-700 mb-1">ชั้นพัสดุ (Class 2 หลัก) <span class="text-red-500">*</span></label>
+                    <select id="modalFsnClass" onchange="generateModalFsnCode()" aria-label="ชั้นพัสดุ FSN" class="w-full border border-slate-300 rounded-lg px-2.5 py-2 text-xs bg-white">
+                        <!-- Injected by JS -->
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label for="modalFsnCode" class="block font-semibold text-slate-700 mb-1">รหัสพัสดุ FSN อัตโนมัติ (13 หลัก)</label>
+                <input type="text" id="modalFsnCode" readonly aria-label="รหัสพัสดุ FSN อัตโนมัติ" class="w-full border border-slate-200 bg-slate-50 text-blue-700 font-mono font-bold px-3 py-2 rounded-lg text-sm">
+            </div>
+
+            <div>
+                <label for="modalFsnName" class="block font-semibold text-slate-700 mb-1">ชื่อรายการพัสดุมาตรฐานตามระบบ FSN <span class="text-red-500">*</span></label>
+                <input type="text" id="modalFsnName" placeholder="เช่น กระดาษถ่ายเอกสาร A4 80 แกรม" aria-label="ชื่อรายการพัสดุมาตรฐานตามระบบ FSN" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs">
+            </div>
+
+            <div>
+                <label for="modalFsnLinkedItem" class="block font-semibold text-slate-700 mb-1">เชื่อมโยงกับพัสดุในคลัง (Master Item)</label>
+                <select id="modalFsnLinkedItem" aria-label="เชื่อมโยงกับพัสดุในคลัง" class="w-full border border-slate-300 rounded-lg px-2.5 py-2 text-xs bg-white">
+                    <option value="">-- ไม่เชื่อมโยง (กำหนดภายหลัง) --</option>
+                </select>
+            </div>
+
+            <!-- PDF Attachment Area -->
+            <div>
+                <label class="block font-semibold text-slate-700 mb-1">แนบไฟล์คุณลักษณะเฉพาะ (Specification / TOR PDF)</label>
+                <div id="pdfDropZone" onclick="document.getElementById('filePdfInput').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); document.getElementById('filePdfInput').click();}" aria-label="คลิกเพื่อเลือกไฟล์ PDF หรือลากไฟล์มาวาง" class="border-2 border-dashed border-slate-300 hover:border-blue-400 rounded-xl p-4 text-center cursor-pointer bg-slate-50/60 transition flex flex-col items-center justify-center gap-1">
+                    <input type="file" id="filePdfInput" accept=".pdf" aria-label="แนบไฟล์คุณลักษณะเฉพาะ PDF" class="hidden" onchange="handleFileSelect(event)">
+                    <i class="ph-fill ph-file-pdf text-2xl text-red-500"></i>
+                    <span class="font-medium text-slate-700 text-xs">คลิกเพื่อเลือกไฟล์ หรือลากไฟล์ .PDF มาวางที่นี่</span>
+                    <span class="text-[10px] text-slate-400">รองรับเอกสาร TOR, สเปกสินค้า (ขนาดไม่เกิน 10MB)</span>
+                </div>
+                <!-- Selected PDF badge -->
+                <div id="pdfSelectedBadge" class="hidden mt-2 p-2 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-xs text-emerald-800">
+                        <i class="ph-fill ph-check-circle text-emerald-600"></i>
+                        <span id="pdfFileName" class="font-medium">filename.pdf</span>
+                        <span id="pdfFileSize" class="text-[10px] text-emerald-600"></span>
+                    </div>
+                    <button type="button" onclick="removeSelectedPdf(event)" aria-label="ลบไฟล์ PDF ที่เลือก" class="text-red-500 hover:text-red-700 text-xs font-bold p-1">
+                        ลบ
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <button type="button" onclick="closeAddFsnModal()" class="px-3.5 py-2 min-h-[40px] rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-medium">
+                ยกเลิก
+            </button>
+            <button type="button" onclick="submitNewFsn()" class="px-4 py-2 min-h-[40px] rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold">
+                บันทึกรหัส FSN
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- PDF Viewer Modal (In-App Document Reader) -->
+<div id="pdfViewerModal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-3 sm:p-5 hidden backdrop-blur-xs">
+    <div class="bg-white rounded-2xl max-w-2xl w-full h-[85vh] shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
+        <div class="p-3.5 bg-slate-900 text-white flex items-center justify-between flex-shrink-0">
+            <div class="flex items-center gap-2 text-xs">
+                <i class="ph-fill ph-file-pdf text-red-400 text-lg"></i>
+                <span id="pvTitle" class="font-bold truncate max-w-sm">เอกสารคุณลักษณะเฉพาะ</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="downloadSimulatedPdf()" aria-label="ดาวน์โหลดเอกสาร PDF" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 min-h-[36px] rounded text-xs font-semibold flex items-center gap-1 transition">
+                    <i class="ph-bold ph-download-simple"></i>
+                    <span>ดาวน์โหลด</span>
+                </button>
+                <button type="button" onclick="closePdfViewer()" aria-label="ปิดหน้าต่างแสดงตัวอย่างเอกสาร PDF" title="ปิดหน้าต่าง (Esc)" class="text-slate-400 hover:text-white min-w-[40px] min-h-[40px] flex items-center justify-center p-2 rounded-lg hover:bg-slate-800 transition">
+                    <i class="ph ph-x text-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Simulated PDF Page Display -->
+        <div class="flex-1 overflow-y-auto p-6 bg-slate-100 flex justify-center">
+            <div class="bg-white w-full max-w-xl p-6 rounded-lg border border-slate-200 text-xs space-y-4 text-slate-700">
+                <div class="text-center border-b border-slate-200 pb-3">
+                    <div class="font-bold text-slate-900 text-sm">เอกสารคุณลักษณะเฉพาะพัสดุ (Specification Sheet)</div>
+                    <div class="text-xs text-slate-500">โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี) • กลุ่มบริหารงานงบประมาณ</div>
+                    <div class="font-mono text-xs text-blue-700 font-bold mt-1" id="pvFsnCode">7510-00-582-4112</div>
+                </div>
+                <div class="space-y-2">
+                    <div><b>ชื่อรายการมาตรฐาน:</b> <span id="pvDocName">-</span></div>
+                    <div><b>คุณลักษณะเฉพาะ:</b> <span id="pvDocSpec">-</span></div>
+                    <div><b>พัสดุในคลังที่เชื่อมโยง:</b> <span id="pvDocItem">-</span></div>
+                    <div><b>ไฟล์เอกสารแนบ:</b> <span id="pvDocFile" class="font-mono text-blue-600">-</span></div>
+                </div>
+                <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg text-[11px] text-slate-500">
+                    เอกสารนี้ได้รับการขึ้นทะเบียนในระบบจัดซื้อจัดจ้างภาครัฐ (e-GP) และผ่านการรับรองความถูกต้องโดยงานพัสดุ กลุ่มบริหารงานงบประมาณ
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Import Data Modal (นำเข้าข้อมูลพัสดุเริ่มต้นใช้งาน) -->
+<div id="importDataModal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-3 sm:p-5 hidden backdrop-blur-xs">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-lg">
+                    <i class="ph-fill ph-file-arrow-up"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-800 text-base">นำเข้าข้อมูลพัสดุ (Import Inventory CSV)</h3>
+                    <p class="text-[11px] text-slate-400">นำเข้าไฟล์ Master_Items.csv เพื่อเริ่มต้นใช้งานระบบจริง</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeImportModal()" aria-label="ปิดหน้าต่างนำเข้าข้อมูล" title="ปิดหน้าต่าง (Esc)" class="text-slate-500 hover:text-slate-700 min-w-[40px] min-h-[40px] flex items-center justify-center p-2 rounded-lg hover:bg-slate-100 transition">
+                <i class="ph ph-x text-lg"></i>
+            </button>
+        </div>
+
+        <div class="space-y-4 text-xs text-slate-600">
+            <!-- Dropzone for CSV -->
+            <div>
+                <label class="block font-semibold text-slate-700 mb-1">เลือกไฟล์ข้อมูล CSV (UTF-8) <span class="text-red-500">*</span></label>
+                <div id="csvDropZone" onclick="document.getElementById('fileCsvInput').click()" ondragover="handleCsvDragOver(event)" ondragleave="handleCsvDragLeave(event)" ondrop="handleCsvDrop(event)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); document.getElementById('fileCsvInput').click();}" aria-label="คลิกเลือกไฟล์ CSV หรือลากไฟล์มาวางที่นี่" class="border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-xl p-5 text-center cursor-pointer bg-slate-50/60 transition flex flex-col items-center justify-center gap-1.5">
+                    <input type="file" id="fileCsvInput" accept=".csv" aria-label="เลือกไฟล์ CSV สำหรับนำเข้าข้อมูล" class="hidden" onchange="handleCsvFileSelect(event)">
+                    <i class="ph-fill ph-file-csv text-3xl text-emerald-600"></i>
+                    <span class="font-semibold text-slate-800 text-sm">คลิกเลือกไฟล์ CSV หรือลากไฟล์มาวางที่นี่</span>
+                    <span class="text-[11px] text-slate-400">รองรับไฟล์ CSV มาตรฐาน (UTF-8 with BOM หรือ Plain UTF-8)</span>
+                </div>
+                <!-- Selected File Info -->
+                <div id="csvSelectedBadge" class="hidden mt-2 p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-xs text-emerald-900">
+                        <i class="ph-fill ph-check-circle text-emerald-600 text-base"></i>
+                        <div>
+                            <span id="csvFileName" class="font-bold">Master_Items.csv</span>
+                            <span id="csvFileStats" class="text-slate-500 text-[11px] ml-1.5">(100 รายการ)</span>
+                        </div>
+                    </div>
+                    <button type="button" onclick="removeSelectedCsv(event)" aria-label="ลบไฟล์ CSV ที่เลือก" class="text-red-500 hover:text-red-700 text-xs font-bold p-1">
+                        ลบ
+                    </button>
+                </div>
+            </div>
+
+            <!-- Import Mode Selection -->
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                <span class="font-bold text-slate-700 block">รูปแบบการนำเข้าข้อมูล:</span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-300 bg-white cursor-pointer hover:border-blue-400">
+                        <input type="radio" name="importMode" value="replace" checked aria-label="แทนที่ข้อมูลเดิมทั้งหมด" class="mt-0.5 text-blue-600">
+                        <div>
+                            <span class="font-bold text-slate-800 block text-xs">แทนที่ข้อมูลทั้งหมด (Overwrite)</span>
+                            <span class="text-[10.5px] text-slate-500">ล้างฐานข้อมูลเดิมแล้วใส่ข้อมูลจากไฟล์ทั้งหมด (เหมาะสำหรับการเริ่มต้นระบบใหม่)</span>
+                        </div>
+                    </label>
+                    <label class="flex items-start gap-2 p-2 rounded-lg border border-slate-300 bg-white cursor-pointer hover:border-blue-400">
+                        <input type="radio" name="importMode" value="merge" aria-label="อัปเดตและเพิ่มรายการ" class="mt-0.5 text-blue-600">
+                        <div>
+                            <span class="font-bold text-slate-800 block text-xs">อัปเดตและเพิ่มรายการ (Merge)</span>
+                            <span class="text-[10.5px] text-slate-500">เพิ่มรายการใหม่ หรืออัปเดตข้อมูลหากมีรหัสพัสดุซ้ำเดิม</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Data Preview Table (First 5 rows) -->
+            <div id="csvPreviewSection" class="hidden space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-slate-800 text-xs">ตัวอย่างข้อมูล 5 รายการแรก:</span>
+                    <span id="csvRowCountBadge" class="text-xs font-mono font-bold text-blue-700"></span>
+                </div>
+                <div class="overflow-x-auto border border-slate-200 rounded-lg max-h-48">
+                    <table class="w-full text-left text-[11px]">
+                        <thead class="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200 sticky top-0">
+                            <tr>
+                                <th class="py-1.5 px-2">รหัส</th>
+                                <th class="py-1.5 px-3">ชื่อรายการ</th>
+                                <th class="py-1.5 px-2">หมวดหมู่</th>
+                                <th class="py-1.5 px-2">หน่วย</th>
+                                <th class="py-1.5 px-2">สถานที่จัดเก็บ</th>
+                                <th class="py-1.5 px-2 text-right">ราคา/หน่วย</th>
+                                <th class="py-1.5 px-2 text-right">คงเหลือ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="csvPreviewBody" class="divide-y divide-slate-100">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+            <button type="button" onclick="exportDatabaseTemplate()" class="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1 min-h-[38px]" aria-label="ดาวน์โหลดไฟล์เทมเพลตต้นแบบ CSV" title="ดาวน์โหลดเทมเพลต (.CSV)">
+                <i class="ph-bold ph-download-simple"></i>
+                <span>ดาวน์โหลดเทมเพลตต้นแบบ (.CSV)</span>
+            </button>
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="closeImportModal()" class="px-3.5 py-2 min-h-[38px] rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-semibold cursor-pointer">
+                    ยกเลิก
+                </button>
+                <button type="button" id="btnConfirmImport" disabled onclick="confirmImportData()" class="px-4 py-2 min-h-[38px] rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer">
+                    <i class="ph-bold ph-check"></i>
+                    <span>ยืนยันนำเข้าข้อมูลสู่ระบบ</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

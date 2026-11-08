@@ -1,0 +1,134 @@
+[
+  {
+    "case_id": "LS-01",
+    "name": "Database Identity & Schema Integrity Binding",
+    "related_acceptance_ids": ["TX-01", "P8-01"],
+    "expected": "configuredId in Script Properties strictly equals SpreadsheetApp.openById(configuredId).getId(); all 16 canonical sheets present with correct headers",
+    "actual": "In Unit/AST: PASS (Verified in tests/p8_backend_sheets_architecture_test.js). In Live Staging: BLOCKED (BLK-DB-LIVE / No isolated staging spreadsheet ID provided)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "BLK-DB-LIVE",
+    "unitTestRef": "tests/p8_backend_sheets_architecture_test.js"
+  },
+  {
+    "case_id": "LS-02",
+    "name": "Inaccessible / Missing Database Fail-Closed",
+    "related_acceptance_ids": ["REL-04"],
+    "expected": "Missing or inaccessible spreadsheet ID throws structured DATABASE_ACCESS_ERROR; zero writes to fallback or active spreadsheet",
+    "actual": "In Unit/AST: PASS (Config.gs getSS() throws DATABASE_ACCESS_ERROR). In Live Staging: BLOCKED (BLK-DB-LIVE)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "BLK-DB-LIVE",
+    "unitTestRef": "tests/release_consolidation_test.js: REL-04"
+  },
+  {
+    "case_id": "LS-03",
+    "name": "Read-Only Health Check & Latency Measurement",
+    "related_acceptance_ids": ["SET-07", "SET-08"],
+    "expected": "Health check measures real API latency and reports read/schema health; write status remains NOT_TESTED until write suite runs",
+    "actual": "In Unit/AST: PASS (Measured latency reported in apiGetSystemDiagnostics). In Live Staging: BLOCKED (BLK-DB-LIVE)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "BLK-DB-LIVE",
+    "unitTestRef": "tests/settings_diagnostics_backup_test.js"
+  },
+  {
+    "case_id": "LS-04",
+    "name": "Role-Scoped Catalog, Fiscal Year & Requisition Read",
+    "related_acceptance_ids": ["RPC-01", "RPC-02"],
+    "expected": "Reads master items, current fiscal year, and requisitions filtered strictly by caller role without falling back to mock fixtures",
+    "actual": "In Unit/AST: PASS (Read.gs enforces requester isolation and role filtering). In Live Staging: BLOCKED (BLK-DB-LIVE)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "BLK-DB-LIVE",
+    "unitTestRef": "tests/rpc_contract_test.js"
+  },
+  {
+    "case_id": "LS-05",
+    "name": "Stock Receive Transaction & Multi-Sheet Propagation",
+    "related_acceptance_ids": ["TX-02", "TX-03", "TX-13"],
+    "expected": "Receiving 10 units of fixture item writes to 09_Stock_Transactions, updates 10_Stock_Ledger, updates 03_Master_Items, and records in 11_Audit_Trail",
+    "actual": "In Unit/AST: PASS (ACID propagation and balance journal verified). In Live Staging: BLOCKED (BLK-DB-LIVE)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "BLK-DB-LIVE",
+    "unitTestRef": "tests/stock_transaction_idempotency_test.js: TX-02, TX-03"
+  },
+  {
+    "case_id": "LS-06",
+    "name": "Full Requisition Lifecycle (3 units) & Inventory Balance",
+    "related_acceptance_ids": ["TX-04", "TX-05", "TX-06"],
+    "expected": "Create req (3 units) -> review -> approve -> issue (stock -3, balance 7) -> receive; second receive rejected (no double-issuance)",
+    "actual": "In Unit/AST: PASS (Complete 5-state lifecycle verified; stock deducted only at ISSUED). In Live Staging: BLOCKED (BLK-DB-LIVE)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "BLK-DB-LIVE",
+    "unitTestRef": "tests/stock_transaction_idempotency_test.js: TX-04, TX-05, TX-06"
+  },
+  {
+    "case_id": "LS-07",
+    "name": "Idempotency Key Enforcement on Stock Actions",
+    "related_acceptance_ids": ["TX-09", "TX-10"],
+    "expected": "Retry with exact same idempotencyKey returns original cached response; retry with same key but altered payload rejected with IDEMPOTENCY_CONFLICT",
+    "actual": "In Unit/AST: PASS (16_Idempotency_Log enforces replay cache and payload hash verification). In Live Staging: BLOCKED (BLK-DB-LIVE)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "BLK-DB-LIVE",
+    "unitTestRef": "tests/stock_transaction_idempotency_test.js: TX-09, TX-10"
+  },
+  {
+    "case_id": "LS-08",
+    "name": "Non-Admin Mutation Rejection & Requester Isolation",
+    "related_acceptance_ids": ["RPC-06", "SEC-04"],
+    "expected": "Teacher attempting to mutate settings/users or view another teacher's requisition is rejected with FORBIDDEN",
+    "actual": "In Unit/AST: PASS (Enforced in ApiRouter and ReadService). In Live Staging: BLOCKED (BLK-DB-LIVE)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "BLK-DB-LIVE",
+    "unitTestRef": "tests/security_surface_test.js: SEC-04"
+  },
+  {
+    "case_id": "LS-09",
+    "name": "Settings Precision & Optimistic Locking",
+    "related_acceptance_ids": ["SET-01", "SET-02", "SET-03"],
+    "expected": "Saving 0, false, and empty string preserves exact types; version mismatch rejected with OPTIMISTIC_LOCK_CONFLICT",
+    "actual": "In Unit/AST: PASS (15_Settings_Config preserves data types; expectedRevisionId strictly checked). In Live Staging: BLOCKED (BLK-DB-LIVE)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "BLK-DB-LIVE",
+    "unitTestRef": "tests/p7_settings_comprehensive_test.js, tests/settings_diagnostics_backup_test.js"
+  },
+  {
+    "case_id": "LS-10",
+    "name": "Validation Guardrails: Fiscal Year & Stock Limits",
+    "related_acceptance_ids": ["FY-02", "TX-07"],
+    "expected": "Mutations against closed fiscal year, zero/negative quantities, or quantities exceeding available stock fail closed with zero partial writes",
+    "actual": "In Unit/AST: PASS (Transactional rollback and atomic pre-checks verified). In Live Staging: BLOCKED (BLK-DB-LIVE)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "BLK-DB-LIVE",
+    "unitTestRef": "tests/fiscal_year_official_reports_test.js: FY-02, tests/stock_transaction_idempotency_test.js: TX-07"
+  },
+  {
+    "case_id": "LS-11",
+    "name": "Cryptographic Audit Hash Chaining Verification",
+    "related_acceptance_ids": ["TX-14", "TX-15", "REL-10"],
+    "expected": "All mutations produce SHA-256 hash chaining (hash = SHA256(prevHash + timestamp + action + actor + reqId)); chain verification reports ZERO tampering",
+    "actual": "In Unit/AST: PASS (Audit.gs verifyAuditTrail_ verifies entire cryptographic hash chain). In Live Staging: BLOCKED (BLK-DB-LIVE)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "BLK-DB-LIVE",
+    "unitTestRef": "tests/stock_transaction_idempotency_test.js: TX-14, TX-15"
+  },
+  {
+    "case_id": "LS-12",
+    "name": "Server-Side Before/After Row Count & Balance Verification",
+    "related_acceptance_ids": ["TX-11", "TX-12"],
+    "expected": "Mutation suites capture pre-test and post-test row counts and balances by re-reading directly from Sheets, not from client cache",
+    "actual": "In Unit/AST: PASS (Direct sheet reader verifies row delta). In Live Staging: BLOCKED (BLK-DB-LIVE)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "BLK-DB-LIVE",
+    "unitTestRef": "tests/stock_transaction_idempotency_test.js: TX-11, TX-12"
+  }
+]

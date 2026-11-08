@@ -1,18 +1,66 @@
-﻿# Operating System Files
+# Operating System Files
 Thumbs.db
 Desktop.ini
 .DS_Store
 
-# Dependencies & Build
+# Version Control
+.git/
+
+# Dependencies & Environments
 node_modules/
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Build outputs & caches
 dist/
 build/
+.next/
+.nuxt/
+coverage/
+.cache/
+exports/
+
+# Archives & Handover Packages (Manage as GitHub Release Artifacts)
+*.zip
+*.rar
+backups/
+releases/
+scratch/
+HRT_Inventory_v2.7.0-rc.6_Runtime/
+
+# Apps Script Credentials & Deploy Configs
+.clasp.json
+.clasprc.json
+
+# Logs & Temporary files
 *.log
+*.tmp
+temp_check/
+.system_generated/
 
-# Environment variables
+# Environment variables & local secrets
 .env
-.env.local
+.env.*
+!.env.example
 
-# IDE
+# IDE & Editor Files
 .vscode/
 .idea/
+*.swp
+*.swo
+
+# Internal Scratch & Working Notes
+AUDIT_REPORT.md
+docs_task_prompt.txt
+Notebook.MD
+baseline.txt
+baseline_report.md
+
+# Local snapshot backups
+*_v2.7.0-rc.*
+
+# Unrelated local scratch projects
+student_care_system/
+

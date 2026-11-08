@@ -1,0 +1,18 @@
+Step_ID,Step_Name,Actor,UI_Action,Backend_RPC,Source_Sheet,State_Change,Stock_Impact,Audit_Logged,Error_Handling
+STEP-01,User Authentication,Teacher / Staff,Open MiniUI Web App URL,apiGetCurrentUser,01_Users,CHECKING -> AUTHENTICATED,NONE,NO,ACCESS_DENIED if inactive/suspended; renders clear contact Admin guidance
+STEP-02,Catalog Initialization,Teacher / Staff,Auto-load on login,apiGetItems,03_Master_Items,Items cached in state.items,NONE,NO,Fallback to empty catalog with retry button
+STEP-03,Camera QR Item Scan,Teacher / Staff,Point mobile camera to item QR,apiResolveQr,14_QR_Registry + 03_Master_Items,Opens product modal,NONE,NO,If revoked returns QR_REVOKED; camera failure shows permission guidance
+STEP-04,Manual Code Search,Teacher / Staff,Input code in scanner modal,handleManualItemSearch,state.items (loaded),Opens product modal with [ค้นหาด้วยรหัส],NONE,NO,Warn toast if code not found in inventory
+STEP-05,Warehouse QR Scan,Teacher / Staff,Scan room/warehouse QR,apiResolveQr,14_QR_Registry + 05_Warehouses,Filters catalog to selected warehouse,NONE,NO,Toast error if warehouse ID unmapped or revoked
+STEP-06,Requisition Tracking Scan,Teacher / Staff,Scan requisition QR,apiResolveQr,14_QR_Registry + 07_Requisitions,Opens request detail modal,NONE,NO,ACCESS_DENIED if requisition belongs to another user
+STEP-07,Catalog QR Scan,Teacher / Staff,Scan institution catalog QR,apiResolveQr,None (Routing),Resets filters and opens full catalog,NONE,NO,Toast notification confirming catalog view
+STEP-08,Add Product to Cart,Teacher / Staff,Click Add in product modal,Local (saveDraft),None,Cart state updated; scoped draft saved,NONE,NO,Validation blocks non-integers, decimals, and negative quantities
+STEP-09,Cart Quantity Adjust,Teacher / Staff,Click + or - in cart view,Local (saveDraft),None,Quantity updated; auto-persisted,NONE,NO,Capped at available stock; removal on decrement below 1
+STEP-10,Submit Requisition,Teacher / Staff,Click Confirm in cart,apiCreateRequisition,07_Requisitions + 08_Requisition_Items,Requisition created with SUBMITTED status,NONE (Decoupled),YES,Idempotency key prevents double submit; timeout retains cart under UNKNOWN_OUTCOME
+STEP-11,View My Requests,Teacher / Staff,Navigate to requests tab,apiGetRequisitions,07_Requisitions,Populates user's personal requests list,NONE,NO,Server RBAC filters strictly to caller's own requisitions
+STEP-12,View Requisition Detail,Teacher / Staff,Click requisition card,apiGetRequisitionDetail,07_Requisitions + 08_Requisition_Items,Opens detail modal with full DTO fields,NONE,NO,Missing fields display 'ไม่ระบุ'; access to others blocked
+STEP-13,Cancel Own Requisition,Teacher / Staff,Click Cancel in detail modal,apiCancelRequisition,07_Requisitions,Status updated to CANCELLED,NONE,YES,Only allowed while in SUBMITTED or DRAFT state
+STEP-14,Central Review & Approval,Officer / Approver,Review in Central Desktop,apiReviewRequisition & apiApproveRequisition,07_Requisitions,Status: REVIEWED -> APPROVED,NONE,YES,Self-approval strictly forbidden by server RBAC
+STEP-15,Central Stock Issuance,Officer,Issue in Central Desktop,apiIssueRequisition,03_Master_Items + 09_Stock_Transactions + 10_Stock_Ledger,Status: APPROVED -> ISSUED,DEDUCTED ONCE,YES,Strict lock prevents concurrency race; partial issue rejected
+STEP-16,MiniUI Confirm Receipt,Teacher / Staff,Click Confirm Receipt in MiniUI,apiConfirmReceipt,07_Requisitions,Status: ISSUED -> RECEIVED,NONE (No Double Deduction),YES,Only allowed on ISSUED status; ownership verified
+STEP-17,Sign Out & Session Teardown,Teacher / Staff,Click Sign Out in Account tab,signOut,None,SIGNED_OUT; clears cart/user/DOM/draft,NONE,NO,Stops active camera tracks and purges scoped localStorage

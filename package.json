@@ -1,0 +1,22 @@
+{
+  "name": "hrt-school-inventory-management-system",
+  "version": "2.7.0-rc.6",
+  "description": "HRT School Inventory Management System for Horathep School (Saraburi Provincial Administrative Organization)",
+  "private": true,
+  "scripts": {
+    "test": "node tests/release_consolidation_test.js && node tests/stock_transaction_idempotency_test.js && node tests/auth_rbac_test.js && node tests/rpc_contract_test.js && node tests/stock_issuance_fix_test.js",
+    "test:release": "node tests/release_consolidation_test.js",
+    "test:idempotency": "node tests/stock_transaction_idempotency_test.js",
+    "test:auth": "node tests/auth_rbac_test.js",
+    "test:rpc": "node tests/rpc_contract_test.js",
+    "test:issuance": "node tests/stock_issuance_fix_test.js"
+  },
+  "keywords": [
+    "apps-script",
+    "school-inventory",
+    "google-sheets",
+    "thai-government-procurement"
+  ],
+  "author": "Horathep School",
+  "license": "UNLICENSED"
+}

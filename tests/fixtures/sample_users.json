@@ -1,0 +1,52 @@
+[
+  {
+    "id": "USR-001",
+    "email": "wichan.k@hrt.ac.th",
+    "name": "นายวิชาญ เกียรติไพบูลย์",
+    "role": "ADMIN",
+    "roleTitle": "ผู้ดูแลระบบสารสนเทศ",
+    "department": "กลุ่มงานเทคโนโลยีสารสนเทศ",
+    "status": "ACTIVE",
+    "permissions": ["ALL"]
+  },
+  {
+    "id": "USR-002",
+    "email": "somsak.r@hrt.ac.th",
+    "name": "นายสมศักดิ์ รุ่งเรือง",
+    "role": "DIRECTOR",
+    "roleTitle": "ผู้อำนวยการโรงเรียน",
+    "department": "ฝ่ายบริหารสถานศึกษา",
+    "status": "ACTIVE",
+    "permissions": ["VIEW_INVENTORY", "VIEW_ALL_REQUISITIONS", "APPROVE_REQUISITION", "REJECT_REQUISITION", "VIEW_AUDIT_LOG"]
+  },
+  {
+    "id": "USR-003",
+    "email": "anant.m@hrt.ac.th",
+    "name": "นายอนันต์ มั่นคง",
+    "role": "OFFICER",
+    "roleTitle": "เจ้าหน้าที่พัสดุ",
+    "department": "กลุ่มบริหารงานงบประมาณและพัสดุ",
+    "status": "ACTIVE",
+    "permissions": ["VIEW_INVENTORY", "MANAGE_ITEMS", "VIEW_ALL_REQUISITIONS", "REVIEW_REQUISITION", "ISSUE_STOCK", "RECEIVE_STOCK", "ADJUST_STOCK", "YEAR_END_AUDIT", "MANAGE_QR", "IMPORT_ITEMS", "VIEW_AUDIT_LOG"]
+  },
+  {
+    "id": "USR-004",
+    "email": "kanya.s@hrt.ac.th",
+    "name": "นางกัญญา สร้อยสว่าง",
+    "role": "REQUESTER",
+    "roleTitle": "ครูกลุ่มสาระฯ ภาษาไทย",
+    "department": "กลุ่มสาระการเรียนรู้ภาษาไทย",
+    "status": "ACTIVE",
+    "permissions": ["VIEW_INVENTORY", "CREATE_REQUISITION", "VIEW_OWN_REQUISITIONS", "CANCEL_OWN_REQUISITION"]
+  },
+  {
+    "id": "USR-005",
+    "email": "somchai.d@hrt.ac.th",
+    "name": "นายสมชาย เด่นดวง",
+    "role": "REQUESTER",
+    "roleTitle": "ครูศูนย์คอมพิวเตอร์",
+    "department": "ศูนย์คอมพิวเตอร์และเทคโนโลยี",
+    "status": "ACTIVE",
+    "permissions": ["VIEW_INVENTORY", "CREATE_REQUISITION", "VIEW_OWN_REQUISITIONS", "CANCEL_OWN_REQUISITION"]
+  }
+]

@@ -1,0 +1,156 @@
+[
+  {
+    "case_id": "LA-01",
+    "name": "ACTIVE ADMIN via staging /exec",
+    "related_acceptance_ids": ["AUTH-01", "AUTH-04", "REL-01"],
+    "expected": "User with ADMIN role in 01_Users logs in; overlay disappears; server returns full admin permissions, Settings, and User Management",
+    "actual": "In Unit/AST: PASS (Full permissions attached). In Live Staging: BLOCKED (TEST_ACCESS_MISSING / No live staging deployment URL or admin Google account provided)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "TEST_ACCESS_MISSING",
+    "unitTestRef": "tests/auth_rbac_test.js: AUTH-04, AUTH-06"
+  },
+  {
+    "case_id": "LA-02",
+    "name": "ACTIVE TEACHER/REQUESTER via staging /exec",
+    "related_acceptance_ids": ["AUTH-04", "RPC-06"],
+    "expected": "User with TEACHER/REQUESTER role logs in; menu and actions restricted strictly to personal requisitions and catalog view; admin routes hidden",
+    "actual": "In Unit/AST: PASS (Role restricted). In Live Staging: BLOCKED (TEST_ACCESS_MISSING / No live staging account provided)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "TEST_ACCESS_MISSING",
+    "unitTestRef": "tests/auth_rbac_test.js: AUTH-04"
+  },
+  {
+    "case_id": "LA-03",
+    "name": "OFFICER/APPROVER/DIRECTOR specific role verification",
+    "related_acceptance_ids": ["AUTH-04"],
+    "expected": "OFFICER gets stock issuance and management without admin settings; APPROVER/DIRECTOR gets approval workflow without stock mutation; no role collapse",
+    "actual": "In Unit/AST: PASS (Discrete permissions mapped per role in CONFIG.ROLE_PERMISSIONS). In Live Staging: BLOCKED (TEST_ACCESS_MISSING)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "TEST_ACCESS_MISSING",
+    "unitTestRef": "tests/auth_rbac_test.js: AUTH-04"
+  },
+  {
+    "case_id": "LA-04",
+    "name": "Google account authenticated but not in 01_Users",
+    "related_acceptance_ids": ["AUTH-03"],
+    "expected": "Server rejects request with UNREGISTERED_USER; UI displays access denied state; zero catalog or inventory data loaded",
+    "actual": "In Unit/AST: PASS (Throws UNREGISTERED_USER fail-closed). In Live Staging: BLOCKED (TEST_ACCESS_MISSING)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "TEST_ACCESS_MISSING",
+    "unitTestRef": "tests/auth_rbac_test.js: AUTH-03"
+  },
+  {
+    "case_id": "LA-05",
+    "name": "Account SUSPENDED/INACTIVE or blank status",
+    "related_acceptance_ids": ["AUTH-03"],
+    "expected": "Account with status SUSPENDED, INACTIVE, or blank in 01_Users is rejected with USER_SUSPENDED/USER_INACTIVE; no fallback to ACTIVE",
+    "actual": "In Unit/AST: PASS (Explicitly checks status === 'ACTIVE', throws USER_SUSPENDED). In Live Staging: BLOCKED (TEST_ACCESS_MISSING)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "TEST_ACCESS_MISSING",
+    "unitTestRef": "tests/auth_rbac_test.js: AUTH-03"
+  },
+  {
+    "case_id": "LA-06",
+    "name": "Google Session email empty handling",
+    "related_acceptance_ids": ["AUTH-01", "AUTH-02"],
+    "expected": "Session.getActiveUser().getEmail() returning empty string throws UNAUTHORIZED; does NOT fallback to getEffectiveUser() deployer or ADMIN",
+    "actual": "In Unit/AST: PASS (Api.gs:327 strictly rejects blank email with UNAUTHORIZED). In Live Staging: BLOCKED (TEST_ACCESS_MISSING)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "TEST_ACCESS_MISSING",
+    "unitTestRef": "tests/auth_rbac_test.js: AUTH-01, AUTH-02"
+  },
+  {
+    "case_id": "LA-07",
+    "name": "Invalid/expired/wrong-audience token rejection in token path",
+    "related_acceptance_ids": ["AUTH-02"],
+    "expected": "When token path is evaluated, tokens with invalid signatures, expired exp, or wrong aud are rejected with UNAUTHORIZED/null before protected action",
+    "actual": "In Unit/AST: PASS (Api.gs verifyGoogleIdToken validates iss, exp, aud, and email_verified). In Live Staging: BLOCKED (Frontend GIS not implemented)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "CODE-BLK-GIS-FRONTEND",
+    "unitTestRef": "tests/auth_rbac_test.js: AUTH-02"
+  },
+  {
+    "case_id": "LA-08",
+    "name": "Anti-Spoofing: Client payload identity override",
+    "related_acceptance_ids": ["AUTH-05", "SEC-03"],
+    "expected": "Client sending caller, _serverActor, userRole in payload has no effect; server strips overrides and binds to authoritative user from directory",
+    "actual": "In Unit/AST: PASS (Code.gs and Api.gs delete client-supplied spoofing properties). In Live Staging: BLOCKED (TEST_ACCESS_MISSING)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "TEST_ACCESS_MISSING",
+    "unitTestRef": "tests/auth_rbac_test.js: AUTH-05"
+  },
+  {
+    "case_id": "LA-09",
+    "name": "Session purge on logout / refresh / switch",
+    "related_acceptance_ids": ["AUTH-10", "MINI-07"],
+    "expected": "Signout purges sessionStorage, window.currentUser, memory datasets (allData, filteredData), and empties DOM tables immediately",
+    "actual": "In Unit/AST: PASS (Verified in index.html executeGoogleSignOut and MiniUI.html signOut). In Live Staging: BLOCKED (TEST_ACCESS_MISSING)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "TEST_ACCESS_MISSING",
+    "unitTestRef": "tests/auth_rbac_test.js: AUTH-10"
+  },
+  {
+    "case_id": "LA-10",
+    "name": "Immediate role change and suspend cache invalidation",
+    "related_acceptance_ids": ["AUTH-08"],
+    "expected": "Admin modifying user role or setting SUSPENDED in 01_Users invalidates cache; subsequent request enforces new role immediately",
+    "actual": "In Unit/AST: PASS (CacheService and in-memory cache evicted on user mutation). In Live Staging: BLOCKED (TEST_ACCESS_MISSING)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "TEST_ACCESS_MISSING",
+    "unitTestRef": "tests/auth_rbac_test.js: AUTH-08"
+  },
+  {
+    "case_id": "LA-11",
+    "name": "Institutional domain vs External Gmail policy",
+    "related_acceptance_ids": ["AUTH-09"],
+    "expected": "Allowed institutional domain accounts pass if in 01_Users; unlisted external Gmail accounts denied with FORBIDDEN_DOMAIN; listed Gmail accounts accepted",
+    "actual": "In Unit/AST: PASS (Api.gs:390-396 enforced). In Live Staging: BLOCKED (TEST_ACCESS_MISSING)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "TEST_ACCESS_MISSING",
+    "unitTestRef": "tests/auth_rbac_test.js: AUTH-09"
+  },
+  {
+    "case_id": "LA-12",
+    "name": "Non-admin calling Admin RPC routes denied",
+    "related_acceptance_ids": ["RPC-06", "AUTH-04"],
+    "expected": "Non-admin accounts attempting to call apiSaveUser, apiSaveSettings, apiCloseFiscalYear rejected with FORBIDDEN",
+    "actual": "In Unit/AST: PASS (Enforced in ApiRouter dispatch). In Live Staging: BLOCKED (TEST_ACCESS_MISSING)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "TEST_ACCESS_MISSING",
+    "unitTestRef": "tests/rpc_contract_test.js: RPC-06, tests/auth_rbac_test.js: AUTH-06"
+  },
+  {
+    "case_id": "LA-13",
+    "name": "OAuth error / consent failure display",
+    "related_acceptance_ids": ["REL-04"],
+    "expected": "OAuth or connection failure shows explicit error toast/dialog; never displays false success or empty catalog",
+    "actual": "In Unit/AST: PASS (Structured error envelope rendered). In Live Staging: BLOCKED (TEST_ACCESS_MISSING)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "TEST_ACCESS_MISSING",
+    "unitTestRef": "tests/release_consolidation_test.js: REL-04"
+  },
+  {
+    "case_id": "LA-14",
+    "name": "Standard user without Apps Script editor rights",
+    "related_acceptance_ids": ["AUTH-01", "REL-07"],
+    "expected": "Teacher account having only web app access (no script editor permission) can access /exec smoothly under executeAs: USER_DEPLOYING",
+    "actual": "In Unit/AST: PASS (Architecture verified). In Live Staging: BLOCKED (TEST_ACCESS_MISSING)",
+    "status": "BLOCKED",
+    "level": "LIVE_BLOCKED_UNIT_PASS",
+    "blocker": "TEST_ACCESS_MISSING",
+    "unitTestRef": "tests/release_consolidation_test.js: REL-07"
+  }
+]

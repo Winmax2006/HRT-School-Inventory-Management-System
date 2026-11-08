@@ -1,0 +1,314 @@
+/**
+ * HRT School Inventory Management System - Print Engine Styles
+ * File: frontend/styles/print.css
+ */
+
+/* Dynamic A4 Page Orientation Base Default */
+@page {
+    size: A4 portrait;
+    margin: 8mm 10mm;
+}
+
+/* ==========================================================================
+   PRINT ENGINE RULES (Strict Monochrome A4 Optimization)
+   ========================================================================== */
+@media print {
+    /* 1. Global Reset */
+    html, body {
+        width: 100% !important;
+        height: auto !important;
+        min-height: 100% !important;
+        overflow: visible !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-family: 'TH Sarabun New', 'TH Sarabun PSK', 'Sarabun', sans-serif !important;
+        font-size: 10pt !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* 2. Strict UI Elimination */
+    #mainSidebar,
+    header,
+    #sidebarBackdrop,
+    #drawerBackdrop,
+    #itemDrawer,
+    #toastContainer,
+    #actionCenterAlert,
+    .no-print,
+    .doc-tab-btn,
+    #viewInventory,
+    #viewFSN,
+    #viewSettings,
+    #viewDashboard,
+    #viewYearEndAudit,
+    #addStockModal,
+    #requisitionModal,
+    #addFsnModal,
+    #pdfViewerModal,
+    #multiItemRequisitionModal,
+    #confirmIssueModal,
+    #closeFiscalYearModal,
+    #importDataModal,
+    #sheetsModal,
+    #reqDetailDrawer,
+    #reqDrawerBackdrop,
+    .sidebar-menu-item {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        width: 0 !important;
+        overflow: hidden !important;
+    }
+
+    /* 3. Outer Flex Unlocked */
+    body.h-screen, body.w-screen {
+        height: auto !important;
+        width: 100% !important;
+        overflow: visible !important;
+    }
+    .h-screen, .w-screen, .h-full, .overflow-hidden, .overflow-y-auto {
+        overflow: visible !important;
+        height: auto !important;
+        max-height: none !important;
+    }
+    .flex-1 {
+        flex: none !important;
+        width: 100% !important;
+    }
+
+    /* 4. Display Active Document */
+    #viewDocs {
+        display: block !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: visible !important;
+        width: 100% !important;
+        background: #ffffff !important;
+    }
+
+    #docContentRequisition:not(.active-print-doc),
+    #docContentDaily:not(.active-print-doc),
+    #docContentMonthly:not(.active-print-doc),
+    #docContentStockCard:not(.active-print-doc),
+    #docContentYearEndSummary:not(.active-print-doc),
+    #docContentYearEndCategory:not(.active-print-doc),
+    #docContentYearEndAllItems:not(.active-print-doc) {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+    }
+
+    #docContentRequisition.active-print-doc,
+    #docContentDaily.active-print-doc,
+    #docContentMonthly.active-print-doc,
+    #docContentStockCard.active-print-doc,
+    #docContentYearEndSummary.active-print-doc,
+    #docContentYearEndCategory.active-print-doc,
+    #docContentYearEndAllItems.active-print-doc {
+        display: block !important;
+        visibility: visible !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+
+    /* 5. Zero-Margin & Zero-Shadow Canvas for Physical Print */
+    .doc-preview-wrapper {
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: visible !important;
+        display: block !important;
+    }
+    .printable-document,
+    .doc-portrait-a4,
+    .doc-landscape-a4,
+    .doc-page-sheet {
+        display: block !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: auto !important;
+        height: auto !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        overflow: visible !important;
+    }
+
+    /* Monochrome & Font Guarantee */
+    .printable-document,
+    .printable-document * {
+        color: #000000 !important;
+        text-shadow: none !important;
+        font-family: 'TH Sarabun New', 'TH Sarabun PSK', 'Sarabun', sans-serif !important;
+    }
+
+    /* Tables in Print */
+    .printable-document table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        border: 1.5px solid #000000 !important;
+        page-break-inside: auto;
+    }
+    .printable-document tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+    .printable-document thead {
+        display: table-header-group;
+    }
+    .printable-document tfoot {
+        display: table-footer-group;
+    }
+    .printable-document th {
+        border: 1px solid #000000 !important;
+        background-color: #f2f2f2 !important;
+        color: #000000 !important;
+        font-weight: 700 !important;
+        font-size: 10.5pt !important;
+        padding: 2.5px 3px !important;
+        text-align: center !important;
+    }
+    .printable-document td {
+        border: 1px solid #000000 !important;
+        padding: 2px 3px !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        font-size: 10pt !important;
+    }
+    .printable-document tfoot td {
+        font-size: 10pt !important;
+        font-weight: 700 !important;
+        border: 1px solid #000000 !important;
+        background-color: #f2f2f2 !important;
+    }
+
+    /* Badges & Meta */
+    .printable-document .status-badge {
+        border: 1px solid #000000 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 1px 3px !important;
+        font-size: 8.5pt !important;
+        border-radius: 2px !important;
+        display: inline-block !important;
+    }
+    .printable-document .dot {
+        display: none !important;
+    }
+    .printable-document .doc-control-box {
+        border: 1.5px solid #000000 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 3px 6px !important;
+    }
+
+    /* Signatures */
+    .printable-document .signature-section {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        margin-top: 8px !important;
+        padding-top: 6px !important;
+        border-top: 1px solid #000000 !important;
+    }
+    .printable-document .signature-section div {
+        font-size: 10pt !important;
+    }
+
+    /* Running Headers/Footers */
+    .doc-print-header-meta,
+    .doc-print-footer-meta {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        font-size: 8pt !important;
+        color: #000000 !important;
+        width: 100% !important;
+    }
+    .doc-print-header-meta {
+        border-bottom: 0.5px solid #000000 !important;
+        padding-bottom: 1.5px !important;
+        margin-bottom: 3px !important;
+    }
+    .doc-print-footer-meta {
+        border-top: 0.5px solid #000000 !important;
+        padding-top: 1.5px !important;
+        margin-top: 4px !important;
+    }
+
+    /* Strict 1-Page Guarantee for Doc 5 (แบบ พ.ด. ๕) */
+    #docContentYearEndSummary.active-print-doc {
+        page-break-inside: avoid !important;
+        page-break-after: avoid !important;
+        break-inside: avoid !important;
+        break-after: avoid !important;
+    }
+    #docContentYearEndSummary .ye-summary-grid {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 8px !important;
+        margin-bottom: 4px !important;
+    }
+    #docContentYearEndSummary .ye-summary-left {
+        flex: 0 0 58% !important;
+        width: 58% !important;
+    }
+    #docContentYearEndSummary .ye-summary-right {
+        flex: 0 0 42% !important;
+        width: 42% !important;
+    }
+    #docContentYearEndSummary table th,
+    #docContentYearEndSummary table td {
+        padding: 1.5px 2.5px !important;
+        font-size: 8pt !important;
+        line-height: 1.15 !important;
+    }
+    #docContentYearEndSummary .signature-section {
+        margin-top: 6px !important;
+        padding-top: 4px !important;
+    }
+    #docContentYearEndSummary .signature-section .sig-gap {
+        height: 12px !important;
+    }
+
+    /* Strict 1-Page Guarantee for Doc 6 (แบบ พ.ด. ๖) */
+    #docContentYearEndCategory.active-print-doc {
+        page-break-inside: avoid !important;
+        page-break-after: avoid !important;
+        break-inside: avoid !important;
+        break-after: avoid !important;
+    }
+    #docContentYearEndCategory table th,
+    #docContentYearEndCategory table td {
+        padding: 1.5px 2.5px !important;
+        font-size: 7.5pt !important;
+        line-height: 1.15 !important;
+    }
+    #docContentYearEndCategory .signature-section {
+        margin-top: 4px !important;
+        padding-top: 3px !important;
+        border-top: 1px solid #000000 !important;
+    }
+    #docContentYearEndCategory .signature-section .sig-gap-cat {
+        height: 12px !important;
+    }
+    #docContentYearEndCategory .signature-section div {
+        font-size: 7.5pt !important;
+    }
+
+    /* Multi-page Sheets (Doc 7) */
+    .doc-page-sheet {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+    .doc-page-break-after {
+        page-break-after: always !important;
+        break-after: page !important;
+    }
+}

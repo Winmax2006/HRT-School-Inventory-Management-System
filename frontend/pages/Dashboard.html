@@ -1,0 +1,798 @@
+<!-- ========================================== -->
+<!-- VIEW 0: DASHBOARD (INVENTORY COMMAND CENTER) -->
+<!-- ========================================== -->
+<main id="viewDashboard" class="flex-1 overflow-y-auto p-4 lg:p-6 flex flex-col gap-4">
+
+    <!-- SECTION 1 — HEADER (Command Header Strip - No Technical Jargon) -->
+    <div class="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="space-y-0.5">
+            <div class="flex items-center gap-2 text-xs text-slate-500 font-medium">
+                <span class="font-semibold text-slate-700">โรงเรียนหรเทพ(รุ่งเรืองประชาสามัคคี)</span>
+                <span>•</span>
+                <span>สังกัด อบจ.สระบุรี</span>
+                <span class="hidden sm:inline">•</span>
+                <span id="dashFiscalYearBadge" class="hidden sm:inline text-slate-600 font-semibold">ปีงบประมาณ พ.ศ. 2569</span>
+            </div>
+            <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">ภาพรวมคลังพัสดุ</h1>
+            <p class="text-xs sm:text-[13px] text-slate-500">ศูนย์ควบคุม ติดตามสถานะสต็อก และบริหารการเบิกจ่ายพัสดุสถานศึกษา</p>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+            <!-- Quick Search Trigger with Debounce Support -->
+            <div class="relative flex-1 sm:w-64">
+                <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                <input type="text" id="dashQuickSearchInput" oninput="handleDashQuickSearch(this.value)" onkeydown="if(event.key==='Enter'){handleDashQuickSearchEnter(this.value);}" aria-label="ค้นหาพัสดุด่วน" placeholder="ค้นหาพัสดุด่วน... (Ctrl+K)" class="w-full pl-8 pr-3 py-2 text-xs bg-slate-50 hover:bg-slate-100 focus:bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100 transition text-slate-700 placeholder:text-slate-400">
+            </div>
+
+            <!-- Refresh / Reload Cache Action Button (with Cooldown) -->
+            <button type="button" id="dashRefreshBtn" onclick="refreshDashboardData()" aria-label="รีเฟรชข้อมูลภาพรวมคลัง" title="รีเฟรชข้อมูล (เคลียร์แคชและคำนวณใหม่)" class="inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex-shrink-0 cursor-pointer active:scale-95">
+                <i id="dashRefreshIcon" class="ph ph-arrow-counter-clockwise text-base"></i>
+            </button>
+
+            <!-- Primary Action -->
+            <button type="button" onclick="openRequisitionModal(null)" aria-label="ทำเรื่องขอเบิกพัสดุ" class="inline-flex items-center gap-1.5 px-4 py-2 min-h-[40px] rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition flex-shrink-0 cursor-pointer">
+                <i class="ph-bold ph-hand-pointing"></i>
+                <span>+ ทำเรื่องขอเบิก</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- GLOBAL ERROR STATE (Hidden by default, shown on unhandled dashboard exception) -->
+    <div id="dashGlobalErrorState" class="hidden bg-rose-50 border border-rose-200 rounded-2xl p-4 text-rose-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+        <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-lg flex-shrink-0">
+                <i class="ph-bold ph-warning-octagon"></i>
+            </div>
+            <div>
+                <div class="font-bold text-xs sm:text-sm text-rose-900" id="dashGlobalErrorTitle">พบข้อผิดพลาดในการประมวลผลข้อมูลภาพรวม</div>
+                <div class="text-[11px] text-rose-700" id="dashGlobalErrorMessage">กรุณารีเฟรชข้อมูล หรือกดรีเซ็ตตัวกรองเพื่อกู้คืนการแสดงผลที่เสถียร</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-2 self-end sm:self-center">
+            <button type="button" onclick="resetDashFilters(); hideDashGlobalError();" class="px-3 py-1.5 bg-white border border-rose-200 hover:bg-rose-100/50 text-rose-700 rounded-lg text-xs font-semibold transition active:scale-95 cursor-pointer">
+                รีเซ็ตตัวกรอง
+            </button>
+            <button type="button" onclick="refreshDashboardData(); hideDashGlobalError();" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold transition active:scale-95 cursor-pointer">
+                โหลดใหม่
+            </button>
+        </div>
+    </div>
+
+    <!-- SKELETON LOADING STATE (Visible during initial data fetch or refresh) -->
+    <div id="dashLoadingSkeleton" class="hidden flex-col gap-4 animate-pulse" aria-hidden="true">
+        <div class="h-28 bg-slate-200/70 rounded-2xl"></div>
+        <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3.5">
+            <div class="h-24 bg-slate-200/70 rounded-2xl"></div>
+            <div class="h-24 bg-slate-200/70 rounded-2xl"></div>
+            <div class="h-24 bg-slate-200/70 rounded-2xl"></div>
+            <div class="h-24 bg-slate-200/70 rounded-2xl"></div>
+            <div class="h-24 bg-slate-200/70 rounded-2xl"></div>
+            <div class="h-24 bg-slate-200/70 rounded-2xl"></div>
+        </div>
+        <div class="h-40 bg-slate-200/70 rounded-2xl"></div>
+        <div class="h-72 bg-slate-200/70 rounded-2xl"></div>
+    </div>
+
+    <!-- SECTION 1.5 — MOBILE DEDICATED SEARCH (Mobile Step 2: Touch-Friendly Quick Search) -->
+    <div class="block md:hidden bg-white rounded-2xl border border-slate-200/90 p-3">
+        <div class="relative">
+            <i class="ph ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-base pointer-events-none"></i>
+            <input type="text" id="mobileDashSearchInput" onkeyup="handleMobileDashSearch(event)" aria-label="ค้นหาพัสดุด่วน" placeholder="ค้นหาพัสดุด่วน... พิมพ์ชื่อหรือรหัสแล้วกด Enter" class="w-full pl-10 pr-9 py-2.5 text-xs sm:text-sm bg-slate-50 hover:bg-slate-100 focus:bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 transition text-slate-800 placeholder:text-slate-400">
+            <button type="button" onclick="clearMobileDashSearch()" id="clearMobileDashSearchBtn" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 hidden text-xs leading-none p-2 rounded-full hover:bg-slate-200 min-w-[36px] min-h-[36px] flex items-center justify-center" aria-label="ล้างการค้นหา" title="ล้างการค้นหา">
+                <i class="ph-bold ph-x"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- SECTION 2 — DASHBOARD GLOBAL FILTER BAR & 6 EXECUTIVE KPIS (6 Core Questions) -->
+    <div class="flex flex-col gap-3.5" role="region" aria-label="ตัวกรองภาพรวมและดัชนีชี้วัดหลัก 6 มิติ">
+        
+        <!-- 2.1 Dashboard Global Filter Toolbar (8-Dimensional Unified Filter System) -->
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-3.5 sm:p-4 shadow-sm flex flex-col gap-3">
+            <!-- Filter Toolbar Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-base font-bold flex-shrink-0">
+                        <i class="ph-bold ph-faders"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="font-bold text-slate-800 text-xs sm:text-sm">ตัวกรองภาพรวมคลัง (Global Filter)</h2>
+                            <span id="dashActiveFilterCountBadge" class="hidden text-[10.5px] font-bold font-num bg-blue-600 text-white px-2 py-0.5 rounded-full" role="status">ใช้งาน 0 ตัวกรอง</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400">คำนวณ KPI, กราฟวิเคราะห์, และสถานะพัสดุแบบเรียลไทม์ตามเงื่อนไขที่เลือก</p>
+                    </div>
+                </div>
+
+                <!-- Count Badge & Reset Button -->
+                <div class="flex items-center gap-2 self-end sm:self-center">
+                    <span id="dashActiveFilterBadge" class="text-[11px] text-slate-600 font-num bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg whitespace-nowrap">
+                        แสดง <strong id="dashFilteredCount" class="text-blue-700 font-bold">100</strong>/<span id="dashTotalCount" class="font-medium text-slate-500">100</span> รายการ
+                    </span>
+                    <button type="button" id="dashResetFilterBtn" onclick="resetDashFilters()" aria-label="รีเซ็ตตัวกรองทั้งหมดกลับเป็นค่าเริ่มต้น" title="รีเซ็ตตัวกรองทั้งหมด" class="px-2.5 py-1 min-h-[30px] rounded-lg border border-slate-200 hover:bg-slate-100 hover:border-slate-300 text-slate-600 hover:text-slate-900 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 active:scale-95">
+                        <i class="ph ph-arrow-counter-clockwise text-xs"></i>
+                        <span>รีเซ็ต</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 8 Filter Controls (Responsive Grid: 2 cols on mobile, 4 cols on tablet/desktop) -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+                <!-- 1. Warehouse Filter (คลัง/สถานที่จัดเก็บ) -->
+                <div class="flex flex-col gap-1">
+                    <label for="dashFilterWarehouse" class="text-[10.5px] font-semibold text-slate-500 flex items-center gap-1">
+                        <i class="ph ph-map-pin text-slate-400"></i>
+                        <span>คลัง / สถานที่จัดเก็บ</span>
+                    </label>
+                    <select id="dashFilterWarehouse" onchange="applyDashFilters()" aria-label="กรองตามคลังพัสดุหรือสถานที่จัดเก็บ" class="w-full text-xs bg-slate-50 hover:bg-slate-100 focus:bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-100 text-slate-700 cursor-pointer font-medium transition">
+                        <option value="">ทุกคลัง / สถานที่จัดเก็บ</option>
+                    </select>
+                </div>
+
+                <!-- 2. Category Filter (หมวดหมู่พัสดุ) -->
+                <div class="flex flex-col gap-1">
+                    <label for="dashFilterCategory" class="text-[10.5px] font-semibold text-slate-500 flex items-center gap-1">
+                        <i class="ph ph-squares-four text-slate-400"></i>
+                        <span>หมวดหมู่พัสดุ</span>
+                    </label>
+                    <select id="dashFilterCategory" onchange="applyDashFilters()" aria-label="กรองตามหมวดหมู่พัสดุ" class="w-full text-xs bg-slate-50 hover:bg-slate-100 focus:bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-100 text-slate-700 cursor-pointer font-medium transition">
+                        <option value="">ทุกหมวดหมู่พัสดุ</option>
+                    </select>
+                </div>
+
+                <!-- 3. Stock Status Filter (สถานะสต็อก) -->
+                <div class="flex flex-col gap-1">
+                    <label for="dashFilterStatus" class="text-[10.5px] font-semibold text-slate-500 flex items-center gap-1">
+                        <i class="ph ph-shield-check text-slate-400"></i>
+                        <span>สถานะสต็อก</span>
+                    </label>
+                    <select id="dashFilterStatus" onchange="applyDashFilters()" aria-label="กรองตามสถานะสต็อก" class="w-full text-xs bg-slate-50 hover:bg-slate-100 focus:bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-100 text-slate-700 cursor-pointer font-medium transition">
+                        <option value="">ทุกสถานะสต็อก</option>
+                        <option value="normal">ปกติ (พร้อมใช้งาน)</option>
+                        <option value="low">ใกล้จุดสั่งซื้อ (ROP)</option>
+                        <option value="critical">วิกฤติ (ต่ำกว่าเกณฑ์ Min)</option>
+                        <option value="out_of_stock">หมดสต็อก (Out of Stock)</option>
+                        <option value="action_needed">ต้องดำเนินการ (วิกฤติ + ROP)</option>
+                        <option value="non_moving">ไม่เคลื่อนไหว (Non-Moving)</option>
+                    </select>
+                </div>
+
+                <!-- 4. Date / Fiscal Period Filter (ช่วงเวลา/ปีงบประมาณ) -->
+                <div class="flex flex-col gap-1">
+                    <label for="dashFilterDate" class="text-[10.5px] font-semibold text-slate-500 flex items-center gap-1">
+                        <i class="ph ph-calendar text-slate-400"></i>
+                        <span>ช่วงเวลา / ปีงบ</span>
+                    </label>
+                    <select id="dashFilterDate" onchange="applyDashFilters()" aria-label="กรองตามช่วงเวลาหรือปีงบประมาณ" class="w-full text-xs bg-slate-50 hover:bg-slate-100 focus:bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-100 text-slate-700 cursor-pointer font-medium transition">
+                        <option value="">ทุกช่วงเวลา</option>
+                        <option value="2569">ปีงบประมาณ 2569 (ปัจจุบัน)</option>
+                        <option value="2568">ปีงบประมาณ 2568</option>
+                        <option value="2567">ปีงบประมาณ 2567</option>
+                    </select>
+                </div>
+
+                <!-- 5. Movement Type Filter (ประเภทการเคลื่อนไหว) -->
+                <div class="flex flex-col gap-1">
+                    <label for="dashFilterMovement" class="text-[10.5px] font-semibold text-slate-500 flex items-center gap-1">
+                        <i class="ph ph-arrows-left-right text-slate-400"></i>
+                        <span>ประเภทการเคลื่อนไหว</span>
+                    </label>
+                    <select id="dashFilterMovement" onchange="applyDashFilters()" aria-label="กรองตามประเภทการเคลื่อนไหวของพัสดุ" class="w-full text-xs bg-slate-50 hover:bg-slate-100 focus:bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-100 text-slate-700 cursor-pointer font-medium transition">
+                        <option value="">ทุกประเภทการเคลื่อนไหว</option>
+                        <option value="fast">เคลื่อนไหวเร็ว (Fast-Moving)</option>
+                        <option value="slow">เคลื่อนไหวช้า (Slow-Moving)</option>
+                        <option value="nonmoving">ไม่เคลื่อนไหว (Non-Moving)</option>
+                    </select>
+                </div>
+
+                <!-- 6. ABC Classification Filter (การจัดกลุ่ม ABC) -->
+                <div class="flex flex-col gap-1">
+                    <label for="dashFilterAbc" class="text-[10.5px] font-semibold text-slate-500 flex items-center gap-1">
+                        <i class="ph ph-chart-pie-slice text-slate-400"></i>
+                        <span>การจัดกลุ่ม ABC</span>
+                    </label>
+                    <select id="dashFilterAbc" onchange="applyDashFilters()" aria-label="กรองตามการจัดกลุ่มมูลค่า ABC" class="w-full text-xs bg-slate-50 hover:bg-slate-100 focus:bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-100 text-slate-700 cursor-pointer font-medium transition">
+                        <option value="">ทุกกลุ่ม ABC</option>
+                        <option value="A">กลุ่ม A (มูลค่าสูง 70%)</option>
+                        <option value="B">กลุ่ม B (มูลค่าปานกลาง 20%)</option>
+                        <option value="C">กลุ่ม C (มูลค่าทั่วไป 10%)</option>
+                    </select>
+                </div>
+
+                <!-- 7. FSN Classification Filter (มาตรฐาน FSN) -->
+                <div class="flex flex-col gap-1">
+                    <label for="dashFilterFsn" class="text-[10.5px] font-semibold text-slate-500 flex items-center gap-1">
+                        <i class="ph ph-barcode text-slate-400"></i>
+                        <span>มาตรฐาน FSN (e-GP)</span>
+                    </label>
+                    <select id="dashFilterFsn" onchange="applyDashFilters()" aria-label="กรองตามมาตรฐานรหัสพัสดุภาครัฐ FSN" class="w-full text-xs bg-slate-50 hover:bg-slate-100 focus:bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-100 text-slate-700 cursor-pointer font-medium transition">
+                        <option value="">ทุกมาตรฐาน FSN</option>
+                        <option value="linked">ผูกรหัส FSN แล้ว (e-GP)</option>
+                        <option value="unlinked">ยังไม่ผูกรหัส FSN</option>
+                    </select>
+                </div>
+
+                <!-- 8. Department Filter (หน่วยงานผู้เบิก) -->
+                <div class="flex flex-col gap-1">
+                    <label for="dashFilterDept" class="text-[10.5px] font-semibold text-slate-500 flex items-center gap-1">
+                        <i class="ph ph-users-three text-slate-400"></i>
+                        <span>หน่วยงานผู้เบิก</span>
+                    </label>
+                    <select id="dashFilterDept" onchange="applyDashFilters()" aria-label="กรองตามหน่วยงานหรือกลุ่มสาระผู้เบิก" class="w-full text-xs bg-slate-50 hover:bg-slate-100 focus:bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-100 text-slate-700 cursor-pointer font-medium transition">
+                        <option value="">ทุกหน่วยงานผู้เบิก</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Active Filter Chips Container -->
+            <div id="dashActiveFilterChipsContainer" class="hidden flex-wrap items-center gap-1.5 pt-2 border-t border-slate-100 text-xs">
+                <span class="text-[11px] font-semibold text-slate-500 flex items-center gap-1 flex-shrink-0">
+                    <i class="ph-bold ph-funnel text-blue-600"></i>
+                    <span>ตัวกรองที่เลือก (<span id="dashActiveChipsCount">0</span>):</span>
+                </span>
+                <div id="dashActiveFilterChipsList" class="flex flex-wrap items-center gap-1.5">
+                    <!-- Injected dynamically by renderDashFilterChips() -->
+                </div>
+                <button type="button" onclick="resetDashFilters()" class="text-[11px] text-rose-600 hover:text-rose-800 hover:underline font-semibold ml-auto sm:ml-2 cursor-pointer flex items-center gap-0.5" aria-label="ล้างตัวกรองทั้งหมด">
+                    <i class="ph ph-x"></i>
+                    <span>ล้างทั้งหมด</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 2.2 6 Executive KPI Cards Grid (Directly Answers the 6 Core Questions) -->
+        <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3.5" role="region" aria-label="ดัชนีชี้วัดหลัก 6 มิติ">
+            
+            <!-- 1. มูลค่าสินค้าคงคลัง (คำถาม: มีของอยู่เท่าไร?) -->
+            <div onclick="drillDownToAnalytics('value')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); this.click();}" aria-label="ดูบทวิเคราะห์มูลค่าสินค้าคงคลัง (คลิกเพื่อเจาะลึกบทวิเคราะห์)" class="bg-white rounded-2xl border border-slate-200/90 p-3.5 hover:border-emerald-300 hover:shadow-sm active:scale-[0.98] transition cursor-pointer flex flex-col justify-between group">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-slate-500 font-semibold tracking-tight">มูลค่าคงคลัง</span>
+                    <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-base group-hover:bg-emerald-100 transition-colors flex-shrink-0">
+                        <i class="ph-fill ph-currency-circle-dollar"></i>
+                    </div>
+                </div>
+                <div class="mt-2 space-y-0.5">
+                    <div class="font-num font-bold text-base sm:text-lg text-slate-900 tracking-tight truncate" id="kpiValue" style="font-variant-numeric: tabular-nums;">฿0.00</div>
+                    <div class="text-[11px] text-slate-400 flex items-center justify-between pt-0.5">
+                        <span class="truncate">ราคาทุนจริงต่อหน่วย</span>
+                        <i class="ph ph-arrow-right text-[10px] text-slate-400 group-hover:translate-x-0.5 transition-transform flex-shrink-0"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. รายการพัสดุ (คำถาม: มีรายการพัสดุกี่รายการ?) -->
+            <div onclick="resetDashFilters(); scrollToDashSection('dashActionPrioritySection');" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); this.click();}" aria-label="ดูรายการพัสดุทั้งหมดในคลัง (คลิกเพื่อรีเซ็ตตัวกรองและดูรายการ)" class="bg-white rounded-2xl border border-slate-200/90 p-3.5 hover:border-blue-300 hover:shadow-sm active:scale-[0.98] transition cursor-pointer flex flex-col justify-between group">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-slate-500 font-semibold tracking-tight">รายการพัสดุ (SKU)</span>
+                    <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base group-hover:bg-blue-100 transition-colors flex-shrink-0">
+                        <i class="ph-fill ph-package"></i>
+                    </div>
+                </div>
+                <div class="mt-2 space-y-0.5">
+                    <div class="flex items-baseline gap-1.5 font-num" style="font-variant-numeric: tabular-nums;">
+                        <span id="kpiTotal" class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">100</span>
+                        <span class="text-xs text-slate-500 font-medium">รายการ</span>
+                    </div>
+                    <div class="text-[11px] text-slate-400 flex items-center justify-between pt-0.5">
+                        <span class="truncate">ครอบคลุม 8 หมวด</span>
+                        <i class="ph ph-arrow-right text-[10px] text-slate-400 group-hover:translate-x-0.5 transition-transform flex-shrink-0"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. พัสดุวิกฤติ (คำถาม: มีของวิกฤตกี่รายการ?) -->
+            <div id="kpiCardCrit" onclick="setDashCrossFilterStatus('critical')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); this.click();}" aria-label="กรองรายการพัสดุวิกฤติต่ำกว่าเกณฑ์ Min Stock (คลิกเพื่อกรอง/สลับ)" class="bg-white rounded-2xl border border-slate-200/90 p-3.5 hover:border-rose-300 hover:shadow-sm active:scale-[0.98] transition cursor-pointer flex flex-col justify-between group">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-slate-500 font-semibold tracking-tight">พัสดุวิกฤติ</span>
+                    <div class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-base group-hover:bg-rose-100 transition-colors flex-shrink-0">
+                        <i class="ph-fill ph-warning-octagon"></i>
+                    </div>
+                </div>
+                <div class="mt-2 space-y-0.5">
+                    <div class="flex items-baseline gap-1.5 font-num" style="font-variant-numeric: tabular-nums;">
+                        <span id="kpiCritical" class="text-base sm:text-lg font-bold text-rose-600 tracking-tight">0</span>
+                        <span class="text-xs text-rose-500 font-medium">รายการ</span>
+                        <!-- Hidden legacy compatibility element -->
+                        <span id="kpiActionNeeded" class="sr-only">0</span>
+                    </div>
+                    <div class="text-[11px] text-rose-500/80 flex items-center justify-between pt-0.5">
+                        <span class="truncate">ต่ำกว่าเกณฑ์ Min Stock</span>
+                        <i class="ph ph-arrow-right text-[10px] text-rose-400 group-hover:translate-x-0.5 transition-transform flex-shrink-0"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. ใกล้จุดสั่งซื้อ (คำถาม: มีของเสี่ยงขาดกี่รายการ?) -->
+            <div id="kpiCardLow" onclick="setDashCrossFilterStatus('low')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); this.click();}" aria-label="กรองรายการพัสดุใกล้จุดสั่งซื้อซ้ำ Near ROP (คลิกเพื่อกรอง/สลับ)" class="bg-white rounded-2xl border border-slate-200/90 p-3.5 hover:border-amber-300 hover:shadow-sm active:scale-[0.98] transition cursor-pointer flex flex-col justify-between group">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-slate-500 font-semibold tracking-tight">ใกล้จุดสั่งซื้อ (ROP)</span>
+                    <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-base group-hover:bg-amber-100 transition-colors flex-shrink-0">
+                        <i class="ph-fill ph-warning"></i>
+                    </div>
+                </div>
+                <div class="mt-2 space-y-0.5">
+                    <div class="flex items-baseline gap-1.5 font-num" style="font-variant-numeric: tabular-nums;">
+                        <span id="kpiLow" class="text-base sm:text-lg font-bold text-amber-600 tracking-tight">0</span>
+                        <span class="text-xs text-amber-500 font-medium">รายการ</span>
+                    </div>
+                    <div class="text-[11px] text-amber-600/80 flex items-center justify-between pt-0.5">
+                        <span class="truncate">ถึงระดับสั่งซื้อซ้ำ</span>
+                        <i class="ph ph-arrow-right text-[10px] text-amber-400 group-hover:translate-x-0.5 transition-transform flex-shrink-0"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. พัสดุไม่เคลื่อนไหว (คำถาม: มีของไม่เคลื่อนไหวกี่รายการ?) -->
+            <div id="kpiCardNonMoving" onclick="setDashCrossFilterMovement('nonmoving')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); this.click();}" aria-label="กรองรายการพัสดุที่ไม่เคลื่อนไหว (ไม่มีประวัติเบิกจ่าย)" class="bg-white rounded-2xl border border-slate-200/90 p-3.5 hover:border-indigo-300 hover:shadow-sm active:scale-[0.98] transition cursor-pointer flex flex-col justify-between group">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-slate-500 font-semibold tracking-tight">ไม่เคลื่อนไหว</span>
+                    <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-base group-hover:bg-indigo-100 transition-colors flex-shrink-0">
+                        <i class="ph-fill ph-archive-box"></i>
+                    </div>
+                </div>
+                <div class="mt-2 space-y-0.5">
+                    <div class="flex items-baseline gap-1.5 font-num" style="font-variant-numeric: tabular-nums;">
+                        <span id="kpiNonMoving" class="text-base sm:text-lg font-bold text-indigo-600 tracking-tight">0</span>
+                        <span class="text-xs text-indigo-500 font-medium">รายการ</span>
+                    </div>
+                    <div class="text-[11px] text-slate-400 flex items-center justify-between pt-0.5">
+                        <span class="truncate">ไม่มีเบิกจ่ายรอบนี้</span>
+                        <i class="ph ph-arrow-right text-[10px] text-slate-400 group-hover:translate-x-0.5 transition-transform flex-shrink-0"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. ปริมาณเบิกจ่ายสะสม (คำถาม: มีการเบิกจ่ายมากน้อยเพียงใด?) -->
+            <div onclick="switchMainView('requisition')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); this.click();}" aria-label="ดูระบบบริหารการเบิกจ่ายพัสดุ (คลิกเพื่อเปิด Requisition Center)" class="bg-white rounded-2xl border border-slate-200/90 p-3.5 hover:border-teal-300 hover:shadow-sm active:scale-[0.98] transition cursor-pointer flex flex-col justify-between group">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-slate-500 font-semibold tracking-tight">เบิกจ่ายสะสม</span>
+                    <div class="w-8 h-8 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center text-base group-hover:bg-teal-100 transition-colors flex-shrink-0">
+                        <i class="ph-fill ph-arrows-out-cardinal"></i>
+                    </div>
+                </div>
+                <div class="mt-2 space-y-0.5">
+                    <div class="flex items-baseline gap-1.5 font-num" style="font-variant-numeric: tabular-nums;">
+                        <span id="kpiDisbursed" class="text-base sm:text-lg font-bold text-teal-700 tracking-tight">0</span>
+                        <span class="text-xs text-teal-600 font-medium">หน่วย</span>
+                    </div>
+                    <div class="text-[11px] text-slate-400 flex items-center justify-between pt-0.5">
+                        <span class="truncate"><span id="kpiDisbursedTxCount">0</span> รายการเบิก</span>
+                        <i class="ph ph-arrow-right text-[10px] text-slate-400 group-hover:translate-x-0.5 transition-transform flex-shrink-0"></i>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 4. ALERT LAYER: MANAGEMENT INSIGHTS & STOCK STATUS HEALTH OVERVIEW BAR   -->
+    <!-- ========================================================================= -->
+
+    <!-- SECTION 4.1 — MANAGEMENT INSIGHTS (What Needs Attention • 4 Severity Tiers) -->
+    <div id="sectionManagementInsights" class="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 flex flex-col gap-4">
+        <!-- Header of Management Insights -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-base font-bold flex-shrink-0">
+                    <i class="ph-fill ph-lightbulb"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h2 class="font-bold text-slate-800 text-sm sm:text-base">ข้อสังเกตและประเด็นที่ต้องติดตาม (Management Insights)</h2>
+                        <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 uppercase tracking-wider">What Needs Attention</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-0.5">วิเคราะห์ข้อมูลจริงเชิงลึกเพื่อการตัดสินใจของผู้บริหารคลังพัสดุ เรียงลำดับตามความเร่งด่วน</p>
+                </div>
+            </div>
+
+            <!-- Severity Count Badges -->
+            <div class="flex items-center flex-wrap gap-1.5 text-xs">
+                <span id="badgeInsightCrit" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                    <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                    <span>วิกฤติ: <strong id="insightCountCrit" class="font-num">0</strong></span>
+                </span>
+                <span id="badgeInsightWarn" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    <span>เฝ้าระวัง: <strong id="insightCountWarn" class="font-num">0</strong></span>
+                </span>
+                <span id="badgeInsightInfo" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                    <span>สาระสำคัญ: <strong id="insightCountInfo" class="font-num">0</strong></span>
+                </span>
+                <span id="badgeInsightHealthy" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span>ปลอดภัย: <strong id="insightCountHealthy" class="font-num">0</strong></span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Insights Cards Grid Container -->
+        <div id="managementInsightsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5" role="region" aria-label="รายการข้อสังเกตเชิงบริหาร">
+            <!-- Dynamic Insight Cards rendered by renderManagementInsights() -->
+        </div>
+    </div>
+
+    <!-- SECTION 4.2 — STOCK STATUS HEALTH OVERVIEW BAR (Normal / Low / Critical) -->
+    <div class="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 flex flex-col gap-3">
+        <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-slate-800 text-sm">ภาพรวมสถานะสต็อกพัสดุ (Stock Status Overview)</span>
+            <span class="text-slate-500 text-[11px]">เกณฑ์ตามระเบียบพัสดุภาครัฐ (คลิกแถบ/ป้ายเพื่อกรอง)</span>
+        </div>
+
+        <!-- Semantic Segmented Progress Bar (Click to Filter) -->
+        <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden flex shadow-inner cursor-pointer" role="progressbar" aria-label="สัดส่วนสถานะสต็อกพัสดุ (คลิกเพื่อกรองในหน้าสรุป)" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100">
+            <div id="healthBarNormal" onclick="setDashCrossFilterStatus('normal')" class="h-full bg-emerald-500 hover:opacity-90 active:opacity-75 transition-all duration-300 cursor-pointer" style="width: 85%" title="ปกติพร้อมใช้งาน (คลิกเพื่อกรองในหน้าสรุป)"></div>
+            <div id="healthBarLow" onclick="setDashCrossFilterStatus('low')" class="h-full bg-amber-500 hover:opacity-90 active:opacity-75 transition-all duration-300 cursor-pointer" style="width: 10%" title="เฝ้าระวังใกล้จุดสั่งซื้อ (คลิกเพื่อกรองในหน้าสรุป)"></div>
+            <div id="healthBarCritical" onclick="setDashCrossFilterStatus('critical')" class="h-full bg-rose-500 hover:opacity-90 active:opacity-75 transition-all duration-300 cursor-pointer" style="width: 5%" title="วิกฤติต่ำกว่าเกณฑ์ (คลิกเพื่อกรองในหน้าสรุป)"></div>
+        </div>
+
+        <!-- 3 Semantic Legend Badges with Explicit Icons & Text Labels (Click to Filter) -->
+        <div class="flex items-center gap-2 sm:gap-4 flex-wrap text-xs pt-1" role="region" aria-label="คำอธิบายสถานะพัสดุ (คลิกเพื่อกรอง)">
+            <button type="button" id="btnStatusLegendNorm" onclick="setDashCrossFilterStatus('normal')" aria-label="กรองเฉพาะพัสดุสถานะปกติพร้อมใช้งาน" title="คลิกเพื่อกรองพัสดุสถานะปกติในหน้าสรุป" class="flex items-center gap-1.5 text-slate-700 bg-slate-50 hover:bg-emerald-50 hover:border-emerald-300 active:scale-[0.98] px-2.5 py-1.5 rounded-lg border border-slate-200 transition cursor-pointer group">
+                <i class="ph-bold ph-check-circle text-emerald-600 text-sm" aria-hidden="true"></i>
+                <span class="font-medium group-hover:text-emerald-800">ปกติ (พร้อมใช้งาน):</span>
+                <span id="statusCountNorm" class="font-bold font-num text-emerald-700">85</span>
+                <span class="text-slate-500 text-[11px]">รายการ</span>
+            </button>
+
+            <button type="button" id="btnStatusLegendLow" onclick="setDashCrossFilterStatus('low')" aria-label="กรองเฉพาะพัสดุสถานะเฝ้าระวังใกล้จุดสั่งซื้อ" title="คลิกเพื่อกรองพัสดุสถานะเฝ้าระวังในหน้าสรุป" class="flex items-center gap-1.5 text-slate-700 bg-slate-50 hover:bg-amber-50 hover:border-amber-300 active:scale-[0.98] px-2.5 py-1.5 rounded-lg border border-slate-200 transition cursor-pointer group">
+                <i class="ph-bold ph-warning text-amber-600 text-sm" aria-hidden="true"></i>
+                <span class="font-medium group-hover:text-amber-800">เฝ้าระวัง (ใกล้จุดสั่งซื้อ):</span>
+                <span id="statusCountLow" class="font-bold font-num text-amber-700">10</span>
+                <span class="text-slate-500 text-[11px]">รายการ</span>
+            </button>
+
+            <button type="button" id="btnStatusLegendCrit" onclick="setDashCrossFilterStatus('critical')" aria-label="กรองเฉพาะพัสดุสถานะวิกฤติต่ำกว่าเกณฑ์" title="คลิกเพื่อกรองพัสดุสถานะวิกฤติในหน้าสรุป" class="flex items-center gap-1.5 text-slate-700 bg-slate-50 hover:bg-rose-50 hover:border-rose-300 active:scale-[0.98] px-2.5 py-1.5 rounded-lg border border-slate-200 transition cursor-pointer group">
+                <i class="ph-bold ph-warning-octagon text-rose-600 text-sm" aria-hidden="true"></i>
+                <span class="font-medium group-hover:text-rose-800">วิกฤติ (ต่ำกว่าขั้นต่ำ):</span>
+                <span id="statusCountCrit" class="font-bold font-num text-rose-700">5</span>
+                <span class="text-slate-500 text-[11px]">รายการ</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 5. MAIN CHARTS LAYER (8 มิติหลักเชิงบริหาร จัดการตามหลัก Pareto)             -->
+    <!-- ========================================================================= -->
+    <div id="sectionMainChartsAndAnalytics" class="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 flex flex-col gap-4">
+        <!-- Header of Main Charts & Switcher Bar -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-base font-bold flex-shrink-0">
+                    <i class="ph-bold ph-chart-line-up"></i>
+                </div>
+                <div>
+                    <h2 class="font-bold text-slate-800 text-sm sm:text-base">กราฟวิเคราะห์ภาพรวมคลัง (Main Charts)</h2>
+                    <p class="text-xs text-slate-500">จำแนกตาม 8 มิติหลักเชิงบริหาร จัดการตามหลัก Pareto และเกณฑ์พัสดุภาครัฐ</p>
+                </div>
+            </div>
+
+            <!-- 8-Dimension Switcher Toolbar (Responsive Scrollable on small screens) -->
+            <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs flex-wrap border border-slate-200">
+                <button type="button" onclick="switchChart('trend')" id="chartBtnTrend" class="px-2.5 py-1.5 rounded-lg font-bold bg-blue-600 text-white transition flex items-center gap-1 cursor-pointer" title="1. Inventory Movement Trend">
+                    <i class="ph-bold ph-chart-line-up"></i>
+                    <span>1. Movement</span>
+                </button>
+                <button type="button" onclick="switchChart('value')" id="chartBtnValue" class="px-2.5 py-1.5 rounded-lg font-medium text-slate-700 hover:text-slate-900 transition flex items-center gap-1 cursor-pointer" title="2. Inventory Value by Category">
+                    <i class="ph-bold ph-currency-circle-dollar"></i>
+                    <span>2. Category</span>
+                </button>
+                <button type="button" onclick="switchChart('health')" id="chartBtnHealth" class="px-2.5 py-1.5 rounded-lg font-medium text-slate-700 hover:text-slate-900 transition flex items-center gap-1 cursor-pointer" title="3. Stock Health">
+                    <i class="ph-bold ph-shield-check"></i>
+                    <span>3. Health</span>
+                </button>
+                <button type="button" onclick="switchChart('top_moving')" id="chartBtnTopMoving" class="px-2.5 py-1.5 rounded-lg font-medium text-slate-700 hover:text-slate-900 transition flex items-center gap-1 cursor-pointer" title="4. Top Moving Items">
+                    <i class="ph-bold ph-trend-up"></i>
+                    <span>4. Top Items</span>
+                </button>
+                <button type="button" onclick="switchChart('abc')" id="chartBtnAbc" class="px-2.5 py-1.5 rounded-lg font-medium text-slate-700 hover:text-slate-900 transition flex items-center gap-1 cursor-pointer" title="5. ABC Analysis (Pareto 70-20-10)">
+                    <i class="ph-bold ph-chart-pie-slice"></i>
+                    <span>5. ABC</span>
+                </button>
+                <button type="button" onclick="switchChart('fsn')" id="chartBtnFsn" class="px-2.5 py-1.5 rounded-lg font-medium text-slate-700 hover:text-slate-900 transition flex items-center gap-1 cursor-pointer" title="6. FSN Analysis (Fast / Slow / Non-moving)">
+                    <i class="ph-bold ph-arrows-clockwise"></i>
+                    <span>6. FSN</span>
+                </button>
+                <button type="button" onclick="switchChart('aging')" id="chartBtnAging" class="px-2.5 py-1.5 rounded-lg font-medium text-slate-700 hover:text-slate-900 transition flex items-center gap-1 cursor-pointer" title="7. Aging / Dead Stock Analysis">
+                    <i class="ph-bold ph-hourglass-medium"></i>
+                    <span>7. Aging</span>
+                </button>
+                <button type="button" onclick="switchChart('department')" id="chartBtnDepartment" class="px-2.5 py-1.5 rounded-lg font-medium text-slate-700 hover:text-slate-900 transition flex items-center gap-1 cursor-pointer" title="8. Department / Requester Usage">
+                    <i class="ph-bold ph-users-three"></i>
+                    <span>8. Dept</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Executive Business Question Callout Banner -->
+        <div id="analyticsBusinessQuestionBox" class="p-3.5 sm:p-4 rounded-xl bg-blue-50/70 border border-blue-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="space-y-1">
+                <div class="flex items-center gap-1.5 text-xs font-bold text-blue-900">
+                    <i class="ph-bold ph-lightbulb text-blue-600 text-sm"></i>
+                    <span class="text-blue-600 uppercase tracking-wide text-[10px]">คำถามเชิงบริหาร (Business Question)</span>
+                </div>
+                <h4 id="bizQuestionText" class="text-xs sm:text-sm font-bold text-slate-800 leading-snug">
+                    <!-- Dynamic Question -->
+                </h4>
+                <p id="bizPurposeText" class="text-[11px] text-slate-600 leading-relaxed">
+                    <!-- Dynamic Purpose -->
+                </p>
+            </div>
+            <div class="flex-shrink-0 self-stretch sm:self-auto bg-white border border-blue-200/70 rounded-lg p-2.5 sm:px-3 sm:py-2 text-left sm:text-right">
+                <span class="text-[10px] text-slate-500 block uppercase font-medium">ข้อค้นพบเชิงประจักษ์ (Finding)</span>
+                <span id="bizFindingText" class="text-xs sm:text-sm font-bold text-blue-700 font-num block">
+                    <!-- Dynamic Finding -->
+                </span>
+            </div>
+        </div>
+
+        <!-- Main Chart Canvas Area (Spacious Responsive Container) -->
+        <div class="bg-slate-50/40 border border-slate-200 rounded-xl p-4 flex flex-col justify-between relative min-h-[340px]">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold text-slate-700" id="chartTitle">สัดส่วนมูลค่าพัสดุคงคลังแยกตาม 8 หมวดหมู่งบประมาณ</span>
+                <span class="text-[10px] text-slate-400 font-num" id="chartSubtitle">หน่วย: บาท (THB)</span>
+            </div>
+
+            <!-- Error State Overlay (Hidden by default) -->
+            <div id="chartErrorState" class="hidden absolute inset-0 bg-white/95 rounded-xl flex flex-col items-center justify-center p-6 text-center z-10">
+                <i class="ph-bold ph-warning-octagon text-rose-500 text-3xl mb-2"></i>
+                <div class="font-bold text-slate-800 text-sm mb-1">ไม่สามารถแสดงผลกราฟได้ในขณะนี้</div>
+                <p class="text-xs text-slate-500 mb-3" id="chartErrorMessage">เกิดข้อผิดพลาดในการประมวลผลข้อมูลกราฟ</p>
+                <button type="button" onclick="renderChart()" class="px-3.5 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition cursor-pointer active:scale-95">
+                    ลองใหม่อีกครั้ง
+                </button>
+            </div>
+
+            <!-- Contextual Empty State Overlay (when data is insufficient) -->
+            <div id="chartEmptyState" class="hidden absolute inset-0 bg-white/95 rounded-xl flex flex-col items-center justify-center p-6 text-center z-10 border border-dashed border-slate-200">
+                <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-2xl mb-2">
+                    <i class="ph-bold ph-funnel-x" id="chartEmptyIcon"></i>
+                </div>
+                <div class="font-bold text-slate-800 text-sm mb-1" id="chartEmptyTitle">ไม่พบข้อมูลตามเงื่อนไข</div>
+                <p class="text-xs text-slate-500 max-w-sm mb-3 leading-relaxed" id="chartEmptyMessage">ไม่มีข้อมูลที่ตรงกับตัวกรองหรือมิติการวิเคราะห์นี้</p>
+                <button type="button" onclick="resetDashFilters()" class="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 text-xs font-bold transition cursor-pointer flex items-center gap-1.5 active:scale-95">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                    <span>รีเซ็ตตัวกรองทั้งหมด</span>
+                </button>
+            </div>
+
+            <div class="h-72 sm:h-80 w-full relative">
+                <canvas id="inventoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 6. ANALYTICS & INSIGHTS LAYER (บทวิเคราะห์เชิงลึกและดัชนีประสิทธิภาพ)          -->
+    <!-- ========================================================================= -->
+    <div id="sectionAnalytics" class="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 flex flex-col gap-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-base font-bold flex-shrink-0">
+                    <i class="ph-bold ph-magnifying-glass-plus"></i>
+                </div>
+                <div>
+                    <h2 class="font-bold text-slate-800 text-sm sm:text-base">บทวิเคราะห์เชิงลึกและดัชนีประสิทธิภาพ (Analytics & Insights)</h2>
+                    <p class="text-xs text-slate-500">สรุปข้อมูลเชิงประจักษ์ สัดส่วนต้นทุน และตัวชี้วัดประสิทธิภาพรายมิติ</p>
+                </div>
+            </div>
+            <button type="button" onclick="switchMainView('docs')" class="text-blue-600 hover:text-blue-800 font-semibold text-xs inline-flex items-center gap-1 transition cursor-pointer">
+                <span>รายงานทะเบียนพัสดุ (พ.ด.)</span>
+                <i class="ph ph-arrow-right"></i>
+            </button>
+        </div>
+
+        <!-- 4 Insight Metric Cards (Unified Neutral Surfaces) -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="bg-slate-50/70 border border-slate-200 rounded-xl p-3 flex flex-col justify-between">
+                <span class="text-[11px] text-slate-500 font-semibold flex items-center gap-1">
+                    <i class="ph-fill ph-trophy text-blue-600"></i> หมวดมูลค่าสูงสุด
+                </span>
+                <div class="mt-1">
+                    <span class="font-bold text-xs sm:text-sm text-slate-800 block truncate" id="insightTopCategory">วัสดุคอมพิวเตอร์</span>
+                    <span class="text-[11px] text-blue-600 font-num font-semibold" id="insightTopCategoryVal">฿0.00</span>
+                </div>
+            </div>
+
+            <div class="bg-slate-50/70 border border-slate-200 rounded-xl p-3 flex flex-col justify-between">
+                <span class="text-[11px] text-slate-500 font-semibold flex items-center gap-1">
+                    <i class="ph-fill ph-trend-up text-blue-600"></i> เบิกจ่ายสะสมสูงสุด
+                </span>
+                <div class="mt-1">
+                    <span class="font-bold text-xs sm:text-sm text-slate-800 block truncate" id="insightTopItem">กระดาษ A4 70 แกรม</span>
+                    <span class="text-[11px] text-slate-700 font-num font-semibold" id="insightTopItemQty">0 หน่วย</span>
+                </div>
+            </div>
+
+            <div class="bg-slate-50/70 border border-slate-200 rounded-xl p-3 flex flex-col justify-between">
+                <span class="text-[11px] text-slate-500 font-semibold flex items-center gap-1">
+                    <i class="ph-fill ph-shield-check text-emerald-600"></i> ดัชนีความพร้อมสต็อก
+                </span>
+                <div class="mt-1">
+                    <span class="font-bold text-xs sm:text-sm text-emerald-700 block font-num" id="insightHealthRate">95%</span>
+                    <span class="text-[10px] text-slate-500 font-medium">สถานะสต็อกพร้อมใช้</span>
+                </div>
+            </div>
+
+            <div class="bg-slate-50/70 border border-slate-200 rounded-xl p-3 flex flex-col justify-between">
+                <span class="text-[11px] text-slate-500 font-semibold flex items-center gap-1">
+                    <i class="ph-fill ph-warehouse text-slate-600"></i> คลังหลัก: ห้องเก็บพัสดุ
+                </span>
+                <div class="mt-1">
+                    <span class="font-bold text-xs sm:text-sm text-slate-800 block font-num" id="insightWarehouseItems">37 รายการ</span>
+                    <span class="text-[10px] text-slate-500 font-medium">สถานที่จัดเก็บศูนย์กลาง</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deep Breakdown Detail Box -->
+        <div class="bg-slate-50/40 border border-slate-200 rounded-xl p-4 flex flex-col justify-between text-xs">
+            <div>
+                <div class="flex items-center gap-1.5 font-bold text-slate-800 mb-2 pb-1.5 border-b border-slate-200/80">
+                    <i class="ph-fill ph-info text-blue-600"></i>
+                    <span id="insightDetailTitle">สรุปสถิติเชิงลึก</span>
+                </div>
+                <div id="insightDetailContent" class="space-y-2 text-slate-600">
+                    <!-- Populated dynamically by JS -->
+                </div>
+            </div>
+            <div class="pt-2 border-t border-slate-200/80 flex items-center justify-between text-[11px] text-slate-400 mt-2">
+                <span>อัปเดตตามสต็อกจริง</span>
+                <button type="button" onclick="switchMainView('docs')" class="text-blue-600 hover:text-blue-800 font-semibold inline-flex items-center gap-0.5 cursor-pointer">
+                    <span>ดูรายงานสรุป (พ.ด.)</span>
+                    <i class="ph ph-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Hidden legacy compatibility element -->
+        <div id="dashAnalyticsCollapsible" class="hidden" aria-hidden="true"></div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 7. ACTION CENTER LAYER (4 หมวดความเร่งด่วน + คิวพัสดุและรายการที่ต้องดำเนินการ)     -->
+    <!-- ========================================================================= -->
+    <div id="sectionActionCenter" class="flex flex-col gap-4">
+        
+        <!-- SECTION 6.1 — ACTION PRIORITY SUMMARY (4 Operational Priority Categories) -->
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 flex flex-col gap-4">
+            <!-- Header of Action Center -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center text-base font-bold flex-shrink-0">
+                        <i class="ph-fill ph-warning-octagon"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-slate-800 text-sm sm:text-base">ศูนย์ปฏิบัติการพัสดุที่ต้องดำเนินการ (Action Priority Center)</h2>
+                        <p class="text-xs text-slate-500">จัดการรายการพัสดุที่มีความสำคัญต่อการปฏิบัติงาน เรียงลำดับตามความเร่งด่วน</p>
+                    </div>
+                </div>
+
+                <!-- Alert Banner status hook -->
+                <div id="actionCenterAlert" class="hidden text-xs text-rose-600 font-semibold items-center gap-2 bg-rose-50 border border-rose-200 px-3 py-1 rounded-full">
+                    <span class="w-2 h-2 rounded-full bg-rose-600 animate-pulse"></span>
+                    <span id="actionCenterTitle">ต้องดำเนินการ 0 รายการ</span>
+                </div>
+            </div>
+
+            <!-- 4 Operational Priority Categories (2x2 on mobile, 4 on tablet/desktop) -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs" role="region" aria-label="หมวดหมู่ความสำคัญเร่งด่วน">
+                <!-- Critical Card -->
+                <button type="button" onclick="setDashCrossFilterStatus('critical')" aria-label="พัสดุวิกฤต ต่ำกว่าเกณฑ์ Min Stock (คลิกเพื่อกรองในหน้าสรุป)" class="p-3 rounded-xl border border-slate-200/90 bg-white hover:bg-rose-50/50 hover:border-rose-300 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 active:scale-[0.98] text-left transition flex flex-col justify-between gap-2 group cursor-pointer">
+                    <div class="flex items-center justify-between w-full">
+                        <div class="flex items-center gap-1.5 font-bold text-slate-800 text-xs">
+                            <i class="ph-bold ph-warning-octagon text-rose-600 text-sm" aria-hidden="true"></i>
+                            <span>Critical (วิกฤติ)</span>
+                        </div>
+                        <span id="actionCritBadge" class="font-mono font-bold text-xs text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-lg" role="status">0</span>
+                    </div>
+                    <div class="text-[11px] text-slate-500 leading-tight">
+                        ต่ำกว่าเกณฑ์ Min Stock (สั่งซื้อทันที)
+                    </div>
+                    <div class="text-[10px] text-rose-600 font-medium inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                        <span>คลิกกรองในหน้าสรุป</span>
+                        <i class="ph ph-arrow-right"></i>
+                    </div>
+                </button>
+
+                <!-- Warning Card -->
+                <button type="button" onclick="setDashCrossFilterStatus('low')" aria-label="พัสดุแจ้งเตือน ใกล้ถึงจุดสั่งซื้อ ROP (คลิกเพื่อกรองในหน้าสรุป)" class="p-3 rounded-xl border border-slate-200/90 bg-white hover:bg-amber-50/50 hover:border-amber-300 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-1 active:scale-[0.98] text-left transition flex flex-col justify-between gap-2 group cursor-pointer">
+                    <div class="flex items-center justify-between w-full">
+                        <div class="flex items-center gap-1.5 font-bold text-slate-800 text-xs">
+                            <i class="ph-bold ph-warning text-amber-600 text-sm" aria-hidden="true"></i>
+                            <span>Warning (เฝ้าระวัง)</span>
+                        </div>
+                        <span id="actionLowBadge" class="font-mono font-bold text-xs text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-lg" role="status">0</span>
+                    </div>
+                    <div class="text-[11px] text-slate-500 leading-tight">
+                        ใกล้ถึงจุดสั่งซื้อ ROP (เตรียมจัดซื้อ)
+                    </div>
+                    <div class="text-[10px] text-amber-600 font-medium inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                        <span>คลิกกรองในหน้าสรุป</span>
+                        <i class="ph ph-arrow-right"></i>
+                    </div>
+                </button>
+
+                <!-- Pending Card -->
+                <button type="button" onclick="switchMainView('docs'); switchDocTab('requisition');" aria-label="ใบเบิกและรอจ่ายพัสดุค้างดำเนินการ" class="p-3 rounded-xl border border-slate-200/90 bg-white hover:bg-blue-50/50 hover:border-blue-300 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 active:scale-[0.98] text-left transition flex flex-col justify-between gap-2 group cursor-pointer">
+                    <div class="flex items-center justify-between w-full">
+                        <div class="flex items-center gap-1.5 font-bold text-slate-800 text-xs">
+                            <i class="ph-bold ph-clock-countdown text-blue-600 text-sm" aria-hidden="true"></i>
+                            <span>Pending (รอตัดจ่าย)</span>
+                        </div>
+                        <span id="actionPendingBadge" class="font-mono font-bold text-xs text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-lg" role="status">3</span>
+                    </div>
+                    <div class="text-[11px] text-slate-500 leading-tight">
+                        ใบเบิกและรอจ่ายพัสดุค้างดำเนินการ
+                    </div>
+                    <div class="text-[10px] text-blue-600 font-medium inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                        <span>เปิดแบบฟอร์ม</span>
+                        <i class="ph ph-arrow-right"></i>
+                    </div>
+                </button>
+
+                <!-- Review Card -->
+                <button type="button" onclick="switchMainView('yearEndAudit')" aria-label="ตรวจนับสิ้นปีงบประมาณ พ.ด.๕-๗" class="p-3 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-100/70 hover:border-slate-300 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-1 active:scale-[0.98] text-left transition flex flex-col justify-between gap-2 group cursor-pointer">
+                    <div class="flex items-center justify-between w-full">
+                        <div class="flex items-center gap-1.5 font-bold text-slate-800 text-xs">
+                            <i class="ph-bold ph-clipboard-text text-slate-600 text-sm" aria-hidden="true"></i>
+                            <span>Review (ตรวจนับ)</span>
+                        </div>
+                        <span id="actionReviewBadge" class="font-mono font-bold text-xs text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-lg" role="status">100</span>
+                    </div>
+                    <div class="text-[11px] text-slate-500 leading-tight">
+                        ตรวจนับสิ้นปีงบประมาณ พ.ด.๕-๗
+                    </div>
+                    <div class="text-[10px] text-primary-600 font-medium inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                        <span>เปิดระบบตรวจนับ</span>
+                        <i class="ph ph-arrow-right"></i>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- SECTION 6.2 — DYNAMIC ACTION PRIORITY QUEUE TABLE & MOBILE CARDS -->
+        <div id="dashActionPrioritySection" class="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 flex flex-col gap-3">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center text-sm font-bold flex-shrink-0">
+                        <i class="ph-fill ph-clock-countdown"></i>
+                    </div>
+                    <div>
+                        <h3 id="dashQueueTitle" class="font-bold text-slate-800 text-xs sm:text-sm">คิวพัสดุวิกฤตและใกล้หมดสต็อก</h3>
+                        <span id="dashQueueSubtitle" class="text-[11px] text-slate-400 hidden sm:inline">คลิกรายการเพื่อเปิด Inspector Drawer หรือกด "ดูในคลัง" เพื่อกรองพัสดุ</span>
+                    </div>
+                </div>
+                <button type="button" onclick="viewFilteredInInventory()" class="text-xs text-blue-600 hover:text-blue-800 font-semibold inline-flex items-center gap-1 flex-shrink-0 cursor-pointer" title="ส่งต่อตัวกรองปัจจุบันไปยังคลังพัสดุหลัก">
+                    <span id="dashQueueInvBtnText">ดูพัสดุทั้งหมดในคลัง</span>
+                    <i class="ph ph-arrow-right text-[10px]"></i>
+                </button>
+            </div>
+
+            <!-- Desktop / Tablet Table View (hidden on mobile) -->
+            <div class="hidden md:block overflow-x-auto rounded-xl border border-slate-200/80">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                            <th class="py-2.5 px-3">รายการพัสดุ & หมวดหมู่</th>
+                            <th class="py-2.5 px-3 text-right">คงเหลือ / Min</th>
+                            <th class="py-2.5 px-3 text-center">สถานะ</th>
+                            <th class="py-2.5 px-3 hidden lg:table-cell">สถานที่จัดเก็บ</th>
+                            <th class="py-2.5 px-3 text-right">การจัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dashCriticalItemsList" class="divide-y divide-slate-100 bg-white">
+                        <!-- Injected by JavaScript renderKPIs() -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Compact Card / List View (visible on < md, NO horizontal scroll) -->
+            <div id="dashCriticalItemsMobileList" class="md:hidden flex flex-col gap-2.5">
+                <!-- Injected by JavaScript renderKPIs() -->
+            </div>
+        </div>
+
+    </div>
+</main>
