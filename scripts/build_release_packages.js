@@ -208,13 +208,37 @@ const filesSha256Path = path.join(ROOT_DIR, 'FILES.sha256');
 fs.writeFileSync(filesSha256Path, sha256Lines.sort().join('\n') + '\n', 'utf8');
 console.log(`[CHECKSUM] Generated ${filesSha256Path} (${sha256Lines.length} files).`);
 
+function createZip(zipName, fileArgs) {
+  try {
+    execSync(`tar -acf "${zipName}" ${fileArgs}`, { cwd: ROOT_DIR });
+  } catch (e1) {
+    try {
+      execSync(`zip -r -q "${zipName}" ${fileArgs}`, { cwd: ROOT_DIR });
+    } catch (e2) {
+      throw new Error(`Failed to create ${zipName}: ${e1.message} / ${e2.message}`);
+    }
+  }
+}
+
+function extractZip(zipPath, destDir) {
+  try {
+    execSync(`tar -xf "${zipPath}" -C "${destDir}"`);
+  } catch (e1) {
+    try {
+      execSync(`unzip -q -o "${zipPath}" -d "${destDir}"`);
+    } catch (e2) {
+      throw new Error(`Failed to extract ${zipPath}: ${e1.message} / ${e2.message}`);
+    }
+  }
+}
+
 // 6. Build HRT_Inventory_v2.7.0-rc.6_Runtime.zip
 console.log(`[ZIP] Packaging ${RUNTIME_ZIP}...`);
 const runtimeZipPath = path.join(ROOT_DIR, RUNTIME_ZIP);
 if (fs.existsSync(runtimeZipPath)) fs.unlinkSync(runtimeZipPath);
 
 const runtimeArgs = RUNTIME_ALLOWLIST.map(f => `"${f}"`).join(' ');
-execSync(`tar -acf "${RUNTIME_ZIP}" ${runtimeArgs}`, { cwd: ROOT_DIR });
+createZip(RUNTIME_ZIP, runtimeArgs);
 console.log(`[ZIP] Created ${RUNTIME_ZIP} (${fs.statSync(runtimeZipPath).size} bytes).`);
 
 // 7. Build HRT_Inventory_v2.7.0-rc.6_Handover.zip
@@ -229,7 +253,6 @@ const handoverEntries = [
   'FILES.sha256',
   'README.md',
   'Implementation_Brief_Google_Antigravity.md',
-  'baseline_report.md',
   'Master_Items.csv',
   'Transactions.csv',
   'generate_inventory.py',
@@ -240,8 +263,11 @@ const handoverEntries = [
   'tests'
 ];
 
-const handoverArgs = handoverEntries.map(e => `"${e}"`).join(' ');
-execSync(`tar -acf "${HANDOVER_ZIP}" ${handoverArgs}`, { cwd: ROOT_DIR });
+const handoverArgs = handoverEntries
+  .filter(e => fs.existsSync(path.join(ROOT_DIR, e)))
+  .map(e => `"${e}"`)
+  .join(' ');
+createZip(HANDOVER_ZIP, handoverArgs);
 console.log(`[ZIP] Created ${HANDOVER_ZIP} (${fs.statSync(handoverZipPath).size} bytes).`);
 
 // 8. Compute External Checksums for Archives
@@ -265,7 +291,7 @@ const tempVerifyDir = path.join(ROOT_DIR, 'tmp_verify_release');
 if (fs.existsSync(tempVerifyDir)) fs.rmSync(tempVerifyDir, { recursive: true, force: true });
 fs.mkdirSync(tempVerifyDir, { recursive: true });
 
-execSync(`tar -xf "${runtimeZipPath}" -C "${tempVerifyDir}"`);
+extractZip(runtimeZipPath, tempVerifyDir);
 
 RUNTIME_ALLOWLIST.forEach(file => {
   const extractedPath = path.join(tempVerifyDir, file);

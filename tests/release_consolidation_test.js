@@ -125,19 +125,35 @@ runTest('REL-05', 'Release ZIP packages verify integrity, extraction, and syntax
   const runtimeZip = path.join(__dirname, '..', 'HRT_Inventory_v2.7.0-rc.6_Runtime.zip');
   const handoverZip = path.join(__dirname, '..', 'HRT_Inventory_v2.7.0-rc.6_Handover.zip');
 
+  if (!fs.existsSync(runtimeZip) || !fs.existsSync(handoverZip)) {
+    try {
+      execSync(`node "${path.join(__dirname, '..', 'scripts', 'build_release_packages.js')}"`, { cwd: path.join(__dirname, '..') });
+    } catch (e) {
+      // proceed to assertion
+    }
+  }
+
   assert.ok(fs.existsSync(runtimeZip), 'Runtime ZIP package must exist');
   assert.ok(fs.existsSync(handoverZip), 'Handover ZIP package must exist');
   assert.ok(fs.statSync(runtimeZip).size > 100000, 'Runtime ZIP must be non-empty (>100KB)');
   assert.ok(fs.statSync(handoverZip).size > 500000, 'Handover ZIP must be non-empty (>500KB)');
 
-  // Verify extraction via tar
+  // Verify extraction via tar or unzip (cross-platform Linux/Windows support)
   const tempVerifyDir = path.join(__dirname, '..', 'tmp_verify_release');
   if (fs.existsSync(tempVerifyDir)) {
     fs.rmSync(tempVerifyDir, { recursive: true, force: true });
   }
   fs.mkdirSync(tempVerifyDir, { recursive: true });
 
-  execSync(`tar -xf "${runtimeZip}" -C "${tempVerifyDir}"`);
+  try {
+    execSync(`tar -xf "${runtimeZip}" -C "${tempVerifyDir}"`);
+  } catch (e1) {
+    try {
+      execSync(`unzip -q -o "${runtimeZip}" -d "${tempVerifyDir}"`);
+    } catch (e2) {
+      throw new Error(`Failed to extract ${runtimeZip}: ${e1.message} / ${e2.message}`);
+    }
+  }
 
   // Verify extracted files match runtime allowlist
   const expectedRuntime = ['Config.gs', 'Api.gs', 'Read.gs', 'Write.gs', 'Audit.gs', 'Code.gs', 'index.html', 'MiniUI.html', 'appsscript.json'];
